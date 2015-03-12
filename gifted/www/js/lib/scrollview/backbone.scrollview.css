@@ -1,0 +1,95 @@
+.scrollview {/*
+	display: -webkit-flex;
+	display: -moz-flex;
+	display: -ms-flexbox;
+	display: flex;
+	display: box;
+	-webkit-flex-direction: column;
+	-moz-flex-direction: column;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	box-orient: vertical;*/
+	width:100%;
+	height:100%;
+}
+.scrollview_content {
+	width:100%;
+	position:relative;
+	overflow:hidden;
+	background-color:#F4F4F4;
+	/*flex:1;
+	box-flex:1;*/
+}
+.scrollview_topbar {
+	padding-top:5px;
+	height:52px;
+	width:100%;
+	border-bottom: solid 1px gray;
+}
+.scrollview_bottombar {
+	width:100%;
+	height:45px;
+	border-top: solid 1px gray;
+}
+.scrollview_panel {
+	height:100%!important;
+	width:100%;
+}
+.scrollview_content_wrap {
+}
+
+.pullDown, .pullUp {
+	height:40px;
+	line-height:40px;
+	/*padding:5px 10px 0px 10px;*/
+	/*border-bottom:1px solid #ccc;*/
+	font-weight:bold;
+	font-size:14px;
+	color:#888;
+}
+/*.pullDownIcon:before,.pullUpIcon:before{*/
+.pullDown .pullDownIcon, .pullUp .pullUpIcon  {
+	display:table-cell; 
+	width:40px; /*height:40px;*/
+	background:url(pull-icon@2x.png) 0 0 no-repeat;
+	-webkit-background-size:40px 80px; background-size:40px 80px;
+	-webkit-transition-property:-webkit-transform;
+	-webkit-transition-duration:250ms;	
+}
+.pullDown .pullDownIcon {
+	-webkit-transform:rotate(0deg) translateZ(0);
+}
+.pullUp .pullUpIcon  {
+	-webkit-transform:rotate(-180deg) translateZ(0);
+}
+.pullDown.flip .pullDownIcon {
+	-webkit-transform:rotate(-180deg) translateZ(0);
+}
+.pullUp.flip .pullUpIcon {
+	-webkit-transform:rotate(0deg) translateZ(0);
+}
+.pullDown.loading .pullDownIcon, .pullUp.loading .pullUpIcon {
+	background-position:0 100%;
+	-webkit-transform:rotate(0deg) translateZ(0);
+	-webkit-transition-duration:0ms;
+	-webkit-animation-name:loading;
+	-webkit-animation-duration:2s;
+	-webkit-animation-iteration-count:infinite;
+	-webkit-animation-timing-function:linear;
+}
+.pullUpLabel, .pullDownLabel{
+	height:40px;
+	line-height:40px;
+	font-weight:bold;
+	font-size:14px;
+	color:#888;
+	text-align:center;
+	/*background:#fff;*/
+}
+.alignwithtable {
+	display:table;
+	margin:0 auto;
+}
+.tophead {
+	z-index:1001;
+}

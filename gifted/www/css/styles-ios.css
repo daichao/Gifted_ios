@@ -1,0 +1,48 @@
+/*
+.fixed_header {
+	height:45px;
+	top:20px;
+}
+.ui-page {
+	top:20px;
+}
+.ui-page {
+	margin-top:20px;
+}
+*/
+/*
+.fixed_header span {
+	top:10px;
+}
+.fixed_header span.header_right {
+	top:20px;
+}
+body {
+	position:relative;
+	top:20px;
+}
+*/
+/*.headbar_sign, .headbar_action_navigator:after, .headbar_action_back:after {
+	padding-top:15px;
+}
+.header_right {
+	padding-top:20px;
+}
+.ui-header .ui-input-search {
+	padding-top:7px;
+	padding-right:5px;
+	margin:5px 5px 5px 5px;
+}
+.ui-alt-icon.ui-icon-search:after, .ui-alt-icon .ui-icon-search:after, .ui-input-search:after {
+	padding-top:10px;
+}
+.navigator {
+	margin-top:53px;
+}
+*/
+.ui-input-search {
+	margin-top:0px;
+}
+.product_search_title {
+	max-width:130px;
+}

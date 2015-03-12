@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<!-- meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" -->
+	<meta name="viewport" content="height=device-height,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta property="og:title" content="5ProApp’s WebSite" />
+	<meta property="og:type" content="Gifted"/>
+	<meta property="og:description" content="Worldwide Gift Shipping"/>
+	<!--meta property="fb:admins" content="100001422224225" /-->
+	<!--meta property="fb:page_id" content="241333394220" /--> 
+	<!--meta property="fb:app_id" content="89186614300" /-->
+	<!--meta property="og:image" content="http://gifted.5proapp.com/logo.gif" /-->
+	<!--meta property="og:url" content="http://gifted.5proapp.comm" /-->
+	<!--meta property="og:site_name" content="gifted.5proapp.com" /-->
+	<!--meta property="og:locale" content="zn_CN" /-->
+	<link rel="stylesheet" href="css/awesome-4.3.0/css/font-awesome.min.css"/>
+	<script type="text/javascript" src="cordova-2.6.0.js"></script> <!-- type="text/javascript"  Not Support Require -->
+	<script type="text/javascript" data-main="init" src="js/lib/require.js"></script> <!-- data-main="init"  -->
+	<script>
+		function NotificationCallback(url) { // for notification
+			if (url.indexOf('#')>=0) {
+				var href = url.substring(url.indexOf('#'));
+				console.log('NotificationCallback.href:'+query);
+				window.location.href = href
+			} else {
+				alert('Not Support:'+url);
+			}
+		}
+	</script>
+</head>
+<body style="margin:0px;padding:0px;">
+	<img style="margin:0px;padding:0px;height:100%;width:100%;" src="img/gifted_bg.png" />
+</body>
+</html>

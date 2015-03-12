@@ -1,0 +1,154 @@
+
+.product_catalog_search {
+	position: relative;
+	margin:0;
+	padding:0;
+}
+.product_catalog_wrapper {
+	position: relative;
+	margin:0;
+	padding:0;
+}
+.product_catalog_list li {
+    line-height: 0;
+    list-style-type: none;
+}
+.product_catalog_item  {
+	/* background-clip: border-box; */
+	/* background-attachment: inherit; */
+	/* background-origin: inherit; */
+	display:inline-block;
+	cursor:pointer;
+    padding:0px;
+	width: 50%;
+	height: 50vw;
+	float:left;
+	/*background: url(../images/product_catalog.png) 0 0 no-repeat !important;*/
+}
+.product_catalog_item span {
+	background-color: white;
+	color: #FD6D05;
+	/* min-height: 50px; */
+	font-size: 1em;
+	font-weight: bold;
+	border-radius: 3px;
+	padding: 5px;
+	filter: alpha(opacity=90);
+	-moz-opacity: 0.90;
+	opacity: 0.90;
+}
+.product_catalog_image  {
+	width: 100%;
+	height: 100%;
+	/*background: url(../images/product_catalog.png) 0 0 no-repeat !important;*/
+}
+.product_catalog_1 {
+	background: url(../images/Advertising_Gifts_Premium.jpg) 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_2 {
+	background: url("../images/Bags & Leathers.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_3 {
+	background: url("../images/Beauty Products & Accessories.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_4 {
+	background: url("../images/Corporate Gifts.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_5 {
+	background: url("../images/Ceramics, Crystals & Glasses.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_6 {
+	background: url("../images/Product Design Service.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_7 {
+	background: url("../images/Fashion Jewelry & Accessories.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_8 {
+	background: url("../images/Figurines & Accessories.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_9 {
+	background: url("../images/Food.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_10 {
+	background: url("../images/Green Gifts.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_11 {
+	background: url("../images/Hiking & Camping Products.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_12 {
+	background: url("../images/Home & Kitchen.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_13 {
+	background: url("../images/Luggage & Travel Goods.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_14 {
+	background: url("../images/Party & Festive items.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_15 {
+	background: url("../images/Wedding Favours.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_16 {
+	background: url("../images/Packaging & Paper.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_17 {
+	background: url("../images/Personal & Well being Gifts.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_18 {
+	background: url("../images/Pictures & Photo Frames.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_19 {
+	background: url("../images/Stationery.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_20 {
+	background: url("../images/Tech Gifts.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_21 {
+	background: url("../images/Testing, Inspection & Certification.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_22 {
+	background: url("../images/Tools.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_23 {
+	background: url("../images/Toys & Sporting Goods.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_24 {
+	background: url("../images/Umbrella & Outdoor Goods.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+.product_catalog_25 {
+	background: url("../images/Watches & Clocks.jpg") 0 0 no-repeat !important;
+	background-size: cover;
+}
+
+.product_catalog_item:nth-child(odd){
+	border-right:solid 1px white;
+	border-bottom:solid 1px white;
+}
+
+.product_catalog_item:nth-child(even){
+	border-bottom:solid 1px white;
+}
+

@@ -1,0 +1,36 @@
+.notlogined {
+	display:none;
+}
+.setting_list li>label {
+	display:inline-block;
+	line-height:50px;
+	font-weight:bold;
+}
+.setting_list fieldset {
+	display:inline-block;
+	float:right;
+}
+.setting_list li {
+	border-bottom: solid 1px rgba(0, 0, 0, 0.2);
+}
+.setting_list .ui-radio {
+	width:90px;
+}
+.setting_list .settings-currency {
+	min-width:120px;
+}
+.setting_list .settings-servers {
+	min-width:120px;
+}
+.setting_list .settings-clearcache {
+	min-width:120px;
+}
+.settings-logout {
+	width: 100% !important;
+	color: white !important;
+	background-color: #FD6D05 !important;
+}
+
+.about_tabs_content {
+	padding:5px;
+}

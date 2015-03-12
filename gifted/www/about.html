@@ -1,0 +1,87 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0" />
+<script type="text/javascript" charset="utf-8" src="./js/frame/cordova-2.6.0.js"></script>
+<script type="text/javascript">
+window.echo = function(str, callback) {
+	var exec = cordova.require('cordova/exec');
+	exec(
+		callback, 
+		function(err) {
+			alert('Nothing to echo:' + err);
+		}, 
+		"Echo", "echo", [str]);
+};
+function test() {
+	window.echo("echo me", //
+		function(value) {
+			alert(value); // should alert true.
+		}
+	);
+}
+/*********test***************/
+// 响铃3声  
+function playBeep() {
+	navigator.notification.beep(3);
+}
+// 振动  
+function vibrate() { // Vibrate for 1 seconds  
+	navigator.notification.vibrate(1000);
+}
+// 跳转  
+function intent() {
+	navigator.intent.demo(1);
+}
+$(document).ready(
+	function() {
+		$('#checkconn-btn').bind('click', function(){
+			Gifted.Plugin.dispatch('checkConnection', [], 
+				function(val){alert(val);}
+			);
+		});
+		$('#cacheimg-btn').bind("click", function() {
+			try {
+				Gifted.Cache.localFile(
+					'http://www.leedongifted.com/upimages/hp_images/topic4.jpg',
+					'testcacheimg', //
+					'image-btn');
+			} catch (E) {
+				alert(E.message);
+			}
+		});
+		$('#test1-btn').bind('click', function(){
+			window.location.href='test/Accelerometer1.html';
+		});
+		$('#test2-btn').bind('click', function(){
+			window.location.href='test/Accelerometer2.html';
+		});
+	});
+</script>
+</head>
+<body>
+About Us
+<p>
+	<a href="#" onclick="test(); return false;">Echo</a>
+</p>
+<p>
+	<a href="#" onclick="playBeep(); return false;">Play Beep</a>
+</p>
+<p>
+	<a href="#" onclick="vibrate(); return false;">Vibrate</a>
+</p>
+<!-- 
+<p>
+	<a href="#" onclick="intent(); return false;">Goto Android</a>
+</p>
+-->
+<!--  -->
+<a href="#" data-rel="test" data-role="button" data-inline="true"
+	data-theme="" data-icon="" id="checkconn-btn">Test NewWork</a>
+<a href="#" data-rel="test" data-role="button" data-inline="true"
+	data-theme="" data-icon="" id="test1-btn">TestAccelerometer1</a>
+<a href="#" data-rel="test" data-role="button" data-inline="true"
+	data-theme="" data-icon="" id="test2-btn">TestAccelerometer2</a>
+</body>
+</html>

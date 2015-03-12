@@ -1,0 +1,51 @@
+
+.ui-input-search {
+	position: absolute;
+	top: 10px;
+	right: 0px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	padding-left: 0px;
+	margin: 0px;
+	margin-right: 5px;
+	margin-bottom: 5px;
+	width: 80%;
+}
+.product_search_title2 {
+	font-size:25px;
+	font-weight:bold;
+	color:gray;
+	text-align:center;
+	
+	top:200px;
+	margin:0px;
+	padding:0px;
+	padding-top:120px;
+
+	width:100%;
+	/*position:absolute;
+	-webkit-transform: translateZ(80);
+	-moz-transform: translateZ(80);
+	-ms-transform: translateZ(80);
+	-o-transform: translateZ(80);
+	transform: translateZ(80);*/
+}
+.product_search_title {
+	font-size:13px;
+	font-weight:bold;
+	color:green;
+	/*z-Index:99999;*/
+	float:right;
+	padding:0;
+	width:0px;
+	display:none;
+    /*
+    cursor: pointer; 
+	background: url(../../../../css/images/icons-png/refresh-black.png) center center norepeat; 
+    background-color:gray;
+	background-size: cover;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    */
+}
