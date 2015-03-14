@@ -3,10 +3,8 @@ define(['modules/product/templates/productchoosecatalog_new','modules/product/vi
 		templateTop:Handlebars.compile(tpl.top),
 		templateContent:Handlebars.compile(tpl.content),
 		events:{
-			//'tap .headbar_sign':'openNavigate',
 			'tap .headbar_sign':'back',
 			'tap .header_search':'openSearch',
-			'tap .product_back_home':'backHome',
 			'tap .product_catalog_item':'doSearchCatalog',
 			"change .search_input":'doSearchContent'
 		},

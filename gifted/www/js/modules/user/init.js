@@ -78,35 +78,38 @@ define(['modules/user/models/models'
         	require(['modules/user/views/UserInteractiveView'],_.bind(function(UserInteractiveView){
         		if (!userId || userId == 'navigate')
         			userId = this.app.user.get('ID'); // 看自己的信息
-        		//var hv = this.app.selectView('userinteractive_'+userId,_.bind(function(){
-	    		var hv = this.app.createView('userinteractive_'+userId,_.bind(function(){
+        		var hv = this.app.selectView('userinteractive_'+userId,_.bind(function(){
+	    		//var hv = this.app.createView('userinteractive_'+userId,_.bind(function(){
 	    			var model = new UserInteractiveModel(userId); // 复合 Model
 	    			var result = new UserInteractiveView({model:model,app:this.app});
 	    			this.app.pageContainer.append(result.$el);
 	    			result.key = 'UserInteractiveView';
 	    			result.render();
+					result.loadData();
 	    			return result;
 	    		},this));
 	    		if (this.app.currentView && 
 	    			(this.app.currentView.key=='UserInfoView' 
 	    			|| this.app.currentView.key=='ProductDetailView'
-	    			|| this.app.currentView.key=='ProductSearchView')) 
-	    			this.app.changeView(hv,{reverse:true}); 
-	    		else
-	    			this.app.changeView(hv); 
+	    			|| this.app.currentView.key=='ProductSearchView')) {
+	    			this.app.changeView(hv,{reverse:true});
+	    		} else {
+	    			this.app.changeView(hv);
+	    		}
         	},this));
         };
         this.userInfo = function(userId){
         	require(['modules/user/views/UserInfoView'],_.bind(function(UserInfoView){
         		if (!userId || userId == 'navigate')
         			userId = this.app.user.get('ID'); // 看自己的信息
-	    		//var hv = this.app.createView('userinfo_'+userId,_.bind(function(){
 	    		var hv = this.app.selectView('userinfo_'+userId,_.bind(function(){
+	    		//var hv = this.app.createView('userinfo_'+userId,_.bind(function(){
 	    			var model = new Publisher(userId); // Bean Model
 	    			var result = new UserInfoView({model:model,app:this.app});
 	    			this.app.pageContainer.append(result.$el);
 	    			result.key = 'UserInfoView';
 	    			result.render();
+					result.loadData();
 	    			return result;
 	    		},this));
 	    		if (this.app.currentView && this.app.currentView.key=='UserEditView') 
@@ -118,7 +121,7 @@ define(['modules/user/models/models'
         this.userEdit = function(){
         	require(['modules/user/views/UserEditView'],_.bind(function(UserEditView){
         		//if (!userId || userId == 'navigate')
-        		//var userId = this.app.user.get('ID'); // 看自己的信息
+        		//	  userId = this.app.user.get('ID'); // 看自己的信息
 	    		//var hv = this.app.createView('useredit',_.bind(function(){
 	    		var hv = this.app.selectView('useredit',_.bind(function(){
 	    			var model = new UserEditModel(); // 复合 Model

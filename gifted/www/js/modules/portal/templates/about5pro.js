@@ -1,7 +1,7 @@
 define(['css!lib/mobitabs/jquery.mobile.tabs.css'],function(){
 	var result = {};
 	result.top = '<span class="headbar_sign">'+
-					'<div class="headbar_action headbar_action_navigator">G</div>'+
+					'<div class="headbar_action">G</div>'+
 				'</span>';
 	result.content = 
 				'<p>' +

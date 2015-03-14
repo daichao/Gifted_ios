@@ -3,7 +3,7 @@ define(['css!modules/product/styles/productlist.css'
 	var result = {};
 	result.top =
 		'<span class="headbar_sign">'+
-			'<div class="headbar_action headbar_action_back">G</div>'+
+			'<div class="headbar_action">G</div>'+
 		'</span>'+
 		'<input type="search" class="header_right_input search_input" data-clear-btn="true" data-wrapper-class="searchbox"></input>'+
 		'<div class="product_search_title vertical-align"></div>';
@@ -48,6 +48,3 @@ define(['css!modules/product/styles/productlist.css'
 	//<option value="inputQDL">起定量</option> 范围选择
 	//<option value="inputYXQ">有效期</option> 范围选择
 });
-//srcset="http://gifted.qiniudn.com/BBB?imageView/2/w/200/q/50 480w,
-//http://gifted.qiniudn.com/BBB?imageView/2/w/800/q/50 768w,
-//http://gifted.qiniudn.com/BBB?imageView/2/w/800/q/50 979w"/>\

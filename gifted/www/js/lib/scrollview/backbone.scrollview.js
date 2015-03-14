@@ -30,14 +30,18 @@ define(deps, function(util) {
 			return null;
 		},
 		initSwipeEffect:function(){
-			/*if(this.effectInited)
+			if(this.effectInited)
 				return;
-			this.$el.on('touchstart',_.bind(this.onTouchStart,this));
-			this.$el.on('touchmove',_.bind(this.onTouchMove,this));
-			this.$el.on('touchend',_.bind(this.onTouchEnd,this));
-			this.$el.on('touchcancel',_.bind(this.onTouchCancel,this));
+			this.el.addEventListener('touchstart',_.bind(this.onTouchStart,this));
+			this.el.addEventListener('touchmove',_.bind(this.onTouchMove,this));
+			this.el.addEventListener('touchend',_.bind(this.onTouchEnd,this));
+			this.el.addEventListener('touchcancel',_.bind(this.onTouchCancel,this));
+//			this.$el.on('touchstart',_.bind(this.onTouchStart,this));
+//			this.$el.on('touchmove',_.bind(this.onTouchMove,this));
+//			this.$el.on('touchend',_.bind(this.onTouchEnd,this));
+//			this.$el.on('touchcancel',_.bind(this.onTouchCancel,this));
 //			this.$el.on('swiptright',_.bind(this.onSwipeRight,this));
-			this.effectInited = true;*/
+			this.effectInited = true;
 		},
 //		onSwipeRight:function(e){
 //			if(this.swiping){
@@ -53,7 +57,7 @@ define(deps, function(util) {
 			if(this.inTransition)
 				return;
 			this.swiping=true;
-			var originEvent = e.originalEvent;
+			var originEvent = e;
 			var pos = originEvent.touches ? originEvent.touches[0] : originEvent;
 			this.startX = pos.pageX;
 			if(this.startX>40){
@@ -78,7 +82,7 @@ define(deps, function(util) {
 		},
 		onTouchMove:function(e){
 			if(this.swiping){
-				var originEvent = e.originalEvent;
+				var originEvent = e;
 				var pos = originEvent.touches ? originEvent.touches[0] : originEvent;
 				var curX = pos.pageX;
 				if(Math.abs(curX-this.lastX)<2)
@@ -180,6 +184,7 @@ define(deps, function(util) {
     	    }
 		},
 		render:function(){
+			this.beforeRender();
 			this.scrollDestroy();
 			this.$el.html(this.template());
 			this.$topbarEl = this.getTopbarEl();
@@ -190,13 +195,29 @@ define(deps, function(util) {
 			this.bottomRender();
 			this.caculateHeight();
 			this.scrollRender();
+			this.afterRender();
+		},
+		beforeRender:function(){
+		},
+		afterRender:function(){
 			this.initSwipeEffect();
+			/*if(this.effectInited)
+				return;
+			this.$el.on('touchstart',_.bind(this.onTouchStart,this));
+			this.$el.on('touchmove',_.bind(this.onTouchMove,this));
+			this.$el.on('touchend',_.bind(this.onTouchEnd,this));
+			this.$el.on('touchcancel',_.bind(this.onTouchCancel,this));
+//			this.$el.on('swiptright',_.bind(this.onSwipeRight,this));
+			this.effectInited = true;*/
 		},
 		caculateHeight:function(){
 			//这里需要计算content的高度
-			var h = this.$el.height()-this.$topbarEl.height();
+			var h = this.$el.height();
+			if(this.$topbarEl.is(':visible')){
+				h-=this.$topbarEl.outerHeight();
+			}
 			if(this.$bottombarEl.is(':visible')){
-				h-=this.$bottombarEl.height();
+				h-=this.$bottombarEl.outerHeight();
 			}
 			this.$el.find('.'+this.scrollClassName).height(h);
 		},
@@ -306,7 +327,7 @@ define(deps, function(util) {
             	this.scroll.refresh();
 	        }
 			this.$el.translate(); // 翻译 after content refresh
-			console.log('已描绘完DOM');
+			console.log('已描绘完View');
 		},
 		onRefreshComplete:function(){
 			if(this.$el.find('.pullDown').hasClass('loading')){
@@ -325,7 +346,7 @@ define(deps, function(util) {
             	this.scroll.refresh();
 	        }
 			this.$el.translate(); // 翻译 after load data
-			console.log('已刷新完DOM');
+			console.log('已刷新完View');
 		},
 		onScrollRelease:function(){
 			if(!this.topBound && !this.bottomBound)

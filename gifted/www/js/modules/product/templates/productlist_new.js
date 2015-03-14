@@ -2,7 +2,7 @@ define(['css!modules/product/styles/productlist.css'],function(){
 	var result = {};
 	result.top =
 		'<span class="headbar_sign">\
-			<div class="headbar_action headbar_action_navigator">G</div>\
+			<div class="headbar_action">G</div>\
 		</span>\
 		<span class="header_right header_camera"></span>\
 		<span class="header_right header_refresh"></span>\
@@ -21,6 +21,3 @@ define(['css!modules/product/styles/productlist.css'],function(){
 		</div>';
 	return result;
 });
-//srcset="http://gifted.qiniudn.com/BBB?imageView/2/w/200/q/50 480w,
-//http://gifted.qiniudn.com/BBB?imageView/2/w/800/q/50 768w,
-//http://gifted.qiniudn.com/BBB?imageView/2/w/800/q/50 979w"/>\

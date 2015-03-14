@@ -25,7 +25,7 @@
 .setting_list .settings-clearcache {
 	min-width:120px;
 }
-.settings-logout {
+.setting-button {
 	width: 100% !important;
 	color: white !important;
 	background-color: #FD6D05 !important;

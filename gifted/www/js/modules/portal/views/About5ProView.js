@@ -7,8 +7,7 @@ define(['modules/portal/templates/about5pro', 'handlebars', 'jquery.mobitabs'],f
 	    	About5ProView.__super__.initialize.apply(this, arguments);
 	    },
 	    events:{
-			"tap .headbar_sign":"openNavigate"
-	    	//"tap .headbar_sign":"back"
+	    	"tap .headbar_sign":"back"
 		},
 		render:function() {
 			this.tabs = this.$el.find('[data-role="tabs"]').tabs();
@@ -21,9 +20,6 @@ define(['modules/portal/templates/about5pro', 'handlebars', 'jquery.mobitabs'],f
 	    	this.$el.find('.'+this.scrollClassName).height(3024);
 		},
 	    remove : function() {
-			if (this.app) {
-	    		delete this.app;
-	    	}
 	    	if (this.tabs) {
 	    		this.tabs.off('afterTabShow');
 	    	}

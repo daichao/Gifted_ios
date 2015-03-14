@@ -9,7 +9,7 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 		//scrollClassName:'product_list_content',
 	    // public
 		events:{
-			'tap .headbar_sign':'openNavigate',
+			'tap .headbar_sign':'back',
 			'tap .header_search':'openSearch',
 			'tap .header_camera':'newProduct',
 			'tap .header_refresh':'refreshPage',
@@ -148,10 +148,12 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 				cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
 				cw=cw-20;
 				h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
-				h=h*4/5;
+				h=Math.round(h*4/5);
+				if (cw<0)
+					return false;
 				//var r=json.PHOTOURLS[i].PHOTORADIO;
 				//h=r?Math.round(cw/r):cw;
-				Gifted.Cache.localFile(json.PHOTOURLS[0].PHOTOURL+'?imageView/1/w/'+cw+'/h/'+h+'/q/80', //'/h/'+h+
+				Gifted.Cache.localFile(json.PHOTOURLS[0].PHOTOURL+'?imageView2/1/w/'+cw+'/h/'+h+'/q/80', //'/h/'+h+
 					json.PHOTOURLS[0].PHOTOID+'_1_'+cw+'_'+h+'_80', //'_'+h+
 					domImg); // remoteURL, imgID, domImg
 				return true; // 图片刷新成功的标记
@@ -189,7 +191,9 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 			//cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
 			cw=cw-20;
 			//h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
-			//h=h*4/5;
+			//h=Math.round(h*4/5);
+			if (cw<0)
+				return false;
 			//json._maxListWidth=cw;
 			//json._maxListHeight=h;
 			/*var heightRule=Math.round(window.screen.height*3/5);
@@ -244,7 +248,7 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 					var domImg=domImgs[0];
 					
 					var cw=json._maxListWidth, h=json._maxListHeight;
-					Gifted.Cache.localFile(json.PHOTOURLS[0].PHOTOURL+'?imageView/1/w/'+cw+'/h/'+h+'/q/50',  
+					Gifted.Cache.localFile(json.PHOTOURLS[0].PHOTOURL+'?imageView2/1/w/'+cw+'/h/'+h+'/q/50',  
 						json.PHOTOURLS[0].PHOTOID+'_1_'+cw+'_'+h+'_50', 
 						domImg); // remoteURL, imgID, domImg
 				},this,json));

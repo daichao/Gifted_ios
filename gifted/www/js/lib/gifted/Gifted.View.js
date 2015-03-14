@@ -28,21 +28,62 @@ define(['underscore','backbone','backbone.scrollview'],function(_){
 			}
 			return null;
 		},
-	    // public
-		back:function(event){
-			if (Backbone.history.history.length>1) {
-				Backbone.history.history.back();
-			} else {
-	    		this.backHome(event);
-			}
+		// abstract
+		topbarRender:function(){
+	    	Gifted.View.__super__.topbarRender.apply(this, arguments);
 		},
+		// abstract
+		bottomRender:function(){
+	    	Gifted.View.__super__.bottomRender.apply(this, arguments);
+		},
+		refreshHeadBar:function() {
+	    	if (this.key=='home') {
+	    		//while(Backbone.history.handlers.length>1) {
+	    		//	Backbone.history.handlers.pop();
+	    		//}
+	    		this.$el.find('.headbar_action').removeClass('headbar_action_back').addClass('headbar_action_navigator');
+	    	} else {
+		    	if (this.prevView) {
+			    	this.$el.find('.headbar_action').removeClass('headbar_action_navigator').addClass('headbar_action_back');
+		    	} else {
+			    	this.$el.find('.headbar_action').removeClass('headbar_action_back').addClass('headbar_action_navigator');
+		    	}
+	    	}
+		},
+	    onActive:function(){
+	    	Gifted.View.__super__.onActive.apply(this, arguments);
+	    	this.refreshHeadBar();
+	    },
+	    onRefreshContent:function(){
+	    	Gifted.View.__super__.onRefreshContent.apply(this, arguments);
+	    	this.refreshHeadBar();
+	    },
 	    // public
 	    backHome:function(event){
 	    	this.app.navigate('home', {trigger:true});
 	    },
 	    // public
+		back:function(event){
+			if (this.$el.find('.headbar_action').hasClass('headbar_action_navigator') 
+				|| this.$el.find('.headbar_action').hasClass('headbar_action_navigator2')) { // 优先判断css
+				this.openNavigate(event);
+				return;
+			}
+			if (Backbone.history.history.length>1) {
+				Backbone.history.history.back();
+			} else {
+	    		this.app.navigate('home', {trigger:true});
+			}
+		},
+	    // public
 		openNavigate:function(event){
-			this.app.navigate('navigate', {trigger:true});
+			if (this.$el.find('.headbar_action').hasClass('headbar_action_back')) { // 优先判断css
+				this.back(event);
+				return;
+			}
+			//this.app.navigate('navigate', {trigger:true});
+			//this.app.loadUrl('navigate');
+			this.app.trigger('route:navigator');
 		},
 	    // public
 	    openSearch:function(event) {
@@ -57,13 +98,7 @@ define(['underscore','backbone','backbone.scrollview'],function(_){
 	    	console.log('openLink,'+href);
 	    	if (href && href!='tel:+' && href!='mailto:')
 	    		window.location.href=href;
-	    	//$(event.target).click();
 	    },
-	    //openCatalog:function(event) {
-	    //	event.stopPropagation();
-		//  	event.preventDefault();
-		//	this.app.navigate('product/choosecatalog', {trigger:true,transition:'slidetop'});
-	    //},
 	    // public
 		showLoading:function() {
 			Gifted.Global.showLoading();
@@ -72,27 +107,42 @@ define(['underscore','backbone','backbone.scrollview'],function(_){
 		hideLoading:function() {
 			Gifted.Global.hideLoading();
 		},
-	    // public
+	    // protected
 	    refresh:function() {
-	    	//this.trigger('refreshcontent');
 	    	this.onRefreshContent();
 		},
-		// protected
+		// public
 		render:function(){
 			Gifted.View.__super__.render.apply(this,arguments);
-			//this.trigger('refreshcontent');
 			this.onRefreshContent();
 		},
+		removeOWLCanvas:function() {
+        	if (Gifted.Config.isCanvasCarouel) { // 启用CanvasCarouel或OWLCarousel的开关
+	        	this.$el.find('.canvascarousel').carouseldestroy();
+        	} else {
+		    	this.$el.find('.owl-carousel').off('swipeleft swiperight touchstart');
+		    	if (this.owl) {
+					this.owl.destroy();
+					delete this.owl;
+				}
+		    	if(this.othersOwl){//其他产品的图片控件
+					this.othersOwl.destroy();
+					delete this.othersOwl;
+		    	}
+	    	}
+		},
 		remove:function(){
-			Gifted.View.__super__.remove.apply(this,arguments);
+			if (this.app) {
+				delete this.app;
+			}
 			var tt = this.model||this.collection;
 			if (tt) {
 	    		tt.off("request");
 	    		tt.off("sync");
 	    		tt.off("error");
 			}
-			if(this.app)
-				delete this.app;
+			this.removeOWLCanvas();
+			Gifted.View.__super__.remove.apply(this,arguments);
 		},
 		hint:function(event){				
 			var input = $(event.target).val();

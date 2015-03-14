@@ -6,8 +6,7 @@ define(['modules/portal/templates/settings', 'handlebars'],function(mod0){
 			this.app.user.on('logoutComplete',this.logoutComplete,this);
 		},
 	    events:{
-			"tap .headbar_sign":"openNavigate",
-	    	//"tap .headbar_sign":"back",
+	    	"tap .headbar_sign":"back",
 			"change .settings-language-radio":"switchLanguage",
 			"change .settings-servers":"switchServer",
 			"change .settings-currency":"switchCurrency",
@@ -46,10 +45,7 @@ define(['modules/portal/templates/settings', 'handlebars'],function(mod0){
 		},
 		remove:function(){
 	    	this.app.user.off('logoutComplete',this.logoutComplete,this);
-			if (this.app) {
-	    		delete this.app;
-	    	}
-            Gifted.View.prototype.remove.apply(this, arguments);
+            SettingsView.__super__.remove.apply(this, arguments);
 		}
 	});
 	return SettingsView;

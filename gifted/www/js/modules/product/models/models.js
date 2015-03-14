@@ -2,6 +2,7 @@ define(['moment'],function(monent){
 	var catalogs = TRANSLATE.getCurrentLangItem(null,'CatalogData');
 	Product = Backbone.Model.extend({
 		idAttribute: "ID",
+		dateFields:['YXQ_START','YXQ_END','CREATEDATE','UPDATEDATE'],
 		urlRoot:Gifted.Config.serverURL+Gifted.Config.Product.loadItemURL,
 		defaults:{
 			NAME:'',
@@ -16,7 +17,6 @@ define(['moment'],function(monent){
 			this.collection = config.collection;
 			//this.on('add',this.parse,this);
 		},
-		dateFields:['YXQ_START','YXQ_END','CREATEDATE','UPDATEDATE'],
 		_calculateTimes:function(json){ // 计算剩余时间
 			if (!json)
 				return null;
@@ -155,13 +155,13 @@ define(['moment'],function(monent){
             	Gifted.Global.checkStatus(status);
             },this));
 		},
-		loadDetailItem:function(id, refresh){
+		loadDetailItem:function(id, reload){
 			console.log('loadDetailItem：id='+id);
 			if (!id) {
 				return null;
 			}
 			var localDatas = Gifted.Cache.getCache('productdetail_'+id);
-			if (!localDatas || refresh) {
+			if (!localDatas || reload) {
 				this.loadItem(id, _.bind(function(){
 					var json = this.toSaveJSON();
 					Gifted.Cache.setCache('productdetail_'+id, JSON.stringify(json));
@@ -175,11 +175,11 @@ define(['moment'],function(monent){
 				this.trigger('sync');
 			}
 		},
-		loadModifyItem:function(id, sync, refresh) {
+		loadModifyItem:function(id, sync, reload) {
 			console.log('loadModifyItem：id='+id);
 			var item = this.loadListItem(id, sync);
 			if (!item) {
-				this.loadDetailItem(id, refresh);
+				this.loadDetailItem(id, reload);
 			}
 		},
 		isNew:function(){
@@ -263,9 +263,9 @@ define(['moment'],function(monent){
 			if (this.attributes['YXQ_END']<this.attributes['YXQ_START']) {
 				return Gifted.Lang['YXQEndMustLaterThanYXQStart'];
 			}
-			if (this.isEmtpyValue(this.attributes['DESCRIPTION'])) {
+			/*if (this.isEmtpyValue(this.attributes['DESCRIPTION'])) {
 				return Gifted.Lang['NotInputDescription'];
-			}
+			}*/
 		},
 		getURL:function(id) { // 切换server后重新计算
 			this.urlRoot=Gifted.Config.serverURL+Gifted.Config.Product.loadItemURL;
@@ -274,9 +274,42 @@ define(['moment'],function(monent){
 		}
 	});
 	ProductDetail = Product.extend({ // 特殊model
-		urlRoot:Gifted.Config.serverURL+Gifted.Config.Product.loadDetailURL,
 		idAttribute: "ID",
 		dateFields:['YXQ_START','YXQ_END','CREATEDATE','UPDATEDATE'],
+		urlRoot:Gifted.Config.serverURL+Gifted.Config.Product.loadDetailURL,
+		defaults:{
+			NAME:'',
+			DESCRIPTION:'',
+			QDL:0,
+			PRICE:0,
+			CURRENCY:Gifted.Config.Currency,
+			CATALOG:1,
+			PHOTOURLS:[{
+				PHOTOID:'placeholder',
+				PHOTONAME:'placeholder',
+				PHOTOURL:'img/notexists.png',
+				PHOTOINDEX:1,
+				PHOTORADIO:1,
+				PHOTOWIDTH:200,
+				PHOTOHEIGHT:150
+			}],
+			others:[{
+				PHOTOID:'placeholder',
+				PHOTONAME:'placeholder',
+				PHOTOURL:'img/notexists.png',
+				PHOTOINDEX:1,
+				PHOTORADIO:1,
+				PHOTOWIDTH:200,
+				PHOTOHEIGHT:150
+			}],
+			publisher:{
+				ID:'-1',
+				PORTRAIT:'img/noportrait_30_30.png',
+				PRODUCT:0,
+				FOLLOW:0,
+				FOLLOWER:0
+			}
+		},
 		initialize:function(config){
 			// 方法置空 否则在init中new ProductDetail就去做parseDatas了
 			return ProductDetail.__super__.initialize.call(this, config);
@@ -298,8 +331,10 @@ define(['moment'],function(monent){
 		last:null, // 最后记录的时间戳，避免重复下拉加载
 		perCount:10, // 每页记录数
 	    model:Product,
-		dateFields:['YXQ_START','YXQ_END','CREATEDATE','UPDATEDATE'],
+	    key:'',
+	    sortField:'UPDATEDATE',
 		idAttribute: "ID",
+		dateFields:['YXQ_START','YXQ_END','CREATEDATE','UPDATEDATE'],
 	    url:Gifted.Config.serverURL+Gifted.Config.Product.loadDataURL,
 		getURL:function(_start,_count) { // 切换server后重新计算
 			this.url = Gifted.Config.serverURL+Gifted.Config.Product.loadDataURL;
@@ -365,14 +400,18 @@ define(['moment'],function(monent){
 				_.each(datas,_.bind(function(json){
 					// 缓存已经都是本地化数据了 只要计算时间即可
 					this._parseDatas(json, catalogs);
-					this.add(json); // collection.set->model.parse
+					this.add(json,{sort:true}); // collection.set->model.parse
 				},this));
+				//this.sort();
 				//this.set(datas,{parse:true}); // 只触发了collection的parse
 				this.trigger('hasmoredata', true, true); // 绘制上下是否有最新数据的状态栏->v.refresh
 			} else if (this.isInit == 0) {
 				this.loadData();
 				this.isInit = 1;
 			}
+		},
+		comparator:function(model) {
+		    return model.get(this.sortField);
 		},
 		search:function(sRestfulAction) {
 			if (!Gifted.Global.checkConnection()) {

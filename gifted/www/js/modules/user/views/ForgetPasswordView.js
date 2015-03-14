@@ -6,7 +6,6 @@ define(['modules/user/templates/forgetpassword', 'handlebars'],function(mod0){
 		bottomRefresh:false,
 		events:{
 			'tap .headbar_sign':'back',
-			//'tap .headbar_sign':'openNavigate',
 			'tap .send-identifying-code-btn':'sendIdentifyingCode',
 			'tap .reset-password-btn':'resetPassword'
 		},
@@ -42,9 +41,8 @@ define(['modules/user/templates/forgetpassword', 'handlebars'],function(mod0){
 	    remove : function() {
 	    	if (this.app) {
 	    		this.app.user.off("change:forgetPasswordMessage",this.refreshMessage,this);
-	    		delete this.app;
 	    	}
-	    	Backbone.View.prototype.remove.apply(this, arguments);
+	    	ForgetPasswordView.__super__.remove.apply(this, arguments);
 	    }
 	});
 	return ForgetPasswordView;

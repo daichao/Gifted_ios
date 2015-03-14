@@ -116,21 +116,21 @@ define(['modules/user/templates/useredit', 'handlebars', 'gifted.countrycode'],f
 			var portrait = this.model.get('PORTRAIT');
 			if (portrait) {
 				var domImg = this.$el.find('.useredit-portrait')[0], cw=h=80;
-				Gifted.Cache.localFile(portrait+'?imageView/1/w/'+cw+'/h/'+h+'/q/50',  
+				Gifted.Cache.localFile(portrait+'?imageView2/1/w/'+cw+'/h/'+h+'/q/50',  
 					'userportrait_'+userID+'_1_'+cw+'_'+h+'_50', 
 					domImg, null, override); // remoteURL, imgID, domImg, callback, override
 			}
 			var cardURL = this.model.get('BUSINESSCARD');
 			if (cardURL) {
 				var domImg = this.$el.find('.useredit_businesscard_pic')[0], cw=h=80;
-				Gifted.Cache.localFile(cardURL+'?imageView/1/w/'+cw+'/h/'+h+'/q/50',  
+				Gifted.Cache.localFile(cardURL+'?imageView2/1/w/'+cw+'/h/'+h+'/q/50',  
 					'usercard_'+userID+'_1_'+cw+'_'+h+'_50', 
 					domImg, null, override); // remoteURL, imgID, domImg, callback, override
 			}
 			var licenceURL = this.model.get('BUSINESSLICENCE');
 			if (licenceURL) {
 				var domImg = this.$el.find('.useredit_businesslicence_pic')[0], cw=h=80;
-				Gifted.Cache.localFile(licenceURL+'?imageView/1/w/'+cw+'/h/'+h+'/q/50',  
+				Gifted.Cache.localFile(licenceURL+'?imageView2/1/w/'+cw+'/h/'+h+'/q/50',  
 					'userlicence_'+userID+'_1_'+cw+'_'+h+'_50', 
 					domImg, null, override); // remoteURL, imgID, domImg, callback, override
 			}
@@ -142,7 +142,6 @@ define(['modules/user/templates/useredit', 'handlebars', 'gifted.countrycode'],f
 				this.model.getSimCountryIso();
 			if(!this.model.get('MOBILE'))
 				this.model.getPhoneNumber();
-			
 			this.paintImage();
 		},
 		deletePhoto:function() {

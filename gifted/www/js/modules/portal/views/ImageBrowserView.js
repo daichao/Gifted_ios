@@ -9,7 +9,7 @@ define(['modules/portal/templates/imagebrowser', 'handlebars',
 		urls:[],
 	    events:{
 			"tap .headbar_sign":"back",
-			"tap .imageview_content":"back"
+			"tap .scrollview_content":"back"
 		},
 	    initialize: function() {
 	    	ImageBrowser.__super__.initialize.apply(this, arguments);
@@ -47,7 +47,7 @@ define(['modules/portal/templates/imagebrowser', 'handlebars',
 				//if (Gifted.Config.isCanvasCarouel) { // 启用CanvasCarouel或OWLCarousel的开关
 				//	$(domImg).hide();
 				//}
-				Gifted.Cache.localFile(json.PHOTOURLS[i].PHOTOURL+'?imageView/1/w/'+cw+'/q/80', //'/h/'+h+
+				Gifted.Cache.localFile(json.PHOTOURLS[i].PHOTOURL+'?imageView2/1/w/'+cw+'/q/80', //'/h/'+h+
 					json.PHOTOURLS[i].PHOTOID+'_1_'+cw+'_80', //'_'+h+
 					domImg); // remoteURL, imgID, domImg
 				return true; // 图片刷新成功的标记
@@ -66,7 +66,6 @@ define(['modules/portal/templates/imagebrowser', 'handlebars',
 	    	//	return;
 	    	//} 
     		//this.$el.find('.product_image_0').remove();
-	    	this.$el.find('.imageview_images').addClass(Gifted.Config.isCanvasCarouel?'canvascarousel':'owl-carousel');
         	var len = json.PHOTOURLS.length;
         	for (var i=0;i<len;i++) {
 		        var domImgs = this.$el.find('.imageview_'+json.PHOTOURLS[i].PHOTOID);
@@ -85,13 +84,14 @@ define(['modules/portal/templates/imagebrowser', 'handlebars',
 				json._maxBrowserHeight=Math.max(h,json._maxBrowserHeight||0);
 				//if (placeholder) // 占位符不加载图片
 				//	continue;
-				Gifted.Cache.localFile(json.PHOTOURLS[i].PHOTOURL+'?imageView/1/w/'+cw+'/q/80', //'/h/'+h+
+				Gifted.Cache.localFile(json.PHOTOURLS[i].PHOTOURL+'?imageView2/1/w/'+cw+'/q/80', //'/h/'+h+
 					json.PHOTOURLS[i].PHOTOID+'_1_'+cw+'_80', //'_'+h+
 					domImg); // remoteURL, imgID, domImg
         	}
 		},
 		doPaintEffects:function() {
-    		//var func=_.bind(function(){ // 延迟加载图片和其他信息
+			return;
+	    	this.$el.find('.imageview_images').addClass(Gifted.Config.isCanvasCarouel?'canvascarousel':'owl-carousel');
         	if (Gifted.Config.isCanvasCarouel) { // 启用CanvasCarouel或OWLCarousel的开关
 	        	this.$el.find('.canvascarousel').carouseldestroy();
 				var cw=this.$el.css('width'), h=cw;
@@ -106,61 +106,38 @@ define(['modules/portal/templates/imagebrowser', 'handlebars',
 			            slideSpeed:300,
 			            paginationSpeed:400
 			        });
-				    //var imgs = this.$el.find('.imageview_images img');
-			        //imgs.show();
-					//imgs.height(imgs.width());
 			        // 获取所有的carousel实例
 			        this.owl = this.$el.find('.imageview_images').data('owlCarousel');
 		        }
-		        // 禁止左拉菜单 应该拉到最左边还继续swiperight则执行backHome
+		        // 禁止左拉菜单 应该拉到最左边还继续swiperight则执行back
 		        this.$el.find('.owl-carousel').off('swipeleft swiperight');
 		        this.$el.find('.owl-carousel').on('swipeleft swiperight', function(event) {
 		        	 event.stopPropagation();
 		        	 event.preventDefault();
 		        });
+		        this.$el.find('.owl-carousel').on('touchstart',function(event){
+		        	 event.stopPropagation();
+	//		        	 event.preventDefault();
+		        });
 		    }
-        	//},this);
-        	//_.defer(func);
 	    },
 	    contentRender:function(){
-		    this.$el.off('swiperight');
-		    this.$el.find('.owl-carousel').off('swipeleft swiperight');
-	    	if (this.owl) {//当前产品的图片控件
-				this.owl.destroy();
-				delete this.owl;
-			}
+        	this.removeOWLCanvas();
 			var json = {PHOTOURLS:this.urls};
 	        this.$contentEl.empty().html(this.templateContent(json));
 	        if (this.urls && this.urls.length>0) {
         		this.doPaint(json, false);
         		this.doPaintEffects(); // 渲染dom占位符特效
-		        //var sceenHeight = window.screen.height;
-		        //var browserHeight = json._maxBrowserHeight;
-        		//var top = Math.round((sceenHeight-browserHeight)/2);
-			    //this.$el.find('.imageview_images').css({'top':top});
 	        }
+		    this.$el.off('swiperight');
 	        this.$el.find('.scrollview_topbar').hide();
 	        this.$el.find('.scrollview_content').css({'background-color':'#363636','height':window.screen.height});
 	        return this;
 	    },
-	    caculateHeight:function(){
-	    },
 	    remove:function(){
-			if (this.app) {
-	    		delete this.app;
-	    	}
 	    	this.off('toprefresh');
 	    	this.off('bottomrefresh');
-	    	this.$el.off('swiperight');
-        	if (Gifted.Config.isCanvasCarouel) { // 启用CanvasCarouel或OWLCarousel的开关
-	        	this.$el.find('.canvascarousel').carouseldestroy();
-        	} else {
-		    	this.$el.find('.owl-carousel').off('swipeleft swiperight');
-		    	if (this.owl) {
-					this.owl.destroy();
-					delete this.owl;
-				}
-	    	}
+        	this.removeOWLCanvas();
 	    	ImageBrowser.__super__.remove.apply(this, arguments);
 	    }
 	});

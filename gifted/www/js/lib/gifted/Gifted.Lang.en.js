@@ -65,7 +65,7 @@ define(['translate'], function() {
 		'Currency':'Currency', // Currency
 		'Share':'Share',
 		'Title':'Title',
-		'Description':'Description', // Description
+		'Description':'Description(Optional)', // Description
 		'PublishedBy':'Published By {0}',
 		'Published':':',
 		'Servers':'Servers',

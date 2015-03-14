@@ -22,7 +22,4 @@ define([],function(){
 				</div> \
             </div> \
 		</div>';
-//	<div class="product_header"><h1>{{NAME}}</h1></div>\
-//	<div class="product_footer"><div class="product_rate u2400">&#10084</div></div>\
 });
-//src="http://gifted.qiniudn.com/BBB?imageView/2/w/200/q/50" /></a> \

@@ -38,14 +38,6 @@ define(['modules/product/templates/productmodify_new','handlebars',
 	    		this.setCatalog(view.catalog);
 	    	}
 	    },
-	    paintCatalog:function(){
-			/*var c = 1, v = this.$el.find('.product_catalog').val(), dis='';
-			var catalogs = TRANSLATE.getCurrentLangItem(null,'CatalogData');
-    		_.each(this.$el.find('.product_catalog').children(),function(item){
-    			$(item).html(catalogs[c-1].display);
-    			c++;
-    		});*/
-	    },
 		setDescription:function(text) {
 			this.$el.find('.product_description').val(text);
 		},
@@ -65,8 +57,11 @@ define(['modules/product/templates/productmodify_new','handlebars',
 	    },
 		refreshPage:function(event){
 			var id = this.model.get('ID');
-			var sync = !event?true:false; // 手动刷新event不为空
-			this.model.loadModifyItem(id, sync, false); // 触发了sync->render, refresh:false->loadFromDetail
+			//var sync = !event?true:false; // 手动刷新event不为空
+			this.loadData(id, true, false);
+		},
+		loadData:function(id, sync, reload) {
+			this.model.loadModifyItem(id, sync, reload); // 触发了sync->render, reload:false->loadFromDetail
 		},
 	    changeQDL:function(event){
 	    	var val = $(event.target).val();
@@ -135,7 +130,9 @@ define(['modules/product/templates/productmodify_new','handlebars',
 			cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
 			cw=cw-20;
 			h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
-			h=h*4/5;
+			h=Math.round(h*4/5);
+			if (cw<0)
+				return false;
 			if (json.PHOTOURLS && json.PHOTOURLS.length>0) { // Math.random()
 				var len = json.PHOTOURLS.length;
 				for (var i=0;i<len;i++) {
@@ -145,12 +142,11 @@ define(['modules/product/templates/productmodify_new','handlebars',
 					// 下面代码的目的:直接用明细页面的缓存图片
 					//var r=json.PHOTOURLS[i].PHOTORADIO;
 					//h=r?Math.round(cw/r):cw; // 和detail参数保持一致
-					Gifted.Cache.localFile(json.PHOTOURLS[i].PHOTOURL+'?imageView/1/w/'+cw+'/h/'+h+'/q/80', 
+					Gifted.Cache.localFile(json.PHOTOURLS[i].PHOTOURL+'?imageView2/1/w/'+cw+'/h/'+h+'/q/80', 
 						json.PHOTOURLS[i].PHOTOID+'_1_'+cw+'_'+h+'_80', 
 						domImg); // remoteURL, imgID, domImg, callback(localURL)
 				}
 			}
-			this.paintCatalog();
 	        /*this.$el.find(".product_catalog").mobiscroll('destroy').mobiscroll({
 			    preset: 'select', //选择
 				theme: deviceIsIOS?'ios':'android-ics light', //皮肤样式
@@ -176,6 +172,9 @@ define(['modules/product/templates/productmodify_new','handlebars',
 					//dayText: '日', monthText: '月', yearText: '年', //面板中年月日文字
 					//setText: '确定', //确认按钮名
 					//cancelText: '取消',//取消按钮名
+					//minYear:date.getFullYear(), // 起始年份
+					//minMonth:date.getMonth()+1, // 起始月份
+					//minDate:date.getDate(), // 起始日期
 					startYear:date.getFullYear(), // 起始年份
 					startMonth:date.getMonth()+1, // 起始月份
 					startDate:date.getDate(), // 起始日期
@@ -413,10 +412,10 @@ define(['modules/product/templates/productmodify_new','handlebars',
 	    },
 		// ------------------------------------------------------------------------------------------ //
 	    remove:function(){
-	    	if (this.photoViewer) {
+	    	/*if (this.photoViewer) {
 	    		this.photoViewer.remove();
 	    		delete this.photoViewer;
-	    	}
+	    	}*/
 	        //var eventTap = Gifted.Config.Event.tap;
 			//this.$el.find(".product_description").off(eventTap);
 	    	this.$el.find(".product_currency").mobiscroll('destroy');

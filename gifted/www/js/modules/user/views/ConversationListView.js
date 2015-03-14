@@ -7,10 +7,10 @@ define(['modules/user/templates/conversationlist','handlebars'],function(mod0){
 			this.collection.on('change',this.addConversation,this);
 			this.collection.on('add',this.addConversation,this);
 			this.collection.on('remove',this.removeConversation,this);
-			Gifted.View.prototype.initialize.apply(this,arguments);
+			ConversationListView.__super__.initialize.apply(this,arguments);
 	    },
 		events : {
-			'tap .headbar_sign' : 'openNavigate',
+			'tap .headbar_sign' : 'back',
 			'tap .conversation' : 'openConversation',
 		},
 		openConversation : function(event){
@@ -32,16 +32,14 @@ define(['modules/user/templates/conversationlist','handlebars'],function(mod0){
 		contentRender : function(){
 			var html = this.templateContent(this.collection.toJSON());
 			this.$contentEl.html(html);
-	        this.getViewWrapBottomEl().addClass('conversation_title2').html('No Data');
+			if (this.collection.length==0)
+	        	this.getViewWrapBottomEl().addClass('conversation_title2').html('No Data');
 		},
 	    remove : function() {
-	    	if (this.app) {
-	    		delete this.app;
-	    	}
 	    	this.collection.off('change',this.addConversation,this);
 			this.collection.off('add',this.addConversation,this);
             this.collection.off('remove',this.removeConversation,this);
-            Gifted.View.prototype.remove.apply(this, arguments);
+            ConversationListView.__super__.remove.apply(this, arguments);
 	    }
 	});
 	return ConversationListView;

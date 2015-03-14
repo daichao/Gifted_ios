@@ -65,7 +65,7 @@ define(['translate'], function() {
 		'Currency':'货币',
 		'Share':'分享',
 		'Title':'标题',
-		'Description':'描述',
+		'Description':'描述(选填)',
 		'PublishedBy':'{0}发布的',
 		'Published':'',
 		'Servers':'服务器',

@@ -3,7 +3,7 @@ define(['css!lib/owl.carousel/owl.carousel.css', 'css!lib/owl.carousel/owl.theme
 	var result = {};
 	result.top =
 			'<span class="headbar_sign">' +
-				'<div class="headbar_action headbar_action_back">G</div>' +
+				'<div class="headbar_action">G</div>' +
 			'</span>' +
 			'<span class="header_mid">{{NAME}}</span>'+
 			'<span class="header_right header_edit" style="display:none;"></span>' +
@@ -55,7 +55,7 @@ define(['css!lib/owl.carousel/owl.carousel.css', 'css!lib/owl.carousel/owl.theme
 			'</div>';
 	result.publisher = 
 			'<div class="product_detail_person">'+
-				'<div class="publisher_img"><img src="{{#if publisher.PORTRAIT}}{{publisher.PORTRAIT}}?imageView/1/w/40/h/40/q/50{{else}}img/noportrait_30_30.png{{/if}}"/></div>' +
+				'<div class="publisher_img"><img src="{{#if publisher.PORTRAIT}}{{publisher.PORTRAIT}}?imageView2/1/w/40/h/40/q/50{{else}}img/noportrait_30_30.png{{/if}}"/></div>' +
 				'<div class="publisher_name">{{publisher.NAME}}</div>'+
 			'</div>';
 	result.publisher2 = 
@@ -67,7 +67,7 @@ define(['css!lib/owl.carousel/owl.carousel.css', 'css!lib/owl.carousel/owl.theme
 	result.others = 
 			'{{#each this.others}}' +
 				'<a href="#product/detail/{{ID}}">' +
-					'<img alt="{{PHOTONAME}}" src="{{PHOTOURL}}?imageView/1/w/200/h/150/q/50" class="product_detail_otherimage" />' +
+					'<img alt="{{PHOTONAME}}" src="{{PHOTOURL}}?imageView2/1/w/200/h/150/q/50" class="product_detail_otherimage product_image_{{PHOTOID}}" />' +
 				'</a>' +
 			'{{/each}}'+
 			'<a>' +

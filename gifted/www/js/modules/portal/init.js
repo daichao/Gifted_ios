@@ -7,12 +7,12 @@ define(['modules/portal/models/models'
 			//app.settings.on('settingsModuleInitialized',_.bind(function(){
 			//	this.trigger('inited',this);
 			//},this));
-			app.route('navigate','navigate');
+			app.route('navigate','navigator');
 			app.route('settings','openSettings');
 			app.route('about5pro','about5pro');
         	app.route('imagebrowser','imagebrowser');
         	app.on('route:imagebrowser',this.imageBrowser,this);
-        	app.on('route:navigate',this.toggleNavigator,this);
+        	app.on('route:navigator',this.toggleNavigator,this);
 	    	app.on('route:openSettings',this.openSettings,this);
 	    	app.on('route:about5pro',this.about5pro,this);
 	    	app.on('hideNavigator',_.bind(function(view){
@@ -56,6 +56,8 @@ define(['modules/portal/models/models'
         };
         this.toggleNavigator=function(callback){
         	require(['modules/portal/views/NavigatorView','modules/portal/models/models'],_.bind(function(NavigatorView){
+	    		if (!this.app.currentView)
+	    			return;
 	    		var hv = this.app.selectView('navigator',_.bind(function(){
 	    			var result = new NavigatorView({el:$('#navigator')[0],app:this.app});
 	    			this.app.pageContainer.append(result.$el);

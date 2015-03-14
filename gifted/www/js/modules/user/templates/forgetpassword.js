@@ -2,7 +2,7 @@ define([],function(){
 	var result = {};
 	result.top = 
 			'<span class="headbar_sign">'+
-				'<div class="headbar_action headbar_action_back">G</div>'+
+				'<div class="headbar_action">G</div>'+
 			'</span>';
 	result.content = 
 			'<div data-role="content" data-theme="d" class="content_wrapper">'+

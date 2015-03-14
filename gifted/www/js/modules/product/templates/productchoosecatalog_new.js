@@ -2,7 +2,7 @@ define(['css!modules/product/styles/productcatalog.css'],function(){
 	var result = {};
 	result.top =
 			'<span class="headbar_sign">'+
-				'<div class="headbar_action headbar_action_back">G</div>'+
+				'<div class="headbar_action">G</div>'+
 			'</span>'+
 			'<span class="header_right header_search"></span>';
 	result.content =

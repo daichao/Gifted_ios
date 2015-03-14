@@ -2,17 +2,24 @@ define(['modules/user/templates/userinfo', 'handlebars'],function(mod0){
 	var UserInfoView = Gifted.View.extend({
 		templateTop:Handlebars.compile(mod0.top),
 		templateContent:Handlebars.compile(mod0.content),
+		topRefresh:true,
+		bottomRefresh:false,
+		events:{
+			'tap .headbar_sign':'back',
+			'tap .user_userinfo_edit':'edit',
+	    	'tap .content_wrapper':'refreshImg'
+		},
 		initialize: function () {
 			this.model.on('change:userInfo',_.bind(function(){
 				this.contentRender();
 				this.refresh();
 			},this),this);
-			this.model.getUserInfo();
 	    },
-		events:{
-			'tap .headbar_sign':'back',
-			'tap .user_userinfo_edit':'edit',
-	    	'tap .content_wrapper':'refreshImg'
+	    loadData:function() {
+			this.model.getUserInfo(); // trigger render
+	    },
+		onTopRefresh:function(event){
+			this.loadData();
 		},
 		edit : function(){
 			this.app.navigate('user/useredit', {trigger:true});
@@ -22,8 +29,7 @@ define(['modules/user/templates/userinfo', 'handlebars'],function(mod0){
 			if (!userInfo) {
 				return [];
 			}
-			var userID = userInfo['ID'];
-			var width = this.$el.css('width');
+			var userID = userInfo['ID'], width = this.$el.css('width');
 	    	return [
 	    		{PHOTOURL:userInfo['PORTRAIT']||'img/noportrait.png',PHOTORADIO:1,PHOTOID:'userportrait_'+userID,PHOTOWIDTH:width},
 	    		{PHOTOURL:userInfo['BUSINESSCARD']||'img/notexists_80_80.png',PHOTORADIO:1,PHOTOID:'usercard_'+userID,PHOTOWIDTH:width},
@@ -53,21 +59,21 @@ define(['modules/user/templates/userinfo', 'handlebars'],function(mod0){
 			var portrait = userInfo['PORTRAIT'];
 			if (portrait) {
 				var domImg = this.$el.find('.userinfo_portrait')[0], cw=h=80;
-				Gifted.Cache.localFile(portrait+'?imageView/1/w/'+cw+'/h/'+h+'/q/50',  
+				Gifted.Cache.localFile(portrait+'?imageView2/1/w/'+cw+'/h/'+h+'/q/50',  
 					'userportrait_'+userID+'_1_'+cw+'_'+h+'_50', 
 					domImg); // remoteURL, imgID, domImg, callback, override
 			}
 			var cardURL = userInfo['BUSINESSCARD'];
 			if (cardURL) {
 				var domImg = this.$el.find('.useredit_businesscard_pic')[0], cw=h=80;
-				Gifted.Cache.localFile(cardURL+'?imageView/1/w/'+cw+'/h/'+h+'/q/50',  
+				Gifted.Cache.localFile(cardURL+'?imageView2/1/w/'+cw+'/h/'+h+'/q/50',  
 					'usercard_'+userID+'_1_'+cw+'_'+h+'_50', 
 					domImg); // remoteURL, imgID, domImg, callback, override
 			}
 			var licenceURL = userInfo['BUSINESSLICENCE'];
 			if (licenceURL) {
 				var domImg = this.$el.find('.useredit_businesslicence_pic')[0], cw=h=80;
-				Gifted.Cache.localFile(licenceURL+'?imageView/1/w/'+cw+'/h/'+h+'/q/50',  
+				Gifted.Cache.localFile(licenceURL+'?imageView2/1/w/'+cw+'/h/'+h+'/q/50',  
 					'userlicence_'+userID+'_1_'+cw+'_'+h+'_50', 
 					domImg); // remoteURL, imgID, domImg, callback, override
 			}

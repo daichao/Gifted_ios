@@ -2,14 +2,14 @@ define([],function(){
 	var result = {};
 	result.top = 
 		'<span class="headbar_sign">'+
-			'<div class="headbar_action headbar_action_back">G</div>'+
+			'<div class="headbar_action">G</div>'+
 		'</span>'+
 		'<span class="header_right header_commit"></span>'; // user_save
 	result.content =
 		'<div class="content_wrapper">'+
 			'<div class="useredit_header">'+
 				'<div class="useredit_header_c1">' +
-					'<img class="useredit-portrait" index="1" name="PORTRAIT" src="img/noportrait.png" />' +
+					'<img class="gifted-image useredit-portrait" index="1" name="PORTRAIT" src="img/noportrait.png" />' +
 					//'<img class="useredit-portrait" index="1" name="PORTRAIT" src="{{#if PORTRAIT}}{{PORTRAIT}}?imageView/1/w/80/h/80/q/50{{else}}img/noportrait.png{{/if}}" />'+
 				'</div>' +
 				'<ul class="useredit_header_c2">'+
@@ -21,12 +21,12 @@ define([],function(){
 			'</div>'+
 			'<div class="useredit_businesscard">'+
 				'<span data-translate="businesscard"></span>:'+
-				'<img class="useredit_businesscard_pic" name="BUSINESSCARD" index="2" src="img/takepicture.png" />' +
+				'<img class="gifted-image useredit_businesscard_pic" name="BUSINESSCARD" index="2" src="img/takepicture.png" />' +
 				//'<img class="useredit_businesscard_pic" name="BUSINESSCARD" index="2" src="{{#if BUSINESSCARD}}{{BUSINESSCARD}}?imageView/1/w/80/h/80/q/50{{else}}img/takepicture.png{{/if}}" />'+
 			'</div>'+
 			'<div class="useredit_businesslicence">'+
 				'<span data-translate="businesslicence"></span>:'+
-				'<img class="useredit_businesslicence_pic" name="BUSINESSLICENCE" index="3" src="img/takepicture.png" />' +
+				'<img class="gifted-image useredit_businesslicence_pic" name="BUSINESSLICENCE" index="3" src="img/takepicture.png" />' +
 				//'<img class="useredit_businesslicence_pic" name="BUSINESSLICENCE" index="3" src="{{#if BUSINESSLICENCE}}{{BUSINESSLICENCE}}?imageView/1/w/80/h/80/q/50{{else}}img/takepicture.png{{/if}}" />'+
 			'</div>'+
 			'<div class="useredit_selfintroduction">'+

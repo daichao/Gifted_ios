@@ -17,7 +17,7 @@ define(['modules/user/templates/conversation', 'handlebars'],function(mod0){
 			Gifted.View.prototype.initialize.apply(this,arguments);
 	    },
 		events : {
-			'tap .headbar_action_back' : 'back',
+			'tap .headbar_sign' : 'back',
 			'tap .conversation_send_button' : 'sendMessage',
 		},
 		back : function(){
@@ -85,6 +85,7 @@ define(['modules/user/templates/conversation', 'handlebars'],function(mod0){
 				//this.$contentEl.find('.message_' + nextMessageId).before(html);
 			}else
 				this.$contentEl.append(html);
+			this.trigger('refreshcontent');
 		},
 		contentRender : function(){
 			var html = this.templateContent(this.model.messageList.toJSON());
@@ -97,10 +98,10 @@ define(['modules/user/templates/conversation', 'handlebars'],function(mod0){
 			}
 		},
 		changeFriendPortrait : function(){
-			this.$contentEl.find('.conversation_dir_RECEIVE > img').attr('src',this.model.get('PORTRAIT')+'?imageView/1/w/50/h/50/q/100');
+			this.$contentEl.find('.conversation_dir_RECEIVE > img').attr('src',this.model.get('PORTRAIT')+'?imageView2/1/w/50/h/50/q/100');
 		},
 		changeMyPortrait : function(){
-			this.$contentEl.find('.conversation_dir_SEND > img').attr('src',this.app.user.get('PORTRAIT')+'?imageView/1/w/50/h/50/q/100');
+			this.$contentEl.find('.conversation_dir_SEND > img').attr('src',this.app.user.get('PORTRAIT')+'?imageView2/1/w/50/h/50/q/100');
 		},
 	    remove : function() {
 	    	this.model.off('change:PORTRAIT',this.changeFriendPortrait,this);

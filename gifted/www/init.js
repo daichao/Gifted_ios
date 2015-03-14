@@ -108,8 +108,9 @@ require(['jquery'],function($, language) { // 重载jquery方法
 		console.log('$(document).ajaxError:status='+xhr.status+', xhrErr='+xhrErr);
 		console.log('$(document).ajaxError:responseJSON='+xhr.responseJSON+', responseText='+xhr.responseText);
 		if (xhr.responseJSON && xhr.responseJSON.error) { //  && (xhr.status==500 || xhr.status==0 || xhr.status==404) 
-			if (xhr.status!=403 && xhr.status!=401) {
-				Gifted.Global.alert(xhr.responseJSON.error);
+			if (xhr.status!=403 && xhr.status!=401) { // 认证错误在user代码里处理提示信息， 系统级别错误在这里封装弹出。
+				if (xhr.status!=500) // 非服务器系统级别错误
+					Gifted.Global.alert(xhr.responseJSON.error);
 			}
 			//Gifted.Global.checkStatus(xhr.status);
 		}

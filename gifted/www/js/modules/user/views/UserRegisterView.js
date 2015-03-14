@@ -8,7 +8,8 @@ define(['modules/user/templates/userregister', 'handlebars'],function(mod0){
 			this.app.user.on('registerSuccess',this.registerSuccess,this);
 		},
 		events:{
-			'tap .headbar_sign':'backHome',
+			'tap .headbar_sign':'back',
+			//'tap .headbar_sign':'backHome',
 			'tap .header_login':'login',
 			'tap .register_button':'register'
 		},
@@ -35,16 +36,10 @@ define(['modules/user/templates/userregister', 'handlebars'],function(mod0){
 				Gifted.Global.alert(Gifted.Lang['UsernameIsEmpty']);
 				return;	
 			}
-			var address=this.$el.find('.register_address').val();
-			if(!address || address.length==0){
-				Gifted.Global.alert(Gifted.Lang['AddressIsEmpty']);
-				return;
-			}
 			var params = {
 				EMAIL : email,
 				PASSWORD : password,
 				NAME : username,
-				ADDRESS : address
 			};
 			this.app.user.register(params);
 		},

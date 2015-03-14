@@ -17,7 +17,8 @@ define(['modules/user/templates/userlogin', 'handlebars'], function(mod0){
 			}
 		},
 		events:{
-			'tap .headbar_sign':'backHome',
+			'tap .headbar_sign':'back',
+			//'tap .headbar_sign':'backHome',
 			'tap .header_register':'register',
 			'tap .login_button':'doLogin',
 			'tap .forgetpwd':'forgetpwd'

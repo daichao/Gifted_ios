@@ -1,10 +1,9 @@
 define(['modules/user/templates/modifypassword', 'handlebars'],function(mod0){
-	var ForgetPasswordView = Gifted.View.extend({
+	var ModifyPasswordView = Gifted.View.extend({
 		templateTop:Handlebars.compile(mod0.top),
 		templateContent:Handlebars.compile(mod0.content),
 		events:{
 			'tap .headbar_sign':'back',
-			//'tap .headbar_sign':'openNavigate',
 			'tap .header_login':'login',
 			'tap .reset-password-ok-btn':'resetPassword'
 		},
@@ -33,12 +32,9 @@ define(['modules/user/templates/modifypassword', 'handlebars'],function(mod0){
 			this.$contentEl.empty().html(html);
 		},
 	    remove : function() {
-	    	if (this.app) {
-	    		delete this.app;
-	    	}
-	    	Backbone.View.prototype.remove.apply(this, arguments);
+	    	ModifyPasswordView.__super__.remove.apply(this, arguments);
 	    }
 	});
-	return ForgetPasswordView;
+	return ModifyPasswordView;
 	
 });

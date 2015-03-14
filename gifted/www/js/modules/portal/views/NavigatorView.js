@@ -31,7 +31,6 @@ define(['modules/portal/templates/navigator','handlebars',
 	    remove: function(){
 	    	if(this.app){
 	    		this.app.user.off("change:RIGHTS",this.collection.flterRight,this.collection);
-	    		delete this.app;
 	    	}
 	    	this.collection.off("reset", this.refresh, this);
 	    	Gifted.View.prototype.remove.apply(this, arguments);

@@ -202,6 +202,9 @@ input.ui-slider-input {
 	background-color:#ed5d05!important;
 	color:#FFFFFF!important;
 }
+.gifted-image {
+	border-radius: 8px;
+}
 
 
 
@@ -210,7 +213,7 @@ input.ui-slider-input {
 	background-color:#FD6D05;
 	color:#FFFFFF;
 	width: 15em;
-	margin-top: 53px;
+	margin-top: 52px;
 }
 .navigator li {
 	height: 60px;

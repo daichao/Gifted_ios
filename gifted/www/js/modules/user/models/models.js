@@ -25,7 +25,7 @@ define([],function(){
 			this.on('logoutComplete',this.logoutComplete,this);
 			this.favorites = new FavoritesCollection();
 			this.conversationList = new ConversationCollection();
-			_.defer(_.bind(this.initAppClientID,this));
+			//_.defer(_.bind(this.initAppClientID,this)); // 个推群发用
 			_.defer(_.bind(function(){
 				Gifted.Global.delSessionId();//清空遗留的SessionID
 			    var db = Gifted.Global.getDatabase('alluser');
@@ -111,7 +111,11 @@ define([],function(){
 				},this)
 			});
 		},
+		getAppCIDTry:0,
 		initAppClientID : function(){
+			if (this.getAppCIDTry>10)
+				return;
+			this.getAppCIDTry++;
 			if (Gifted.Config.isRealPhone==false)
 				return;
 			var appCIDCache = Gifted.Cache.getCache('Gifted.AppCID');
@@ -128,7 +132,7 @@ define([],function(){
 					}
 				},this)
 				,_.bind(function(message){ // error
-					console.log(message);
+					console.log('initAppClientID.error:'+message);
 					_.debounce(_.bind(this.initAppClientID, this),10000)();
 				},this));
 			/*Gifted.Plugin.dispatch('getAppCID',[]
@@ -470,6 +474,24 @@ define([],function(){
 	});
 	UserInteractiveModel = Backbone.Model.extend({ // 此model的attributes什么都没有
 		idAttribute: "ID",
+		defaults:{
+			products:[{
+				PHOTOID:'placeholder',
+				PHOTONAME:'placeholder',
+				PHOTOURL:'img/notexists.png',
+				PHOTOINDEX:1,
+				PHOTORADIO:1,
+				PHOTOWIDTH:200,
+				PHOTOHEIGHT:150
+			}],
+			userInfo:{
+				ID:'-1',
+				PORTRAIT:'img/noportrait.png',
+				PRODUCT:0,
+				FOLLOW:0,
+				FOLLOWER:0
+			}
+		},
 		initialize : function(userId){
 			this.set(this.idAttribute, userId);
 		},
@@ -496,8 +518,8 @@ define([],function(){
 				success:_.bind(function(json) { // 客户端jquery预先定义好的callback函数，成功获取跨域服务器上的json数据后，会动态执行这个callback函数
 					//this.user.set({"userInfo" : json.userInfo,
 					this.set({"userInfo" : json.userInfo,
-						"following" : json.following,
 						"products" : json.products,
+						"following" : json.following,
 						"favorites" : json.favorites});
 				},this),
 				complete : function(XMLHttpRequest, textStatus) {
@@ -597,13 +619,13 @@ define([],function(){
 	});
 	ConversationModel = Backbone.Model.extend({
 		idAttribute:'CONVERSATIONID',
+		dateFields:['time'],
 		initialize : function(){
 			this.friend = new Publisher(this.get('CONVERSATIONID'));
 			this.friend.on('change:userInfo',this.init,this);
 			this.friend.getUserInfo();
 			this.messageList = new MessageCollection();
 		},
-		dateFields:['time'],
 		init:function(){
 			var userInfo = this.friend.get('userInfo');
 			this.set({'PORTRAIT':userInfo.PORTRAIT, 'NAME':userInfo.NAME});
