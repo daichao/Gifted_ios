@@ -6,6 +6,16 @@ define(['modules/product/templates/productmodify_new','handlebars',
 		topRefresh:false,
 		bottomRefresh:false,
 		saving:false,
+		events:{
+			'tap .product_catalog':'openCatalog',
+	    	'tap .headbar_sign':'back',
+	    	'tap .header_commit':'saveData',
+	    	'change .product_date':'changeDate',
+	    	'change .product_price':'changePrice',
+	    	'change .product_qdl':'changeQDL',
+	    	'tap .product_image_btn':'pickPhoto',
+	    	'tap .photo_select_list':'selectPhoto'
+	    },
 	    initialize: function () {
 	    	ProductModifyView.__super__.initialize.apply(this,arguments);
 	    	this.model.on("sync", this.render, this);
@@ -13,6 +23,13 @@ define(['modules/product/templates/productmodify_new','handlebars',
 	    	this.on('active',this.onActive,this);
 	    	this.fileUploader = new Gifted.Util.FileUploader({zip:true});
 	    },
+	    // public
+		back:function(event){
+			_.delay(_.bind(function(){
+				this.$el.find('.photo_select_wrap').hide();
+			},this),100);
+			ProductModifyView.__super__.back.apply(this,arguments);
+		},
 	    onActive:function() {
 	    	ProductModifyView.__super__.onActive.apply(this,arguments);
 	    	if (this.prevView=='productchoosecatalogview') {
@@ -35,16 +52,6 @@ define(['modules/product/templates/productmodify_new','handlebars',
 		getDescription:function(text) {
 			return this.$el.find('.product_description').val();
 		},
-		events:{
-			'tap .product_catalog':'openCatalog',
-	    	'tap .headbar_sign':'back',
-	    	'tap .header_commit':'saveData',
-	    	'change .product_date':'changeDate',
-	    	'change .product_price':'changePrice',
-	    	'change .product_qdl':'changeQDL',
-	    	'tap .product_image_btn':'pickPhoto',
-	    	'tap .photo_select_list':'selectPhoto'
-	    },
 	    openCatalog:function(event){
 	    	event.stopPropagation();
 		  	event.preventDefault();
@@ -59,7 +66,7 @@ define(['modules/product/templates/productmodify_new','handlebars',
 		refreshPage:function(event){
 			var id = this.model.get('ID');
 			var sync = !event?true:false; // 手动刷新event不为空
-			this.model.loadModifyItem(id, sync); // 触发了sync->render
+			this.model.loadModifyItem(id, sync, false); // 触发了sync->render, refresh:false->loadFromDetail
 		},
 	    changeQDL:function(event){
 	    	var val = $(event.target).val();
@@ -92,8 +99,10 @@ define(['modules/product/templates/productmodify_new','handlebars',
 				var smm = moment(this.$el.find('.product_yxq_start').val(),'YYYY-MM-DD').add('days', 6);
 				var emm = moment(this.$el.find('.product_yxq_end').val(),'YYYY-MM-DD');
 				if (smm.isBefore(emm)) {
-					Gifted.Global.alert(Gifted.Lang['YXQIsSevenDays']);
-					this.$el.find('.product_yxq_end').val(smm.format('YYYY-MM-DD'));
+					_.delay(_.bind(function(){
+						Gifted.Global.alert(Gifted.Lang['YXQIsSevenDays']);
+						this.$el.find('.product_yxq_end').val(smm.format('YYYY-MM-DD'));
+					},this),500);
 				}
 			//},this),100);
 			//}
@@ -120,28 +129,25 @@ define(['modules/product/templates/productmodify_new','handlebars',
 				var dom = imgDoms[i];
 				dom.src = 'img/takepicture.png';
 			}
+			// 和detail参数保持一致
+			var cw=this.$el.css('width');
+			var h=cw;
+			cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
+			cw=cw-20;
+			h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
+			h=h*4/5;
 			if (json.PHOTOURLS && json.PHOTOURLS.length>0) { // Math.random()
 				var len = json.PHOTOURLS.length;
 				for (var i=0;i<len;i++) {
-					var photoIndex = (json.PHOTOURLS[i].PHOTOINDEX||i+1); // 计算图片的序列位置
-					photoIndex = photoIndex<=0?1:photoIndex;
+					var photoIndex = (!json.PHOTOURLS[i].PHOTOINDEX||json.PHOTOURLS[i].PHOTOINDEX<=0)
+						?(i+1):json.PHOTOURLS[i].PHOTOINDEX; // 计算图片的序列位置
 					var domImg = imgDoms[photoIndex-1];
 					// 下面代码的目的:直接用明细页面的缓存图片
-					//var r=json.PHOTOURLS[i].PHOTORADIO, cw=this.$el.css('width');
-					var cw=this.$el.css('width');
-					cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
+					//var r=json.PHOTOURLS[i].PHOTORADIO;
 					//h=r?Math.round(cw/r):cw; // 和detail参数保持一致
-					Gifted.Cache.localFile(json.PHOTOURLS[i].PHOTOURL+'?imageView/1/w/'+cw+'/q/80', //'/h/'+h+
-						json.PHOTOURLS[i].PHOTOID+'_1_'+cw+'_80', //'_'+h+
-						domImg); // remoteURL, imgID, domImg
-					/*
-					Gifted.Cache.localFile(json.PHOTOURLS[i].PHOTOURL, 
-						json.PHOTOURLS[i].PHOTOID, domImg // remoteURL, imgID, imgDom
-						,_.bind(function(localURL){ // callback
-							this.fileUploader.pickUrl[''+photoIndex]=localURL;
-						},this)
-					);
-					*/
+					Gifted.Cache.localFile(json.PHOTOURLS[i].PHOTOURL+'?imageView/1/w/'+cw+'/h/'+h+'/q/80', 
+						json.PHOTOURLS[i].PHOTOID+'_1_'+cw+'_'+h+'_80', 
+						domImg); // remoteURL, imgID, domImg, callback(localURL)
 				}
 			}
 			this.paintCatalog();
@@ -202,7 +208,6 @@ define(['modules/product/templates/productmodify_new','handlebars',
 	    },
 	    saveData:function(event) {
 	    	if (this.saving==true) {
-	    		//console.log("uploading......");
 	    		Gifted.Global.alert('saving...');
 	    		return false;
 	    	}
@@ -232,6 +237,37 @@ define(['modules/product/templates/productmodify_new','handlebars',
 				var uploadUrl = Gifted.Config.uploadServerURL+Gifted.Config.Product.uploadFileURL +'?'+paramOfURL;
 				console.log("uploading:"+uploadUrl);
 				Gifted.Global.showLoading();
+				if (!Gifted.Config.isRealPhone && len>0) { // NOTICE 非真机且进行照片模拟的时候不保存只用于客户端调试
+					var json = jsonForm; // 模拟保存后的数据
+					json.ID = this.transID;
+					json.PHOTOURLS = [{
+						PHOTOID:this.fileUploader.imageKey,
+						PHOTOURL:this.fileUploader.pickUrl[this.fileUploader.imageKey],
+						PHOTORADIO:1,
+						PHOTOINDEX:1,
+						PHOTOWIDTH:640,
+						PHOTOHEIGHT:480
+					}];
+					this.saving = false;
+					Gifted.Global.hideLoading();
+					// Gifted.Global.checkStatus(status);
+					console.log("uploaded:"+json.url+", completed");
+					Gifted.Global.alert(Gifted.Lang['Success']);
+					this.fileUploader.reset(); // 重置上传信息
+					if (this.model.isNew()) { // 重建新增页面并返回
+						this.model.set(json); // 覆盖当前属性
+						Backbone.history.history.back(); // 后退后才能在List:visible中显示
+						_.delay(_.bind(function(){
+							this.model.afterNew();
+							this.model = new Product({collection:this.model.collection}); // 重建一个model(新建的view是共用的)
+							this.render(); // 把空的model重新render // TODO 需要局部刷新
+						},this),500);
+					} else {
+						this.model.set(json); // 覆盖当前属性
+						this.model.afterModify();
+					}
+					return;
+				}
 				this.fileUploader.upload({ // 上传图片并保存数据
 					//uploadUrlDebug:uploadUrlDebug,
 					uploadUrl:uploadUrl, // url
@@ -244,13 +280,17 @@ define(['modules/product/templates/productmodify_new','handlebars',
 							console.log("uploaded:"+json.url+", completed");
 							Gifted.Global.alert(Gifted.Lang['Success']);
 							this.fileUploader.reset(); // 重置上传信息
-							this.model.collection.trigger('modelchanged',this.model.get('ID')); // 抛出事件
 							if (this.model.isNew()) { // 重建新增页面并返回
-								this.model.clear(); // = new Product();
-								this.render(); // 把空的model重新render
-								//this.refreshPage(); // TODO 需要局部刷新
-								//this.$el.find('.product_modify_form')[0].reset();
-								Backbone.history.history.back();
+								this.model.set(json); // 覆盖当前属性
+								Backbone.history.history.back(); // 后退后才能在List:visible中显示
+								_.delay(_.bind(function(){
+									this.model.afterNew();
+									this.model = new Product({collection:this.model.collection}); // 重建一个model(新建的view是共用的)
+									this.render(); // 把空的model重新render // TODO 需要局部刷新
+								},this),500);
+							} else {
+								this.model.set(json); // 覆盖当前属性
+								this.model.afterModify();
 							}
 						} else {
 							console.log('upload.exception:'+JSON.stringify(json));

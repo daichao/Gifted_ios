@@ -29,6 +29,9 @@ define(['modules/user/templates/userinteractive', 'handlebars','owl-carousel'],f
 			this.model.on("change:userInfo", this.refreshInfoHead, this);
 			this.model.on("change:products", this.refreshProducts, this);
 			this.model.loadData();
+	    	this.on('toprefresh',this.onTopRefresh,this);
+	    	this.on('bottomrefresh',this.onBottomRefresh,this);
+			Gifted.View.prototype.initialize.apply(this,arguments);
 	    },
 	    openIM:function(event){
 	    	var token = this.app.user.get('IMTOKEN');
@@ -41,6 +44,7 @@ define(['modules/user/templates/userinteractive', 'handlebars','owl-carousel'],f
 		onTopRefresh:function(event){
 			this.model.loadData(true);
 			this.contentRender();
+			_.delay(_.bind(this.trigger,this,'refreshcomplete'),1000);
 		},
 		openPassword:function(event){
 			this.app.navigate("user/modifypassword", {trigger:true});

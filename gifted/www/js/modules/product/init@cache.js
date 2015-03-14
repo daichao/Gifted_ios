@@ -3,11 +3,6 @@ define(['modules/product/models/models'
 	,deviceIsIOS?'css!../../../css/styles-ios.css':'css!../../../css/styles-android.css'],function(){
     var products = new ProductCachedCollection(); // 当前模块全局共享
 	var result = new (function(){
-		products.on('modelchanged',function(id){
-			var v = this.app.selectView('productdetailview_'+id);
-			if (v)
-				v.refreshPage();
-		},this);
 		this.dependents=['user', 'portal'];
 		this.detailViewCache = [];
 		this.init = function(app){
@@ -71,8 +66,8 @@ define(['modules/product/models/models'
 					var result = new ProductDetailView({model:model,app:this.app}); // 根据缓存获取model
         			this.app.pageContainer.append(result.$el);
         			result.key = 'productdetailview_'+id;
-	    			result.render(); // 只render一次后面的复用时都清空(先画出来)
-        			//result.refreshPage(); // 触发了loadModifyItem->sync->render
+	    			//result.render(); // 只render一次后面的复用时都清空(先画出来)
+        			result.refreshPage(); // 触发了loadModifyItem->sync->render
 	    			this.addDetailView(result);
         			return result;
         		},this));
@@ -89,9 +84,16 @@ define(['modules/product/models/models'
 	    		}
         	},this));
         };
+		products.on('modelchanged',function(id){
+			var v = this.app.selectView('productdetailview_'+id);
+			if (v)
+				v.refreshPage();
+		},this);
 	    this.productModify=function(publisher, id){ // 放到自己发布的页面去修改
 	        require(['modules/product/views/ProductModifyView_new','jquery.snipbox']
 	        	,_.bind(function(ProductModifyView){
+				if (!Gifted.Global.checkConnection()) // 网络检查
+					return false;
 	        	if(!this.app.checkRight({checkRule:['LOGIN']}))
 		    		return;
 		    	if(this.app.user.get('ID')!=publisher) {
@@ -117,6 +119,8 @@ define(['modules/product/models/models'
         this.productNew=function(){
 	        require(['modules/product/views/ProductModifyView_new','jquery.snipbox']
 	        	,_.bind(function(ProductNewView){
+				if (!Gifted.Global.checkConnection()) // 网络检查
+					return false;
 	        	if(!this.app.checkRight({checkRule:['LOGIN']})) // ,'FACTORY'
 		    		return;
         		var v = this.app.selectView('productnewview',_.bind(function(){
@@ -167,6 +171,7 @@ define(['modules/product/models/models'
 		this.productSearchCatalog = function(catalog, title){
 			require(['modules/product/views/ProductSearchView_new'],_.bind(function(ProductSearchView){
 	    		var v = this.app.selectView('querycatalog',_.bind(function(){
+	    			//var catalogs = TRANSLATE.getCurrentLangItem(null,'CatalogData');
 	    			var collection = new ProductCachedCollection({key:'_querycatalog_'+catalog});
 	    			var result = new ProductSearchView({collection:collection,app:this.app,title:title});
 	    			this.app.pageContainer.append(result.$el);
@@ -186,6 +191,30 @@ define(['modules/product/models/models'
 		    		} 
 	    			this.app.changeView(v);
 	    		}
+				/*var h = this.app.selectView('querycatalog_'+catalog); // 只取
+	    		var v = this.app.selectView('querycatalog_'+catalog,_.bind(function(){
+	    			//var catalogs = TRANSLATE.getCurrentLangItem(null,'CatalogData');
+	    			var collection = new ProductCachedCollection({key:'_querycatalog_'+catalog});
+	    			var result = new ProductSearchView({collection:collection,app:this.app,title:title});
+	    			this.app.pageContainer.append(result.$el);
+        			result.key = 'querycatalog_'+catalog;
+	    			result.render(); // 在创建时只render一次
+	    			return result;
+	    		},this));
+	    		if (this.app.currentView && this.app.currentView.key=='ProductDetailView')
+	    			this.app.changeView(v); // ,{transition:'slidedown'}
+	    		else {
+		    		if (!h) { // 第一次才要设置restfulAction
+		    			if (catalog!='*') {
+			    			var subQuery = {CATALOG:catalog};
+			    			v.clearSearch();
+			    			v.query(subQuery);
+		    			} 
+		    		} else if (!catalog||catalog=='') {
+		    			v.clearHTML();
+		    		} 
+	    			this.app.changeView(v);
+	    		}*/
         	},this));
 		};
 		this.productQueryJSON = function(jsonString, title){
@@ -210,6 +239,29 @@ define(['modules/product/models/models'
 		    		}
 	    			this.app.changeView(v);
 	    		}
+				/*var h = this.app.selectView('queryjson_'+title); // 只取
+	    		var v = this.app.selectView('queryjson_'+title,_.bind(function(){
+	    			var collection = new ProductCachedCollection({key:'_queryjson_'+title});
+	    			var result = new ProductSearchView({collection:collection,app:this.app,title:title});
+	    			this.app.pageContainer.append(result.$el);
+        			result.key = 'queryjson_'+title;
+	    			result.render(); // 在创建时只render一次
+	    			return result;
+	    		},this));
+	    		if (this.app.currentView && this.app.currentView.key=='ProductDetailView') 
+	    			this.app.changeView(v); // ,{transition:'slidedown'}
+	    		else {
+		    		if (!h) { // 第一次才要设置restfulAction
+		    			if (jsonString!='*') {
+			    			var subQuery = JSON.parse(jsonString);
+			    			v.clearSearch();
+			    			v.query(subQuery);
+		    			} 
+		    		} else if (!jsonString||jsonString=='') {
+		    			v.clearHTML();
+		    		}
+	    			this.app.changeView(v);
+	    		}*/
         	},this));
 		};
 		this.productPublishedBy = function(jsonString, title){
@@ -234,6 +286,29 @@ define(['modules/product/models/models'
 		    		}
 	    			this.app.changeView(v);
 	    		}
+				/*var h = this.app.selectView('queryjson_'+title); // 只取
+	    		var v = this.app.selectView('queryjson_'+title,_.bind(function(){
+	    			var collection = new ProductCachedCollection({key:'_queryjson_'+title});
+	    			var result = new ProductSearchView({collection:collection,app:this.app,title:title});
+	    			this.app.pageContainer.append(result.$el);
+        			result.key = 'ProductPublishedByView';
+	    			result.render(); // 在创建时只render一次
+	    			return result;
+	    		},this));
+	    		if (this.app.currentView && this.app.currentView.key=='ProductDetailView') 
+	    			this.app.changeView(v); // ,{transition:'slidedown'}
+	    		else {
+		    		if (!h) { // 第一次才要设置restfulAction
+		    			if (jsonString!='*') {
+			    			var subQuery = JSON.parse(jsonString);
+			    			v.clearSearch();
+			    			v.query(subQuery);
+		    			} 
+		    		} else if (!jsonString||jsonString=='') {
+		    			v.clearHTML();
+		    		}
+	    			this.app.changeView(v);
+	    		}*/
         	},this));
 		};
 	})();

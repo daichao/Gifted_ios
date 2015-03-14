@@ -1,13 +1,13 @@
 define([],function(){
 	var result = {};
-	result.top= 
+	/*result.top= 
 		'<span class="headbar_sign">'+
 			'<div class="headbar_action headbar_action_back">G</div>'+
-		'</span>';
+		'</span>';*/
 	result.content=
 		'<div class="imageview_scroller imageview_content">' +
 			'<div class="clearfix">'+
-				'<div class="imageview_images '+(Gifted.Config.isCanvasCarouel?'canvascarousel':'owl-carousel')+'" >' +
+				'<div class="imageview_images" >' +
 					'{{#each this.PHOTOURLS}}' +
 						'<img class="imageview_image imageview_{{PHOTOID}}" src="img/notexists.png" alt="{{PHOTOID}}" />' +
 					'{{/each}}' +

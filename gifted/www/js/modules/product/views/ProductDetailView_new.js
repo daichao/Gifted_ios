@@ -37,6 +37,7 @@ define(['modules/product/templates/productdetail_new','handlebars',
 	    	ProductDetailView.__super__.initialize.apply(this,arguments);
 	    	this.model.on('sync error', this.completeLoading, this);
 	    	this.model.on("sync", this.render, this);
+	    	//this.model.on("change", this.refreshPage, this);
 	    	//this.model.on("synccache", this.renderCache, this);
 	    	//this.model.on("refresh", this.refresh, this);
 	    	this.app.user.on('change:RIGHTS',this.doPaintUser,this);
@@ -45,8 +46,6 @@ define(['modules/product/templates/productdetail_new','handlebars',
 	    	this.on('bottomrefresh',this.onBottomRefresh,this);
 	    },
 		onTopRefresh:function(){
-			//this.clearCache();
-			//this.loadData(true);
 			this.refreshPage();
 		},
 		onBottomRefresh:function(){
@@ -124,7 +123,7 @@ define(['modules/product/templates/productdetail_new','handlebars',
 			}
 	    },
 	    getImageURLs:function(event) {
-			var json = this.model.toJSON();//this.model.loadCacheItem(productID);
+			var json = this.model.toJSON();
 			if (!json) {
 				return [];
 			}
@@ -134,7 +133,7 @@ define(['modules/product/templates/productdetail_new','handlebars',
 			this.app.navigate('imagebrowser', {trigger:true});
 		},
 		refreshPage:function(event){
-			this.clearCache();
+			this.clearData();
 			this.loadData(true);
 		},
 	    refreshImg:function(event) {
@@ -145,52 +144,67 @@ define(['modules/product/templates/productdetail_new','handlebars',
 			}
 			var src = $(event.target).attr('src');
 			if (src!='#'&&src!=''&&src!=Gifted.Config.emptyImg) {
-				this.app.navigate('imagebrowser', {trigger:true});
+				//this.app.navigate('imagebrowser', {trigger:true});
 				//Gifted.Util.fullScreenToggle(event.target);
 				return false;
 			}
-			var json = this.model.toJSON();//this.model.loadCacheItem(productID);
+			// 和list参数保持一致
+			var cw=this.$el.css('width');
+			var h=cw;
+			cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
+			cw=cw-20;
+			h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
+			h=h*4/5;
+			var json = this.model.toJSON();
 			if (json) {
 				var domImg = event.target;
 				var i = Number($(domImg).attr('index'));
 				//var r=json.PHOTOURLS[i].PHOTORADIO;
-				var cw=this.$el.css('width'), h=cw;
-				cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
-				h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
-				h=h*2/3;
 				//h=r?Math.round(cw/r):cw;
 				//$(domImg).css({'width':cw,'height':h});
 				//$(domImg).attr({'index':i});
 				Gifted.Cache.localFile(json.PHOTOURLS[i].PHOTOURL+'?imageView/1/w/'+cw+'/h/'+h+'/q/80', //'/h/'+h+
 					json.PHOTOURLS[i].PHOTOID+'_1_'+cw+'_'+h+'_80', //'_'+h+
-					domImg); // remoteURL, imgID, domImg
+					domImg); // remoteURL, imgID, domImg, callback(localURL)
 				return true; // 图片刷新成功的标记
 			}
 			return false;
 	    },
 	    doPaint:function(json, placeholder) {
+			// 和list参数保持一致
+			var cw=this.$el.css('width');
+			var h=cw;
+			cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
+			cw=cw-20;
+			h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
+			h=h*4/5;
+	    	//if (placeholder) {
+			//	this.$el.find('.product_image_0').show().css({'width':cw,'height':h});
+	    	//	return;
+	    	//} 
+    		//this.$el.find('.product_image_0').remove();
+	    	this.$el.find('.product_detail_images').addClass(Gifted.Config.isCanvasCarouel?'canvascarousel':'owl-carousel');
         	var len = json.PHOTOURLS.length;
         	for (var i=0;i<len;i++) {
 		        var domImgs = this.$el.find('.product_image_'+json.PHOTOURLS[i].PHOTOID);
         		if (domImgs.length==0)
         			continue;
 				var domImg = domImgs[0];
+				
 				//var r=json.PHOTOURLS[i].PHOTORADIO;
-				var cw=this.$el.css('width'), h=cw;
-				cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
-				h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
-				h=h*2/3;
 				//h=r?Math.round(cw/r):cw;
 				$(domImg).css({'width':cw,'height':h});
 				$(domImg).attr({'index':i});
+				json._maxDetailWidth=cw;
+				json._maxDetailHeight=h;//Math.max(h,json._maxDetailHeight||0);
 				/*if (Gifted.Config.isCanvasCarouel) { // 启用CanvasCarouel或OWLCarousel的开关
 					$(domImg).hide();
 				}*/
-				if (placeholder) 
-					continue;
+				//if (placeholder) // 占位符不加载图片
+				//	continue;
 				Gifted.Cache.localFile(json.PHOTOURLS[i].PHOTOURL+'?imageView/1/w/'+cw+'/h/'+h+'/q/80', //'/h/'+h+
 					json.PHOTOURLS[i].PHOTOID+'_1_'+cw+'_'+h+'_80', //'_'+h+
-					domImg); // remoteURL, imgID, domImg
+					domImg); // remoteURL, imgID, domImg, callback(localURL)
         	}
 		},
 		doPaintEffects:function() {
@@ -202,18 +216,18 @@ define(['modules/product/templates/productdetail_new','handlebars',
 		        this.$el.find('.canvascarousel').css({width:cw,height:h});
 		        this.$el.find('.canvascarousel').carousel({mouseOnly:Gifted.Config.isCanvasCarouelDebug});
 	        } else {
-	        	{
-			        this.$el.find('.product_item_images').owlCarousel({
+	        	{ // 主图片
+			        this.$el.find('.product_detail_images').owlCarousel({
 			            navigation:false,
 			            singleItem:true,
 			            slideSpeed:300,
 			            paginationSpeed:400
 			        });
-				    /*var imgs = this.$el.find('.product_item_images img');
+				    /*var imgs = this.$el.find('.product_detail_images img');
 			        imgs.show();
-					imgs.height(imgs.width()*2/3);*/
+					imgs.height(imgs.width());*/
 			        // 获取所有的carousel实例
-			        this.owl = this.$el.find('.product_item_images').data('owlCarousel');
+			        this.owl = this.$el.find('.product_detail_images').data('owlCarousel');
 		        }
 		        { // 明细图片
 			       	this.$el.find('.product_detail_others').owlCarousel({
@@ -315,7 +329,9 @@ define(['modules/product/templates/productdetail_new','handlebars',
 	        if (json.PHOTOURLS && json.PHOTOURLS.length>0) {
         		this.doPaint(json, false);
         		this.doPaintEffects(); // 渲染dom占位符特效
-	        } 
+	        } else {
+				//this.doPaint(json, true);
+	        }
 			this.doPaintUser();
 		 	this.countdown = this.$el.find('[data-time]').countdown();
 //		 	this.$el.on('swiperight',_.bind(function(event){
@@ -334,8 +350,8 @@ define(['modules/product/templates/productdetail_new','handlebars',
         	},this),3000);*/
 	    },
 	    // public
-		clearCache:function() {
-			var json = this.model.toJSON();////this.model.loadCacheItem(productID);
+		clearData:function() {
+			var json = this.model.toJSON();
 			if (!json) 
 				return false;
 			if (!json.PHOTOURLS)

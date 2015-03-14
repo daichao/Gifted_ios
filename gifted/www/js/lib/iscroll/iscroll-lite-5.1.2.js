@@ -526,7 +526,7 @@ IScroll.prototype = {
 		} else if ( this.x < this.maxScrollX ) {
 			x = this.maxScrollX;
 		}
-		if ( !this.hasVerticalScroll || this.y > this.minScrollY ) {
+		if ( !this.hasVerticalScroll || this.y >= this.minScrollY || this.minScrollY<this.maxScrollY ) {
 			y = this.minScrollY || 0;
 		} else if ( this.y < this.maxScrollY ) {
 			y = this.maxScrollY;
@@ -556,8 +556,8 @@ IScroll.prototype = {
 			this.maxScrollY+=this.options.maxScrollYOffset;
 		}
 /* REPLACE END: refresh */
-		this.hasHorizontalScroll	= this.options.scrollX && this.maxScrollX < 0;
-		this.hasVerticalScroll		= this.options.scrollY && this.maxScrollY < 0;
+		this.hasHorizontalScroll	= this.options.scrollX; //&& this.maxScrollX < 0;
+		this.hasVerticalScroll		= this.options.scrollY;// && this.maxScrollY < 0;
 		if ( !this.hasHorizontalScroll ) {
 			this.maxScrollX = 0;
 			this.scrollerWidth = this.wrapperWidth;

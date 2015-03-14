@@ -8,15 +8,24 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 		bottomRefresh:true,
 		//scrollClassName:'product_list_content',
 	    // public
+		events:{
+			'tap .headbar_sign':'openNavigate',
+			'tap .header_search':'openSearch',
+			'tap .header_camera':'newProduct',
+			'tap .header_refresh':'refreshPage',
+			'tap .product_list_columns':'refreshImg',
+			'tap .product_item_fav':'clickFav'
+		},
+	    // public
 	    initialize:function (options) {
 	    	ProductListView.__super__.initialize.apply(this,arguments);
-	    	this.collection.on('loaddata', _.bind(function(loadNew){ // 请求新数据
-				this.loadData(loadNew);
-	    	},this));
-	    	//this.collection.on('refresh', this.refresh, this));
 	    	this.collection.on('sync error', this.completeLoading, this);
 	    	this.collection.on('set', this.completeLoading, this);
 	    	this.collection.on('clear', this.clearHTML, this);
+	    	this.collection.on('refresh', this.onRefreshContent, this);
+	    	this.collection.on('loaddata', _.bind(function(loadNew){ // 请求新数据
+				this.loadData(loadNew);
+	    	},this));
 	    	this.collection.on('add', _.bind(function(model, collection, options){ // 绘制list
 	    		var json = model.toJSON();
 				this.paintList([json], options.at);
@@ -36,20 +45,17 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 	    	this.on('toprefresh',this.onTopRefresh,this);
 	    	this.on('bottomrefresh',this.onBottomRefresh,this);
 	    },
-	    // public
-		events:{
-			'tap .headbar_sign':'openNavigate',
-			'tap .header_search':'openSearch',
-			'tap .header_camera':'newProduct',
-			'tap .header_refresh':'refreshPage',
-			'tap .product_list_columns':'refreshImg',
-			'tap .product_item_fav':'clickFav'
-		},
 		onTopRefresh:function(){
+			if (this.$el.find('.pullDown').hasClass('loading')) {
+				return;
+			}
 			this.clearFlag();
 			this.loadData(true); // loadData->model.loadData->hasmoredata->refresh
 		},
 		onBottomRefresh:function(){
+			if (this.$el.find('.pullUp').hasClass('loading')) {
+				return;
+			}
 			this.loadData(false);
 		},
 		completeLoading:function(){
@@ -92,8 +98,12 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 			this.$el.find('.product_item').remove();
 	    },
 	    // public
-		clearCache:function() {
-			this.collection.clearCache();
+		clearStorage:function() {
+			this.collection.clearStorage();
+		},
+	    // public
+		clearDatas:function() {
+			this.collection.clearDatas();
 		},
 	    // public
 		clearFlag:function() {
@@ -109,7 +119,8 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 	    },
 		refreshPage:function(event){
 			Gifted.Cache.deleteAllLocalFile(); // 删除缓存图片
-			this.clearCache();
+			this.clearDatas();
+			this.clearStorage();
 			this.loadData(); // loadData->model.loadData->hasmoredata->refresh
 		},
 		refreshImg:function(event){ // 点击图片刷新
@@ -124,17 +135,24 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 				window.location.href=href;
 				return false;
 			}
-			var productID = href.substring(9);
-			var json = this.collection.loadCacheItem(productID);
-			if (json) {
+			var productID = href.substring(16);
+			var model = this.collection.get(productID);
+			if (model) {
+				var json = model.toJSON();
+				if (!json.PHOTOURLS || json.PHOTOURLS.length==0)
+					return false;
 				var domImg = event.target;
-				//var r=json.PHOTOURLS[i].PHOTORADIO;
-				var cw=$(event.target).css('width'), h=$(event.target).css('height');
+				
+				var cw=this.$el.css('width');
+				var h=cw;
 				cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
+				cw=cw-20;
 				h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
+				h=h*4/5;
+				//var r=json.PHOTOURLS[i].PHOTORADIO;
 				//h=r?Math.round(cw/r):cw;
-				Gifted.Cache.localFile(json.PHOTOURLS[0].PHOTOURL+'?imageView/1/w/'+cw+'/h/'+h+'/q/50',  
-					json.PHOTOURLS[0].PHOTOID+'_1_'+cw+'_'+h+'_50', 
+				Gifted.Cache.localFile(json.PHOTOURLS[0].PHOTOURL+'?imageView/1/w/'+cw+'/h/'+h+'/q/80', //'/h/'+h+
+					json.PHOTOURLS[0].PHOTOID+'_1_'+cw+'_'+h+'_80', //'_'+h+
 					domImg); // remoteURL, imgID, domImg
 				return true; // 图片刷新成功的标记
 			}
@@ -165,59 +183,71 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 					}
 				}
 			})(colHeights);
+			var cw, h, cs;
+			cw=columnWidth;
+			//h=cw;
+			//cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
+			cw=cw-20;
+			//h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
+			//h=h*4/5;
+			//json._maxListWidth=cw;
+			//json._maxListHeight=h;
+			/*var heightRule=Math.round(window.screen.height*3/5);
+			if (h>heightRule) {
+				h=heightRule;
+			}*/
 			var len=jsonList.length;
 			for (var i=0;i<len;i++) { // 渲染dom
-				var json = jsonList[i];
-				if (json == null)
+				var json=jsonList[i];
+				if (!json)
 					continue;
-				if (json.PHOTOURLS && json.PHOTOURLS.length>0) {
-					var r=json.PHOTOURLS[0].PHOTORADIO, cw=columnWidth, h=Math.round(cw/r), cs=columnSelector;
-					json.realWidth = cw-16;
-					json.realHeight = h;
-					var col = cs.getColumn(h);
-					if (index==0 || index>0)
-						$(col).prepend(this.template1(json));
-					else
-						$(col).append(this.template1(json));
-				} else{
-					var c, cw=columnWidth, h=cw, cs=columnSelector;
-					json.realWidth = cw-16;
-					json.realHeight = h;
-					var col = cs.getColumn(h);
-					if (index==0 || index>0)
-						$(col).prepend(this.template1(json));
-					else
-						$(col).append(this.template1(json));
-					if ((c=this.$el.find('.product_image_'+json.ID)) && c.length>0) {
-						c[0].src=Gifted.Config.emptyImg;
-						c.attr('class', 'product_image_empty');
-					}
+				if (!json.PHOTOURLS || json.PHOTOURLS.length<=0) 
+					continue;
+				cs=columnSelector;
+				var r=json.PHOTOURLS[0].PHOTORADIO, 
+				h=Math.round(cw/r);
+				var heightRule=Math.round(window.screen.height*3/5);
+				if (h>heightRule) {
+					h=heightRule;
 				}
+				json._maxListWidth=cw;
+				json._maxListHeight=h;
+				var col=cs.getColumn(h);
+				if (index==0 || index>0)
+					$(col).prepend(this.template1(json));
+				else
+					$(col).append(this.template1(json));
+				/*var c;
+				if ((c=this.$el.find('.product_image_'+json.ID)) && c.length>0) {
+					c[0].src=Gifted.Config.emptyImg;
+					c.attr('class', 'product_image_empty');
+				}*/
 				// 描绘占位符
-				var domImgs = this.$el.find('.product_image_'+json.ID); // (list以ProductID作为domID)
-				if (!domImgs || domImgs.length==0)
+				/*var domImgs = this.$el.find('.product_image_'+json.ID); // (list以ProductID作为domID)
+				if (domImgs.length==0)
 					continue;
 				var domImg = domImgs[0];
-				var cw = json.realWidth, h = json.realHeight;
-				$(domImg).css({width:cw,height:h});
+				var cw=json._maxListWidth, h=json._maxListHeight;
+				$(domImg).css({width:cw,height:h}); // 占位符*/
+				this.$el.find('.product_image_'+json.ID).css({width:cw,height:h});
 		 　	}
 		 	for (var i=0;i<len;i++) { // 延迟加载缓存图片
 				var json = jsonList[i];
-				if (json == null)
+				if (!json)
 					continue;
-				if (json.PHOTOURLS && json.PHOTOURLS.length>0) {
-					var func=_.bind(function(json){
-						var domImgs = this.$el.find('.product_image_'+json.ID); // (list以ProductID作为domID)
-						if (!domImgs || domImgs.length==0)
-							return;
-						var domImg = domImgs[0];
-						var cw = json.realWidth, h = json.realHeight;
-						Gifted.Cache.localFile(json.PHOTOURLS[0].PHOTOURL+'?imageView/1/w/'+cw+'/h/'+h+'/q/50',  
-							json.PHOTOURLS[0].PHOTOID+'_1_'+cw+'_'+h+'_50', 
-							domImg); // remoteURL, imgID, domImg
-					},this,json);
-	        		_.defer(func);
-				}
+				if (!json.PHOTOURLS || json.PHOTOURLS.length<=0) 
+					continue;
+				_.defer(_.bind(function(json){
+					var domImgs = this.$el.find('.product_image_'+json.ID); // (list以ProductID作为domID)
+					if (domImgs.length==0)
+						return;
+					var domImg=domImgs[0];
+					
+					var cw=json._maxListWidth, h=json._maxListHeight;
+					Gifted.Cache.localFile(json.PHOTOURLS[0].PHOTOURL+'?imageView/1/w/'+cw+'/h/'+h+'/q/50',  
+						json.PHOTOURLS[0].PHOTOID+'_1_'+cw+'_'+h+'_50', 
+						domImg); // remoteURL, imgID, domImg
+				},this,json));
 		 　	}
 		 	if(this.countdown){
 		 		this.countdown.destroy();
@@ -245,8 +275,10 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 		contentRender:function(){
 	    	this.$contentEl.empty();
 	        this.$contentEl.html(this.templateContent([]));
-			this.clearCache();
-			this.loadInitData();
+	        
+			this.clearDatas();
+			//this.clearStorage(); // 不删除本地缓存
+			this.loadInitData(); // 加载初始化缓存数据
 			//this.loadData(); // 每次打开app都是加载最新的数据
 			return this;
 	    },

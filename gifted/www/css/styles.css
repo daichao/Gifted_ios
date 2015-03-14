@@ -68,6 +68,113 @@ body {
 	column-fill: balance|auto;
 	width:95%;
 }
+.dw-i {color: #000;font-size: 15px;font-weight: bold;text-align: center;text-shadow: none;}
+.owl-controls, .owl-theme .owl-controls {
+	margin-top: -20px;
+}
+.vertical-align {
+	position: relative;
+  	top: 50%;
+  	-webkit-transform: translateY(-50%);
+  	-ms-transform: translateY(-50%);
+  	transform: translateY(-50%);
+}
+.dropDownBoxForEmail{
+	position:absolute;
+	height: auto;
+	width: 100%;
+	background: white;
+	display: none;
+	z-index:100;
+	overflow:auto;
+}
+.dropDownBoxForEmail li{
+	text-align:center;
+	list-style-type:none;
+	text-decoration: underline;
+	line-height: 40px;
+}
+.dropDownBoxForEmail ul{
+	padding:0;
+}
+::-webkit-scrollbar {
+	width:0px;
+}
+
+
+
+.ui-shadow,
+.ui-btn-up-a,
+.ui-btn-hover-a,
+.ui-btn-down-a,
+.ui-body-b,
+.ui-btn-up-b,
+.ui-btn-hover-b,
+.ui-btn-down-b,
+.ui-bar-c,
+.ui-body-c,
+.ui-btn-up-c,
+.ui-btn-hover-c,
+.ui-btn-down-c,
+.ui-bar-c,
+.ui-body-d,
+.ui-btn-up-d,
+.ui-btn-hover-d,
+.ui-btn-down-d,
+.ui-bar-d,
+.ui-body-e,
+.ui-btn-up-e,
+.ui-btn-hover-e,
+.ui-btn-down-e,
+.ui-bar-e,
+.ui-overlay-shadow,
+.ui-shadow,
+.ui-btn-active,
+.ui-body-a,
+.ui-overlay-a,
+.ui-page-theme-a,
+.ui-bar-a {
+	text-shadow: none;
+	box-shadow: none;
+	-webkit-box-shadow: none;
+}
+.ui-body-c, .ui-overlay-c {
+ 	border: 1px solid #AAA;
+ 	color: #333;
+ 	background: #F9F9F9; //修改这里的颜色代码
+}
+.ui-header.ui-fixed-hidden {
+	padding:0px;
+}
+.ui-focus {
+	box-shadow:0px 0px 0px !important;
+	-webkit-box-shadow:0px 0px 0px !important;
+	-moz-box-shadow:0px 0px 0px !important;
+}
+.ui-listview > .ui-li-static.ui-last-child, .ui-listview > .ui-li-divider.ui-last-child, .ui-listview > li.ui-last-child > a.ui-btn {
+	border-bottom-width:0px;
+}
+.ui-input-search {
+	padding:0px!important;
+}
+/*
+.ui-page-theme-a .ui-btn:hover, html .ui-bar-a .ui-btn:hover, html .ui-body-a .ui-btn:hover, html body .ui-group-theme-a .ui-btn:hover, html head + body .ui-btn.ui-btn-a:hover {
+	background-color:#FD6D05;
+	color:#FFFFFF;
+}
+.ui-page-theme-a .ui-btn, html .ui-bar-a .ui-btn, html .ui-body-a .ui-btn, html body .ui-group-theme-a .ui-btn, html head + body .ui-btn.ui-btn-a, .ui-page-theme-a .ui-btn:visited, html .ui-bar-a .ui-btn:visited, html .ui-body-a .ui-btn:visited, html body .ui-group-theme-a .ui-btn:visited, html head + body .ui-btn.ui-btn-a:visited {
+	background-color:#FD6D05;
+	color:#FFFFFF;
+}
+.ui-page-theme-a .ui-btn:active, html .ui-bar-a .ui-btn:active, html .ui-body-a .ui-btn:active, html body .ui-group-theme-a .ui-btn:active, html head + body .ui-btn.ui-btn-a:active{
+	background-color:#ed5d05;
+}
+input.ui-slider-input { 
+	display:none;
+	width:0px;
+}*/
+
+
 
 .gifted-toolbar-btn:active {
 	background-color:lightgrey;
@@ -96,38 +203,7 @@ body {
 	color:#FFFFFF!important;
 }
 
-.ui-body-c, .ui-overlay-c {
- 	border: 1px solid #AAA;
- 	color: #333;
- 	background: #F9F9F9; //修改这里的颜色代码
-}
-/*
-.ui-page-theme-a .ui-btn:hover, html .ui-bar-a .ui-btn:hover, html .ui-body-a .ui-btn:hover, html body .ui-group-theme-a .ui-btn:hover, html head + body .ui-btn.ui-btn-a:hover {
-	background-color:#FD6D05;
-	color:#FFFFFF;
-}
-.ui-page-theme-a .ui-btn, html .ui-bar-a .ui-btn, html .ui-body-a .ui-btn, html body .ui-group-theme-a .ui-btn, html head + body .ui-btn.ui-btn-a, .ui-page-theme-a .ui-btn:visited, html .ui-bar-a .ui-btn:visited, html .ui-body-a .ui-btn:visited, html body .ui-group-theme-a .ui-btn:visited, html head + body .ui-btn.ui-btn-a:visited {
-	background-color:#FD6D05;
-	color:#FFFFFF;
-}
-.ui-page-theme-a .ui-btn:active, html .ui-bar-a .ui-btn:active, html .ui-body-a .ui-btn:active, html body .ui-group-theme-a .ui-btn:active, html head + body .ui-btn.ui-btn-a:active{
-	background-color:#ed5d05;
-}*/
-.ui-header.ui-fixed-hidden {
-	padding:0px;
-}
-.ui-focus {
-	box-shadow:0px 0px 0px !important;
-	-webkit-box-shadow:0px 0px 0px !important;
-	-moz-box-shadow:0px 0px 0px !important;
-}
-.ui-listview > .ui-li-static.ui-last-child, .ui-listview > .ui-li-divider.ui-last-child, .ui-listview > li.ui-last-child > a.ui-btn {
-	border-bottom-width:0px;
-}
-/*input.ui-slider-input { 
-	display:none;
-	width:0px;
-}*/
+
 
 .navigator {
 	z-index:10000;
@@ -215,18 +291,6 @@ body {
 
 
 
-.header_edit:after {
-	content:"\f044";
-	left:-8px;
-}
-.header_commit:after {
-	content:"\f0c7";
-	left:-8px;
-}
-.header_register{
-}
-.header_login{
-}
 .headbar_sign {
 	height:100%;
 	width:40px;
@@ -239,7 +303,6 @@ body {
 	font-size:30px;
 	font-weight:normal;
 	color:#FD6D05!important;
-	height:100%;
 	line-height:52px;
 }
 .headbar_action:active {
@@ -261,6 +324,24 @@ body {
 .headbar_action_back:after {
 	content:"\f104";
 	left: 6px;
+}
+
+
+
+.header_edit:after {
+	content:"\f044";
+	left:-8px;
+}
+.header_commit:after {
+	content:"\f0c7";
+	left:-8px;
+}
+.header_right_input  {
+	padding-top:0px!important;
+}
+.header_register{
+}
+.header_login{
 }
 .header_mid {
 	position: absolute;
@@ -309,6 +390,8 @@ body {
 	content:'\f045';
 }
 
+
+
 .bottom_action_pre:before {
 	float:left;
 	padding-left:5px;
@@ -327,6 +410,8 @@ body {
 	font-family:'FontAwesome';
 	content:'\f054'
 }
+
+
 
 .photo_select_wrap {
 	position:absolute;
@@ -369,6 +454,8 @@ body {
 .photo_select_cancel:after {
 	content: "\f053";
 }
+
+
 
 .pullUpLabel, .pullDownLabel{
 	height:45px;
@@ -417,76 +504,4 @@ body {
 	-webkit-animation-duration:2s;
 	-webkit-animation-iteration-count:infinite;
 	-webkit-animation-timing-function:linear;
-}
-
-.vertical-align {
-	position: relative;
-  	top: 50%;
-  	-webkit-transform: translateY(-50%);
-  	-ms-transform: translateY(-50%);
-  	transform: translateY(-50%);
-}
-
-.ui-shadow,
-.ui-btn-up-a,
-.ui-btn-hover-a,
-.ui-btn-down-a,
-.ui-body-b,
-.ui-btn-up-b,
-.ui-btn-hover-b,
-.ui-btn-down-b,
-.ui-bar-c,
-.ui-body-c,
-.ui-btn-up-c,
-.ui-btn-hover-c,
-.ui-btn-down-c,
-.ui-bar-c,
-.ui-body-d,
-.ui-btn-up-d,
-.ui-btn-hover-d,
-.ui-btn-down-d,
-.ui-bar-d,
-.ui-body-e,
-.ui-btn-up-e,
-.ui-btn-hover-e,
-.ui-btn-down-e,
-.ui-bar-e,
-.ui-overlay-shadow,
-.ui-shadow,
-.ui-btn-active,
-.ui-body-a,
-.ui-overlay-a,
-.ui-page-theme-a,
-.ui-bar-a {
- text-shadow: none;
- box-shadow: none;
- -webkit-box-shadow: none;
-}
-.dropDownBoxForEmail{
-	position:absolute;
-	height: auto;
-	width: 100%;
-	background: white;
-	display: none;
-	z-index:100;
-	overflow:auto;
-}
-.dropDownBoxForEmail li{
-	text-align:center;
-	list-style-type:none;
-	text-decoration: underline;
-	line-height: 40px;
-}
-.dropDownBoxForEmail ul{
-	padding:0;
-}
-::-webkit-scrollbar {
-	width:0px;
-
-	}
-
-.dw-i {color: #000;font-size: 15px;font-weight: bold;text-align: center;text-shadow: none;}
-
-.owl-controls, .owl-theme .owl-controls {
-	margin-top: -20px;
 }

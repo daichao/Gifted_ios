@@ -52,7 +52,7 @@ if (!Gifted.Config)
 		},
 		Cache : {
 			dir:'gifted_cachefiles', // 放到相对目录gifted_cachefiles下
-			cacheLimit:50, // 同一个key的缓存极限
+			cacheLimit:20, // 同一个key的缓存个数限制
 		},
 		Camera : {
 			sourceType:null,

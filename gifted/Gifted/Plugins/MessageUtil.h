@@ -25,4 +25,7 @@
 
 - (void)loadHistory:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
 
+- (void)sendRichContentMessage:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
+
+
 @end

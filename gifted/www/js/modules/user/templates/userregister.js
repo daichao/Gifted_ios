@@ -12,6 +12,8 @@ define([],function(){
 				'<p/>' +
 				'<input type="password" data-wrapper-class="input_underline" class="register_password" name="password" placeholder="'+Gifted.Lang['registerPassword']+'" maxlength="100">'+
 				'<p/>' +
+				'<input type="text" data-wrapper-class="input_underline" class="register_address" name="address" placeholder="'+Gifted.Lang['Address']+'" maxlength="100">'+
+				'<p/>' +
 				'<button data-rel="register" data-role="button" data-inline="true"'+
 					'data-theme="e" data-icon="" class="register_button">'+Gifted.Lang['register']+'</button>'+
 			'</div>';

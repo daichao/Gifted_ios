@@ -1,7 +1,7 @@
 
 .ui-input-search {
 	position: absolute;
-	top: 10px;
+	top: 20px;
 	right: 0px;
 	padding-top: 0px;
 	padding-bottom: 0px;
@@ -10,6 +10,7 @@
 	margin-right: 5px;
 	margin-bottom: 5px;
 	width: 80%;
+	height: 28px;
 }
 .product_search_title2 {
 	font-size:25px;
@@ -34,7 +35,6 @@
 	font-size:13px;
 	font-weight:bold;
 	color:green;
-	/*z-Index:99999;*/
 	float:right;
 	padding:0;
 	width:0px;

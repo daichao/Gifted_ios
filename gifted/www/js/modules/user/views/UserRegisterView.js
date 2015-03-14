@@ -35,10 +35,16 @@ define(['modules/user/templates/userregister', 'handlebars'],function(mod0){
 				Gifted.Global.alert(Gifted.Lang['UsernameIsEmpty']);
 				return;	
 			}
+			var address=this.$el.find('.register_address').val();
+			if(!address || address.length==0){
+				Gifted.Global.alert(Gifted.Lang['AddressIsEmpty']);
+				return;
+			}
 			var params = {
 				EMAIL : email,
 				PASSWORD : password,
 				NAME : username,
+				ADDRESS : address
 			};
 			this.app.user.register(params);
 		},

@@ -25,7 +25,7 @@ define([],function(){
 			this.on('logoutComplete',this.logoutComplete,this);
 			this.favorites = new FavoritesCollection();
 			this.conversationList = new ConversationCollection();
-			//this.on('loginSuccess',this.registAppCID,this);
+			_.defer(_.bind(this.initAppClientID,this));
 			_.defer(_.bind(function(){
 				Gifted.Global.delSessionId();//清空遗留的SessionID
 			    var db = Gifted.Global.getDatabase('alluser');
@@ -63,9 +63,6 @@ define([],function(){
 			if (!this.get('IMTOKEN'))
 				setTimeout(this.getIMToken(),10000);
 		},*/
-		parse:function(response){
-			console.log('user.models.parse.response:'+response);
-		},
 		getIMToken:function(){
 			console.log('getIMToken.sessionID:'+Gifted.Global.getSessionId());
 			if (!Gifted.Global.getSessionId())
@@ -73,21 +70,11 @@ define([],function(){
 			var url = Gifted.Config.serverURL+Gifted.Config.User.IMTokenURL+'?GIFTED_SESSIONID='+Gifted.Global.getSessionId(); // 跨域URL
 			this.fetch({
 				url : url,
-				success:_.bind(function(response){
-					console.log('user.models.getIMToken.response:'+response);
-				},this),
 				error:_.bind(function(){
 					if (!this.get('IMTOKEN')) {
-						_.debounce(_.bind(this.getIMToken, this),10000)();
+						_.debounce(_.bind(this.getIMToken, this),10000)(); // TODO 会造成服务器雪崩现象，最终导致服务器的服务线程耗尽拒绝请求(宕机)
 					}
 				},this)
-			});
-		},
-		registAppCID:function(){
-			var url = Gifted.Config.serverURL+Gifted.Config.User.APPCIDURL+
-				'?GIFTED_SESSIONID='+Gifted.Global.getSessionId()+'&__APP_CID='+this.getAppClientID(); // 跨域URL
-			this.save(null,{
-				url : url
 			});
 		},
 		register : function(params ,async){
@@ -124,14 +111,61 @@ define([],function(){
 				},this)
 			});
 		},
-		getAppClientID : function(){
+		initAppClientID : function(){
 			if (Gifted.Config.isRealPhone==false)
-				return null;
-			if(!this.appCID && deviceIsAndroid)//TODO 等IOS做好再修改
-				Gifted.Plugin.dispatch('getAppCID',[],_.bind(function(cid){
-					this.appCID = cid;
+				return;
+			var appCIDCache = Gifted.Cache.getCache('Gifted.AppCID');
+			if (appCIDCache) {
+				this.appCID = appCIDCache;
+				return;
+			}
+			Gifted.Plugin.dispatch('getAppCID',[]
+				,_.bind(function(clientid){ // success
+					console.log('initAppClientID.success:'+JSON.stringify(json));
+					this.appCID = clientid; // TODO 存本地，不用每次打开app都去获取
+					if (!appCIDCache) {
+						this.registAppCID();
+					}
+				},this)
+				,_.bind(function(message){ // error
+					console.log(message);
+					_.debounce(_.bind(this.initAppClientID, this),10000)();
 				},this));
-			return this.appCID;
+			/*Gifted.Plugin.dispatch('getAppCID',[]
+				,_.bind(function(json){ // success
+					console.log('initAppClientID.success:'+JSON.stringify(json));
+					this.appCID = json.clientid;
+					if (json.sync==true)
+						this.registAppCID();
+				},this)
+				,_.bind(function(message){ // error
+					console.log(message);
+					_.debounce(_.bind(this.initAppClientID, this),10000)();
+				},this));*/
+		},
+		registAppCID:function(){
+			if(!this.appCID){
+				Gifted.Global.alert('this.appCID is null');
+				return;
+			}
+			var params = {'__APP_CID':this.appCID};
+			$.ajax({
+				async : true,
+				url : Gifted.Config.serverURL+Gifted.Config.User.APPCIDURL, // 跨域URL
+				type : 'post',
+				dataType : 'json',
+				data : params,
+				timeout : 5000,
+				crossdomain:true,
+				success : _.bind(function(json) { // 客户端jquery预先定义好的callback函数，成功获取跨域服务器上的json数据后，会动态执行这个callback函数
+					console.log('registAppCID.success:'+JSON.stringify(json));
+					this.set(json);
+					Gifted.Cache.setCache('Gifted.AppCID', this.appCID);
+				},this),
+				error : _.bind(function(xhr, info) { // jsonp 方式此方法不被触发
+					_.debounce(_.bind(this.registAppCID, this),10000)(); // TODO 会造成服务器雪崩现象，最终导致服务器的服务线程耗尽拒绝请求(宕机)
+				},this)
+			});
 		},
 		login : function(params){
 			Gifted.Global.delSessionId();
@@ -204,8 +238,7 @@ define([],function(){
 			}
 		},
 		logout:function(logoutOnly){
-			params = {GIFTED_SESSIONID:Gifted.Global.getSessionId(),
-						__APP_CID : this.getAppClientID()};
+			params = {GIFTED_SESSIONID:Gifted.Global.getSessionId()};
 			this.trigger('request');
 			$.ajax({
 				//useBody:true,
@@ -219,11 +252,6 @@ define([],function(){
 				complete : _.bind(function(XMLHttpRequest, textStatus) {
 					this.trigger('sync');
 					this.trigger('logoutComplete');
-					if (logoutOnly==true) {
-					}else {
-						//Backbone.history.navigate('home',{trigger:true});//登出后跳转到首页
-						Backbone.history.history.back();
-					}
 				},this),
 				error : _.bind(function(xhr, info) { // jsonp 方式此方法不被触发
 					this.trigger('error');
@@ -232,7 +260,6 @@ define([],function(){
 			});
 		},
 		logoutComplete:function(){
-			//TODO 清除favorites
 			var db = Gifted.Global.getDatabase('alluser');
 		    db.transaction(
 		    	_.bind(function selectUser(tx){
@@ -244,6 +271,7 @@ define([],function(){
 		    );
 			this.conversationList.stopListening();
 			this.conversationList.clear();
+			this.favorites.clear();
 			
 		},
 		forgetPassword : function(params){
@@ -546,6 +574,23 @@ define([],function(){
 	});
 	MessageModel = Backbone.Model.extend({
 		idAttribute:'MESSAGEID',
+		dateFields:['time'],
+		parse:function(response){
+			var json = MessageModel.__super__.parse.apply(this,arguments);
+			return this._parseTimes(json);
+		},
+		_parseTimes:function(json){
+			if (!json)
+				return null;
+		    _.each(this.dateFields, function(field) {
+		    	if (json[field]) {
+		    		var mm = moment(json[field]); // moment类型字段 直接转moment对象
+		    		json[field+'_MOMENT'] = mm;
+		    		json[field+'_formnow'] = mm.fromNow();
+		    	}
+		    });
+			return json;
+		},
 	});
 	MessageCollection = Backbone.Collection.extend({
 		model : MessageModel,
@@ -562,16 +607,10 @@ define([],function(){
 		init:function(){
 			var userInfo = this.friend.get('userInfo');
 			this.set({'PORTRAIT':userInfo.PORTRAIT, 'NAME':userInfo.NAME});
-			var unreadCount = this.get('unreadCount');
-			if(!isNaN(unreadCount) && this.get('content')){
-				this.receiveMessage(this.toJSON());
-			}
-			this.inited = true;
-			this.trigger('Inited',this);
 		},
 		parse:function(response){
-			var result = ConversationModel.prototype.parse.apply(this,arguments);
-			this._parseItmes(json, catalogs, force);
+			var json = ConversationModel.__super__.parse.apply(this,arguments);
+			return this._parseTimes(json);
 		},
 		_parseTimes:function(json){
 			if (!json)
@@ -586,17 +625,12 @@ define([],function(){
 			return json;
 		},
 		receiveMessage : function(message){
-			var messageModel = new MessageModel(message);
-			if(message.senderId == this.get('CONVERSATIONID'))
-				messageModel.set({'PORTRAIT':this.get('PORTRAIT'),'NAME':this.get('NAME')});
-			else
-				messageModel.set({'PORTRAIT':Gifted.app.user.get('PORTRAIT'),'NAME':Gifted.app.user.get('NAME')});
-			this.messageList.push(messageModel,{merge:true});
-			this.set(message);
+			this.set(message);//设置conversation最后一条消息为当前message
+			this.messageList.push(message,{merge:true,parse:true});
 			this.trigger('receiveSuccess',this);
 		},
 		sendMessage : function(message){
-			if(message.title){
+			if(message.title && message.imageUri){
 				Gifted.Plugin.messageUtil('sendRichContentMessage',[message.targetId,message.title,message.content,message.imageUri],
 					_.bind(function(message){this.sendSuccess(message)},this),
 					_.bind(function(){
@@ -611,10 +645,8 @@ define([],function(){
 			}
 		},
 		sendSuccess:function(message){
-			var messageModel = new MessageModel(message);
-			messageModel.set({'PORTRAIT':Gifted.app.user.get('PORTRAIT'),'NAME':Gifted.app.user.get('NAME')});
-			this.messageList.push(messageModel,{merge:true});
-			this.set(message);
+			this.set(message);//设置conversation最后一条消息为当前message
+			this.messageList.push(message,{merge:true,parse:true});
 			this.trigger('sendSuccess',this);
 		},
 		loadHistory : function(lastMessageId,count){
@@ -625,15 +657,15 @@ define([],function(){
 					var models = [];
 					for(var i in messages){
 						var message = messages[i];
-						var messageModel = new MessageModel(message);
-						if(message.senderId == this.get('CONVERSATIONID'))
-							messageModel.set({'PORTRAIT':this.get('PORTRAIT'),'NAME':this.get('NAME')});
-						else
-							messageModel.set({'PORTRAIT':Gifted.app.user.get('PORTRAIT'),'NAME':Gifted.app.user.get('NAME')});
-						models.push(messageModel);
+						models.push(message);
 					}
-					if(models.length>0)
-						this.messageList.unshift(models,{merge:true}); 
+					if(models.length>0){
+						this.messageList.unshift(models,{merge:true,parse:true});
+					}
+					this.trigger('loadHistorySuccess');
+				},this),
+				_.bind(function(error){
+					this.trigger('loadHistoryError');
 				},this));
 		},
 		clearUnreadCount : function(){
@@ -659,10 +691,9 @@ define([],function(){
 					}else{
 						data.CONVERSATIONID = data.senderId;
 					}
-					var conversation = new ConversationModel(data);
-					conversations.push(conversation);
+					conversations.push(data);
 				}
-				this.unshift(conversations,{merge:true});
+				this.unshift(conversations,{merge:true,parse:true});
 				this.interval = setInterval(_.bind(this.getMessage,this),1000);
 			},this));
 		},
@@ -686,9 +717,11 @@ define([],function(){
 		receiveMessage : function(message){
 			var conversation = this.get(message.senderId);
 			if(!conversation){//添加conversation
-				message.CONVERSATIONID = message.senderId;
-				conversation = new ConversationModel(message);
-				this.unshift(conversation,{merge:true});
+				var conversationData = message;
+				conversationData.CONVERSATIONID = message.senderId;
+				this.unshift(conversationData,{merge:true,parse:true});
+				conversation = this.get(conversationData.CONVERSATIONID);
+				conversation.receiveMessage(message);
 			}else{
 				conversation.receiveMessage(message);
 			}
@@ -771,5 +804,9 @@ define([],function(){
 				}
 			});
 		},
+		clear : function(){
+			while(this.size()>0)
+				this.pop();
+		}
 	});
 });

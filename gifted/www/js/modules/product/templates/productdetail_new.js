@@ -16,24 +16,26 @@ define(['css!lib/owl.carousel/owl.carousel.css', 'css!lib/owl.carousel/owl.theme
 						// result.publisher
 					'</div>' +
 					'<div class="product_detail_itemfav fav_{{ID}}"></div>' +
-					'<div class="product_item_images product_detail_images '+(Gifted.Config.isCanvasCarouel?'canvascarousel':'owl-carousel')+'" >' +
+					'<div class="product_item_images product_detail_images" >' + 
 						'{{#each this.PHOTOURLS}}' +
-							'<img class="product_item_image product_image product_image_{{PHOTOID}}" src="img/notexists.png" alt="{{PHOTOID}}" />' +
+							'<img class="product_detail_image product_image product_image_{{PHOTOID}}" src="img/notexists.png" alt="{{PHOTOID}}" />' +
 						'{{/each}}' +
+						//'<img class="product_detail_image product_image product_image_0" src="img/notexists.png" alt="0" />' +
 					'</div>' +
 					'<div class="product_detail_infoblock1">' +
 						'<div class="product_detail_publisher2">'+
 							// result.publisher
 						'</div>' +
 						'<div class="product_detail_group1">' +
+            				'{{#if _timeover}}<div class="product_item_yxq_timeover product_detail_yxq_timeover"></div>{{else}}{{/if}}'+
 		                    '<span class="product_detail_qdl product_item_qdl" data-translate="MinQuantity" data-translate-param="{{QDL}}"></span>' +
 		                    '<span class="product_detail_price product_item_price" data-translate="Price" data-translate-param="{{__CURRENCY__Option__}}|{{PRICE}}"></span>' +
 						'</div>' +
 						'<div class="product_item_detail product_detail_detail">'+
 							'<div class="product_item_yxq_progess">'+
-								'<div style="width:{{timeleftpercent}}%" class="product_item_yxq_currentprogess"></div>'+
+								'<div style="width:{{_timeleft_percent}}%" class="product_item_yxq_currentprogess"></div>'+
 							'</div>'+
-							'<span class="product_item_yxq" data-time="{{toseconds timeleft_monent}}"></span>' +
+							'<span class="product_item_yxq" data-time="{{toseconds _timeleft_monent}}"></span>' +
 						'</div>'+
 					'</div>' +
 					'<div class="split">'+Gifted.Lang['Description'] +'</div>'+

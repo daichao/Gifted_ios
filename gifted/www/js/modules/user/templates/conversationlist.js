@@ -9,24 +9,24 @@ define(['css!modules/user/styles/conversation.css'],function(){
 			'<div class="conversation_list_content">' +
 				'{{#each this}}' +
 					'<div conversationId="{{CONVERSATIONID}}" class="conversation clearfix">'+
-						'<img class="conversation_img" src="{{PORTRAIT}}?imageView/1/w/50/h/50/q/100">' +
+						'<img class="conversation_img vertical-align" src="{{PORTRAIT}}?imageView/1/w/50/h/50/q/100">' +
 						'<div class="conversation_text">' + 
 							'<div class="conversation_title">{{NAME}}<span class="conversation_unreadcount">{{unreadCount}}<span></div>' +
 							'<div class="conversation_content">{{content}}</div>' +
 						'</div>' +
-						'<span class="conversation_time vertical-align">{{time_fromnow}}</span>' +	
+						'<span class="conversation_time vertical-align">{{dataformnow time_MOMENT}}</span>' +
 						'</div>' +
 				'{{/each}}' +
 			'</div>' +
 		'</div>';
 	result.conversation = 
 		'<div conversationId="{{CONVERSATIONID}}" class="conversation clearfix">'+
-				'<img class="conversation_img" src="{{PORTRAIT}}?imageView/1/w/50/h/50/q/100">' +
+				'<img class="conversation_img vertical-align" src="{{PORTRAIT}}?imageView/1/w/50/h/50/q/100">' +
 				'<div class="conversation_text">' + 
 					'<div class="conversation_title">{{NAME}}<span class="conversation_unreadcount">{{unreadCount}}<span></div>' +
 					'<div class="conversation_content">{{content}}</div>' +
 				'</div>' +
-				'<span class="conversation_time vertical-align">{{time_fromnow}}</span>' +
+				'<span class="conversation_time vertical-align">{{dataformnow time_MOMENT}}</span>' +
 		'</div>';
 	return result;
 		

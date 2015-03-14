@@ -21,6 +21,11 @@
 #import "RCProfileNotificationMessage.h"
 #import "RCCommandNotificationMessage.h"
 #import "RCContactNotificationMessage.h"
+#import "JSONKit.h"
+#import "RCConversation.h"
+#import "RCMessageContent.h"
+#import "AppDelegate.h"
+#import "MessageQueue.h"
 
 @interface MessageUtil ()<RCReceiveMessageDelegate,RCConnectDelegate,RCSendMessageDelegate>
 
@@ -28,48 +33,78 @@
 @property (nonatomic,strong) AVAudioPlayer *player;
 @property (nonatomic,strong) AVAudioRecorder *recorder;
 @property (nonatomic) NSString *userId;
-
+@property (nonatomic,strong)RCIMClient *client;
 @end
+
 
 
 @implementation MessageUtil
 
-RCIMClient *client;
+//RCIMClient *client;
 @synthesize callbackId;
+
+////发送文本消息
+//- (IBAction)sendText:(id)sender {
+//    
+//    RCTextMessage *rcImageMessage = [RCTextMessage messageWithContent:@"This is a test message!"];
+//    [rcImageMessage setExtra:@"(extra_text 扩展字段)"];
+//    
+//    [[RCIMClient sharedRCIMClient] sendMessage:ConversationType_PRIVATE
+//                                      targetId:self.userId
+//                                       content:rcImageMessage
+//                                      delegate:self object:nil];
+//}
+////图文消息
+//- (IBAction)sendImgAndText:(id)sender {
+//    
+//    RCRichContentMessage *msg = [RCRichContentMessage messageWithTitle:@"图文消息" digest:@"这是一条吴文消息" imageURL:@"http://www.baidu.com" extra:@"图文扩展字段"];
+//    [msg setExtra:@"(extra_text 扩展字段)"];
+//    
+//    [[RCIMClient sharedRCIMClient] sendMessage:ConversationType_PRIVATE targetId:self.userId content:msg delegate:self object:nil];
+//    
+//    
+//}
 
 //连接融云服务器
 - (void)connectIMServer:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
-   self.callbackId = [arguments objectAtIndex:0];
+    self.callbackId = [arguments objectAtIndex:0];
     NSString *IMTOKEN=[arguments objectAtIndex:1];
-    client=[[RCIMClient alloc]init];
+    AppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+    self.client=appDelegate.client;
     if(IMTOKEN!=nil){
-        if(client!=nil){
-         [client disconnect:NO];
+        if(self.client!=nil){
+         [self.client disconnect:NO];
+            
         }
+        else{
          [RCIMClient connect:IMTOKEN delegate:self];
+        }
     }
 }
 
 
 
-
+//清除未读
 - (void)clearUnreadCount:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
     CDVPluginResult* result=nil;
+    NSNumber *type=nil;
     self.callbackId = [arguments objectAtIndex:0];
-    NSNumber *type=(NSNumber *)[arguments objectAtIndex:1];
-//    NSUInteger *cType=[NSNumber numberWithInteger:<#(NSInteger)#>]
+    NSString *conversationType=[arguments objectAtIndex:1];//@"PRIVATE"
+    if([conversationType isEqualToString :@"PRIVATE"]){
+        type=[NSNumber numberWithInt:1];
+    }
     NSString *conversationId=[arguments objectAtIndex:2];
     NSNumber *cType=[NSNumber numberWithInteger:ConversationType_PRIVATE];
     if([type isEqualToNumber:cType]){//默认是私聊
-        NSInteger *count=nil;//unreadcount
-        BOOL success=[client clearMessagesUnreadStatus:ConversationType_PRIVATE targetId:conversationId];//清理未读取消息状态
+        NSNumber *count=nil;//unreadcount
+        BOOL success=[self.client clearMessagesUnreadStatus:ConversationType_PRIVATE targetId:conversationId];//清理未读取消息状态
         NSString *json=nil;
         if(success){
             json=[self returnJson:0];
             
         }
         else{
-            count=[client getUnreadCount:ConversationType_PRIVATE targetId:conversationId];
+            count=[NSNumber numberWithInteger:[self.client getUnreadCount:ConversationType_PRIVATE targetId:conversationId]];
             json=[self returnJson:count];
 //             json.put("unreadCount", client.getConversation(cType, conversationId).getUnreadMessageCount());
         }
@@ -78,7 +113,7 @@ RCIMClient *client;
     }
 }
 //仅用于转换unreadcount
--(NSString*)returnJson:(NSInteger*) unreadCount{
+-(NSString*)returnJson:(NSNumber*) unreadCount{
             NSString *jsonData=nil;
             NSString *jsonString=[NSString stringWithFormat:@"{\"unreadCount\":\"%@\"}",unreadCount];
             NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
@@ -87,57 +122,157 @@ RCIMClient *client;
             return jsonData;
 }
 
-//获取回话列表
+//获取会话列表
 - (void)getConversationList:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
-    
+    CDVPluginResult* result=nil;
+    NSMutableArray *jsonArray=[[NSMutableArray alloc]init];
     NSNumber *cType=[NSNumber numberWithInteger:ConversationType_PRIVATE];//将枚举类型的会话类型转换成数值类型
-    NSArray *clist=[NSArray arrayWithObjects:cType, nil];//将数值类型转换成数组
-   NSArray *list= [client getConversationList:clist];//这里默认会话都为私聊
-    
-//    List<Conversation> list = client.getConversationList();
-//				JSONArray conversationList = new JSONArray();
-//				for(Conversation conversation : list){
-//                    String title = conversation.getConversationTitle();
-//                    String conversationType = conversation.getConversationType().name();
-//                    MessageContent lastMessage = conversation.getLatestMessage();
-//                    int lastMessageId = conversation.getLatestMessageId();
-//                    String senderId = conversation.getSenderUserId();
-//                    //int receiveStatus = conversation.getReceivedStatus().getFlag();
-//                    long sendTime = conversation.getSentTime();
-//                    String senderName = conversation.getSenderUserName();
-//                    String targetId = conversation.getTargetId();
-//                    int unreadCount = conversation.getUnreadMessageCount();
-//                    JSONObject json = new JSONObject(new String(lastMessage.encode(),"UTF-8"));
-//                    json.put("title", title);
-//                    json.put("senderId", senderId);
-//                    json.put("senderName", senderName);
-//                    json.put("MESSAGEID",lastMessageId);
-//                    json.put("targetId", targetId);
-//                    json.put("time", sendTime);
-//                    json.put("conversationType", conversationType);
-//                    //json.put("receiveStatus", receiveStatus);
-//                    json.put("unreadCount", unreadCount);
-//                    conversationList.put(json);
-//                }
-//				callbackContext.success(conversationList);
-    
-    
+    NSArray *clist=[NSArray arrayWithObject:cType];//将数值类型转换成数组
+    NSArray *list= [self.client getConversationList:clist];//这里默认会话都为私聊
+        RCConversation *conversation=[[RCConversation alloc]init];
+        for(conversation in list){
+            NSString *title=[conversation conversationTitle];
+            NSNumber *conversationType=[NSNumber numberWithInteger:[conversation conversationType] ];
+            RCMessageContent *lastMessage=[conversation lastestMessage];
+            NSString *mc=[lastMessage pushContent];
+            NSLog(@"%@",mc);
+            if(mc==nil || mc==Nil || mc==NULL){
+                //result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"NO DATA"];
+                //[self writeJavascript:[result toSuccessCallbackString:[arguments objectAtIndex:0]]];
+                continue;
+            }
+            
+            NSString *lastMessageId=[conversation lastestMessageId];
+            NSString *senderId=[conversation senderUserId];
+            long sendTime=[conversation sentTime];
+            NSString *senderName=[conversation senderUserName];
+            NSString *targetId=[conversation targetId];
+            int unreadCount=[conversation unreadMessageCount];
+            // NSData *data=[lastMessage dataUsingEncoding:NSUTF8StringEncoding];
+            
+            NSString *jsonString=[NSString stringWithFormat:@"{\"title\":\"%@\",\"senderId\":\"%@\",\"senderName\":\"%@\",\"MESSAGEID\":\"%@\",\"targetId\":\"%@\",\"time\":\"%ld\",\"conversationType\":\"%@\",\"unreadCount\":\"%d\"}",title,senderId,senderName,lastMessageId,targetId,sendTime,conversationType,unreadCount];
+            NSData *data=[jsonString dataUsingEncoding:NSUTF8StringEncoding];
+            id json=[NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+            id jsonLastMessage=[NSJSONSerialization JSONObjectWithData:[[lastMessage pushContent] dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
+            jsonLastMessage=json;
+            [jsonArray addObject:jsonLastMessage];
+            
+        }
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:jsonArray];
+        [self writeJavascript:[result toSuccessCallbackString:[arguments objectAtIndex:0]]];
 }
 
+
+//返回最新的消息
 - (void)consumeMessage:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
-
+    CDVPluginResult *result=nil;
+    RCMessage *message=[MessageQueue consumeMessage];
+    if(message!=nil){
+        NSString *json=[self message2json:message];
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:json];
+        [self writeJavascript:[result toSuccessCallbackString:[arguments objectAtIndex:0]]];
+    }
 }
 
+//将message转换成json
+-(NSString*)message2json:(RCMessage*)message{
+    NSNumber *cType=[NSNumber numberWithInteger:[message conversationType]];
+    NSNumber *direction=[NSNumber numberWithInteger:[message messageDirection]];
+    NSString *jsonString=[NSString stringWithFormat:@"{\"senderId\":\"%@\",\"MESSAGEID\":\"%ld\",\"targetId\":\"%@\",\"time\":\"%lld\",\"direction\":\"%@\",\"conversationType\":\"%@\"}",[message senderUserId],[message messageId],[message targetId],[message sentTime],direction,cType];
+    
+    NSData *data=[jsonString dataUsingEncoding:NSUTF8StringEncoding];
+    id json=[NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+    return json;
+}
+
+//发送文本消息
 - (void)sendTextMessage:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
-
+    CDVPluginResult *result=nil;
+    NSString *senderId=[arguments objectAtIndex:1];
+    NSString *toUserId=[arguments objectAtIndex:2];//targetId
+    NSString *context=[arguments objectAtIndex:3];//content
+    RCTextMessage *textMessage=[RCTextMessage messageWithContent:context];
+    [textMessage setExtra:toUserId];
+    [textMessage setPushContent:context];
+    RCMessage *message=[self.client sendMessage:ConversationType_PRIVATE targetId:toUserId content:textMessage delegate:self object:nil];
+    [message setSenderUserId:senderId];
+    [message setMessageDirection:MessageDirection_SEND];
+    [message setConversationType:ConversationType_PRIVATE];
+    NSLog(@"message is %@",[message senderUserId]);
+    @try{
+        NSString *json=[self message2json:message];
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:json];
+        [self writeJavascript:[result toSuccessCallbackString:[arguments objectAtIndex:0]]];
+        
+    }@catch(NSException* exception){
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"发送消息失败！"];
+        [self writeJavascript:[result toErrorCallbackString:[arguments objectAtIndex:0]]];
+    }
 }
 
+//获取历史消息
 - (void)loadHistory:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
-
+//    conversationType,conversationId,lastMessageId,count
+    NSString *cType=[arguments objectAtIndex:1];//@"PRIVATE"
+    RCConversationType *conversationType=[self getConversationType:cType];
+    NSString *cId=[arguments objectAtIndex:2];
+    NSNumber *lastMsgId=[arguments objectAtIndex:3];
+    NSNumber *count=[arguments objectAtIndex:4];
+    NSArray * messages=[self.client getHistoryMessages:*conversationType targetId:cId oldestMessageId:lastMsgId count:count];
+    NSMutableArray *jsonArray=[[NSMutableArray alloc]init];
+    
+    
+//    for(RCMessage *message:messages){
+//        NSString *json=[self message2json:message];
+    
+//    }
+//    String type = args.getString(0);
+//				String conversationId = args.getString(1);
+//				int lastMessageId = args.getInt(2);
+//				int count = args.getInt(3);
+//				RongIMClient.ConversationType cType = getConversationType(type);
+//				List<Message> messages = client.getHistoryMessages(cType, conversationId, lastMessageId, count);
+//				JSONArray array = new JSONArray();
+//				int nextMessageId = lastMessageId;
+//				for(Message message : messages){
+//                    JSONObject json = message2Json(message);
+//                    json.put("nextMessageId", nextMessageId);
+//                    nextMessageId = json.getInt("MESSAGEID");
+//                    array.put(json);
+//                }
+//				callbackContext.success(array);
 }
 
+-(RCConversationType*)getConversationType:(NSString*)cType{
+    RCConversationType *ConversationType=nil;
+    if([cType isEqualToString:@"PRIVATE"]){
+        *ConversationType=ConversationType_PRIVATE;
+    }
+    return ConversationType;
+    
+}
 
+//发送富文本消息
+- (void)sendRichContentMessage:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
 
+//    String toUserId = args.getString(0);
+//				String title = args.getString(1);
+//				String content = args.getString(2);
+//				String imageUri = args.getString(3);
+//				RichContentMessage richMessage = new RichContentMessage();
+//				richMessage.setTitle(title);
+//				richMessage.setContent(content);
+//				richMessage.setUrl(imageUri);
+//				richMessage.setPushContent(title);
+//				Message message = sendMessage(toUserId, richMessage, callbackContext);
+//				JSONObject json = null;
+//    try {
+//        json = message2Json(message);
+//        callbackContext.success(json);
+//				} catch (Throwable e) {
+//                    callbackContext.error(json);
+//                }
+}
 
 #pragma mark - 图片消息
 -(void)sendImageMessage:(UIImage*)image{
@@ -152,50 +287,6 @@ RCIMClient *client;
     
 }
 
-//-(void)publishLocalNotification:(NSString *)message {
-//    //设置1秒之后
-//    
-//    NSDate *date = [NSDate dateWithTimeIntervalSinceNow:2];
-//    
-//    //chuagjian一个本地推送
-//    
-//    UILocalNotification *noti = [[UILocalNotification alloc] init] ;
-//    
-//    //设置推送时间
-//    
-//    noti.fireDate = date;
-//    
-//    //设置时区
-//    
-//    noti.timeZone = [NSTimeZone defaultTimeZone];
-//    
-//    //设置重复间隔
-//    
-//    noti.repeatInterval = NSCalendarUnitWeekday;
-//    
-//    //推送声音
-//    
-//    noti.soundName = UILocalNotificationDefaultSoundName;
-//    //内容
-//    
-//    noti.alertBody = message;
-//    
-//    //显示在icon上的红色圈中的数子
-//    
-//    noti.applicationIconBadgeNumber = 1;
-//    
-//    //设置userinfo 方便在之后需要撤销的时候使用
-//    
-//    NSDictionary *infoDic = [NSDictionary dictionaryWithObject:@"name" forKey:@"key"];
-//    
-//    noti.userInfo = infoDic;
-//    
-//    //添加推送到uiapplication
-//    
-//    UIApplication *app = [UIApplication sharedApplication];
-//    
-//    [app scheduleLocalNotification:noti];
-//}
 
 #pragma mark - RCReceiveMessageDelegate
 -(void)responseOnReceived:(RCMessage *)message left:(int)nLeft object:(id)object

@@ -138,7 +138,9 @@ define(['translate'], function() {
 		'changepwd':'Change Password',
 		'ConfirmPassword':'Confirm Password',
 		'OldPassword':'Old Password',
-		'Password':'Password'
+		'Password':'Password',
+		'Address':'Address',
+		'AddressIsEmpty':'Address is Empty'
 	};
 	TRANSLATE.registerLang('en',data);
 	return data;

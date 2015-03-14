@@ -2,6 +2,7 @@
 // Abstract
 define(['underscore','backbone','backbone.scrollview'],function(_){
 	Gifted.View = Backbone.ScrollView.extend({
+	    // public
 		constructor:function(config){
 			if(config) {
 				this.app=config?config.app:null;
@@ -15,16 +16,19 @@ define(['underscore','backbone','backbone.scrollview'],function(_){
 	    		tt.on("error", this.hideLoading, this);
 			}
 		},
+	    // public
 		changeView:function(to){
 			this.app.showView(to);
 			this.app.navigate(to.path);
 		},
+	    // public
 		getPrevView:function(){
 			if(this.prevView){
 				return this.app.getCacheView(this.prevView);
 			}
 			return null;
 		},
+	    // public
 		back:function(event){
 			if (Backbone.history.history.length>1) {
 				Backbone.history.history.back();
@@ -32,16 +36,20 @@ define(['underscore','backbone','backbone.scrollview'],function(_){
 	    		this.backHome(event);
 			}
 		},
+	    // public
 	    backHome:function(event){
 	    	this.app.navigate('home', {trigger:true});
 	    },
+	    // public
 		openNavigate:function(event){
 			this.app.navigate('navigate', {trigger:true});
 		},
+	    // public
 	    openSearch:function(event) {
 	    	var title = Gifted.Lang['ProductSearch'];
 			this.app.navigate('product/search/query/*/'+title, {trigger:true});
 	    },
+	    // public
 	    openLink:function(event){
 	    	var href = $(event.target).find('a').attr('href');
 	    	if (!href)
@@ -56,14 +64,16 @@ define(['underscore','backbone','backbone.scrollview'],function(_){
 		//  	event.preventDefault();
 		//	this.app.navigate('product/choosecatalog', {trigger:true,transition:'slidetop'});
 	    //},
+	    // public
 		showLoading:function() {
 			Gifted.Global.showLoading();
 		},
+	    // public
 		hideLoading:function() {
 			Gifted.Global.hideLoading();
 		},
 	    // public
-	    refresh : function() {
+	    refresh:function() {
 	    	//this.trigger('refreshcontent');
 	    	this.onRefreshContent();
 		},
@@ -84,20 +94,6 @@ define(['underscore','backbone','backbone.scrollview'],function(_){
 			if(this.app)
 				delete this.app;
 		},
-		bindEmailHintEvent:function(selector){
-			this.events['input '+selector+'']='hint';
-			this.events['tap .dropDownBoxForEmail li']='appendEmailSuffix';	
-			this.events['focus '+selector+'']='renderEmailHintFrame';
-		},
-		renderEmailHintFrame:function(event){
-			if(this.$el.find(".dropDownBoxForEmail").length==0){
-				this.$el.find(event.target).after(
-					'<div class="dropDownBoxForEmail">\
-						<ul class="dropDown"></ul>\
-					</div>'
-				);
-			}	
-		},
 		hint:function(event){				
 			var input = $(event.target).val();
 			if(input.length==0){
@@ -113,17 +109,32 @@ define(['underscore','backbone','backbone.scrollview'],function(_){
 				this.showPreparedEmailList(prefix,suffix);
 			}
 		},
+		bindEmailHintEvent:function(selector){
+			this.events['input '+selector+'']='hint';
+			this.events['tap .dropDownBoxForEmail li']='appendEmailSuffix';	
+			this.events['focus '+selector+'']='renderEmailHintFrame';
+		},
+		renderEmailHintFrame:function(event){
+			if(this.$el.find(".dropDownBoxForEmail").length==0){
+				this.$el.find(event.target).after(
+					'<div class="dropDownBoxForEmail">'+
+						'<ul class="dropDown"></ul>'+
+					'</div>'
+				);
+			}	
+		},
 		showPreparedEmailList:function(prefix,suffix){
-			 var emails = [{domain: '@qq.com', label: 'qq邮箱'}, 
-			                {domain: '@163.com',  label: '163邮箱'},
-			                {domain: '@126.com', label: '126邮箱'},
-			                {domain: '@hotmail.com', label: 'hotmail邮箱'},
-			                {domain: '@sina.com', label:'sina邮箱'},
-			                {domain: '@gmail.com',label:'gmail邮箱'}, 
-			                {domain: '@139.com', label: '139邮箱'}, 
-			                {domain:'@yahoo.com.cn', label: 'yahoo中国邮箱'},
-			                {domain:'@msn.cn', label: 'msn邮箱'}
-			                ];
+			 var emails = [
+                {domain:'@139.com', label:'139邮箱'}, 
+                {domain:'@126.com', label:'126邮箱'},
+                {domain:'@163.com',  label:'163邮箱'},
+                {domain:'@gmail.com',label:'gmail邮箱'}, 
+                {domain:'@hotmail.com', label:'hotmail邮箱'},
+                {domain:'@msn.cn', label:'msn邮箱'},
+		 		{domain:'@qq.com', label:'qq邮箱'}, 
+                {domain:'@sina.com', label:'sina邮箱'},
+                {domain:'@yahoo.com.cn', label:'yahoo中国邮箱'}
+			 ];
 			 this.$el.find(".dropDown").html("");
 			 this.$el.find('.dropDownBoxForEmail').show();
 			 var i;
@@ -139,8 +150,8 @@ define(['underscore','backbone','backbone.scrollview'],function(_){
 				 this.$el.find('.dropDownBoxForEmail').hide();
 		},
 		appendEmailSuffix:function(event){
-			this.$el.find(".dropDownBoxForEmail").prev().val(event.target.innerHTML);
 //			this.$el.find('.login-user').val(event.target.innerHTML);
+			this.$el.find(".dropDownBoxForEmail").prev().val(event.target.innerHTML);
 			this.$el.find('.dropDownBoxForEmail').hide();
 		}
 	});

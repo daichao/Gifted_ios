@@ -3,10 +3,9 @@
 	color:lightblue;
 	font-weight:normal;
 	text-align:center;
-    padding-top: 20px;
 }
 .ui-block-portrait {
-	width:100%;
+	width:25%;
 	text-align: center;
 }
 .ui-controlgroup-controls  {
@@ -71,12 +70,11 @@
 }
 .userinteractive_head {
 	/* width: 100%; */
-	/* margin-top: 20px; */
-	-moz-column-count: 4;
+	/* margin-top: 20px; 
+	padding-top: 20px;*/
+	/*-moz-column-count: 4;
 	-webkit-column-count: 4;
-	column-count: 4;
-	
-	padding-top: 20px;
+	column-count: 4;*/
 }
 .userinteractive_favorite {
 	border-bottom:solid 1px gray;

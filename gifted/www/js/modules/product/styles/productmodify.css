@@ -28,6 +28,7 @@ label.product_label{
 }
 .product_modify_form input {
 	font-size:14px;
+	line-height:30px;
 }
 .product_modify_form .ui-title{
 	font-color:#ff8830;
@@ -46,8 +47,9 @@ label.product_label{
 	padding-top:5px;
 	padding-left:5px;
 }
-.product_modify_form input {
-	line-height:30px;
+.product_modify_yxq_timeover {
+	left: 10px;
+	top: 295px;
 }
 .product_modify_select input {
 	text-align:center;

@@ -138,7 +138,9 @@ define(['translate'], function() {
 		'changepwd':'修改密码',
 		'ConfirmPassword':'确认密码',
 		'OldPassword':'原密码',
-		'Password':'密码'
+		'Password':'密码',
+		'Address':'地址',
+		'AddressIsEmpty':'地址不能为空'
 	};
 	TRANSLATE.registerLang('zh_CN',data);
 	return data;

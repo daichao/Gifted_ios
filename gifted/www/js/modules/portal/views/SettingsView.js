@@ -31,6 +31,7 @@ define(['modules/portal/templates/settings', 'handlebars'],function(mod0){
 		},
 		logoutComplete:function(){
 			this.app.trigger('reset');
+			Backbone.history.history.back();
 		},
 		contentRender:function(){
 			var list = Gifted.Config.serverList; // this.model==this.app.settings
@@ -42,6 +43,13 @@ define(['modules/portal/templates/settings', 'handlebars'],function(mod0){
 			} else {
 				this.$el.find('#settings-language-en').attr('checked',true);
 			}
+		},
+		remove:function(){
+	    	this.app.user.off('logoutComplete',this.logoutComplete,this);
+			if (this.app) {
+	    		delete this.app;
+	    	}
+            Gifted.View.prototype.remove.apply(this, arguments);
 		}
 	});
 	return SettingsView;

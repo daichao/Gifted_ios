@@ -14,24 +14,26 @@ define(['css!lib/owl.carousel/owl.carousel.css', 'css!lib/owl.carousel/owl.theme
 			'<div class="userinteractive_blank userinteractive_product"></div>' +
 		'</div>';
 	result.head =
-		'<div class="userinteractive_portrait ui-block-portrait">'+
+		'<table><tr>'+
+		'<td class="userinteractive_portrait ui-block-portrait">'+
 			'<img class="userinteractive_img" src="img/noportrait.png" />' +
 			//'<img class="userinteractive_img" src="{{#if this.userInfo.PORTRAIT}}{{this.userInfo.PORTRAIT}}?imageView/1/w/80/h/80/q/50{{else}}img/noportrait.png{{/if}}" />' +
 			//'<span class="userinteractive_username">{{this.userInfo.NAME}}</span>'+
 			//'<span class="userinteractive_position"></span>' +
-		'</div>' +
-		'<div class="userinteractive_moreproducts ui-block-portrait" >' +
+		'</td>' +
+		'<td class="userinteractive_moreproducts ui-block-portrait" >' +
 			'<h3>{{this.userInfo.PRODUCT}}</h3>' +
 			'<p data-translate="productsCount"></p>' +
-		'</div>'+
-		'<div class="userinteractive_follow ui-block-portrait" >' +
+		'</td>'+
+		'<td class="userinteractive_follow ui-block-portrait" >' +
 			'<h3>{{this.userInfo.FOLLOW}}</h3>' +
 			'<p data-translate="FOLLOW"></p>' +
-		'</div>' +
-		'<div class="userinteractive_follower ui-block-portrait" >' + // ui-block-portrait
+		'</td>' +
+		'<td class="userinteractive_follower ui-block-portrait" >' + // ui-block-portrait
 			'<h3>{{this.userInfo.FOLLOWER}}</h3>' +
 			'<p data-translate="FOLLOWER"></p>' + // class="ui-block-p" 
-		'</div>' ;
+		'</td>' +
+		'</tr></table>';
 	result.links = 
 		'<div class="userinteractive_favorite">' +
 			'<a class="userinteractive_favorite_link" data-translate="favorites" data-translate-param="{{this.userInfo.NAME}}"></a>&nbsp;(EN/CN)' +

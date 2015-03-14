@@ -154,15 +154,18 @@ Gifted.Util={};
 	};
 	FileUploader.prototype.photo4Camera=function(options1) {
 		try {
+			// !Gifted.Config.isRealPhone
 			if (!Gifted.Config.Camera.sourceType) { // 4PC-debug
 				this.photo4Debug(options1);
 				return;
 			}
 			this.check();
 			var options = {
+				saveToPhotoAlbum:true,
 				sourceType:Gifted.Config.Camera.sourceType.CAMERA, // CAMERA, PHOTOLIBRARY, SAVEDPHOTOALBUM,
 				destinationType:Gifted.Config.Camera.destinationType.FILE_URI,
 				//cameraDirection:Camera.Direction.FRONT
+				allowEdit:true,
 				targetWidth:640,
 				targetHeight:480,
 				quality:100,
@@ -183,6 +186,42 @@ Gifted.Util={};
 				}
 			},this), function(event) {
 				console.log('加载相机异常:'+JSON.stringify(event));
+			}, options);
+		} catch (E) {
+			Gifted.Global.alert(E.message);
+		}
+	};
+	FileUploader.prototype.photo4File = function(options1) {
+		try {
+			if (!Gifted.Config.Camera.sourceType) { // 4PC-debug
+				this.photo4Debug(options1);
+				return;
+			}
+			this.check();
+			var options = {
+				sourceType : Gifted.Config.Camera.sourceType.SAVEDPHOTOALBUM, // CAMERA, PHOTOLIBRARY, SAVEDPHOTOALBUM,
+				destinationType : Gifted.Config.Camera.destinationType.FILE_URI,
+				allowEdit:true,
+				targetWidth:640,
+				targetHeight:480,
+				quality:100,
+				correctOrientation:true
+			};
+			navigator.camera.getPicture(_.bind(function(imageURI) { // imageData
+				try {
+					var imageDom = this.imageDom;
+					imageDom.style.display = 'block';
+					imageDom.src = imageURI;
+					// imageDom.src = "data:image/jpeg;base64," + imageData;
+					this.pickUrl[this.imageKey] = imageURI;
+					if (options1 && options1.callback)
+						options1.callback(imageURI);
+					delete this.deleteUrl[this.imageKey];
+				} catch (e) {
+					Gifted.Global.alert(e.message);
+				}
+			},this), function(event) {
+				console.log('加载相册异常:'+JSON.stringify(event));
 			}, options);
 		} catch (E) {
 			Gifted.Global.alert(E.message);
@@ -213,41 +252,6 @@ Gifted.Util={};
 				function(event) {
 					console.log('加载相册异常:'+JSON.stringify(event));
 				});
-		} catch (E) {
-			Gifted.Global.alert(E.message);
-		}
-	};
-	FileUploader.prototype.photo4File = function(options1) {
-		try {
-			if (!Gifted.Config.Camera.sourceType) { // 4PC-debug
-				this.photo4Debug(options1);
-				return;
-			}
-			this.check();
-			var options = {
-				sourceType : Gifted.Config.Camera.sourceType.SAVEDPHOTOALBUM, // CAMERA, PHOTOLIBRARY, SAVEDPHOTOALBUM,
-				destinationType : Gifted.Config.Camera.destinationType.FILE_URI,
-				targetWidth:640,
-				targetHeight:480,
-				quality:100,
-				correctOrientation:true
-			};
-			navigator.camera.getPicture(_.bind(function(imageURI) { // imageData
-				try {
-					var imageDom = this.imageDom;
-					imageDom.style.display = 'block';
-					imageDom.src = imageURI;
-					// imageDom.src = "data:image/jpeg;base64," + imageData;
-					this.pickUrl[this.imageKey] = imageURI;
-					if (options1 && options1.callback)
-						options1.callback(imageURI);
-					delete this.deleteUrl[this.imageKey];
-				} catch (e) {
-					Gifted.Global.alert(e.message);
-				}
-			},this), function(event) {
-				console.log('加载相册异常:'+JSON.stringify(event));
-			}, options);
 		} catch (E) {
 			Gifted.Global.alert(E.message);
 		}

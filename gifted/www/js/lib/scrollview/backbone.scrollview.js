@@ -188,15 +188,17 @@ define(deps, function(util) {
 			this.topbarRender();
 			this.contentRender();
 			this.bottomRender();
+			this.caculateHeight();
+			this.scrollRender();
+			this.initSwipeEffect();
+		},
+		caculateHeight:function(){
 			//这里需要计算content的高度
 			var h = this.$el.height()-this.$topbarEl.height();
 			if(this.$bottombarEl.is(':visible')){
 				h-=this.$bottombarEl.height();
 			}
 			this.$el.find('.'+this.scrollClassName).height(h);
-
-			this.scrollRender();
-			this.initSwipeEffect();
 		},
 		scrollRender:function() {
 //			console.log($('.scrollview').css('display'));
@@ -357,6 +359,12 @@ define(deps, function(util) {
 		onTopBound:function(isTopBound){
 			if(!this.topBound)
 				return;
+            /*if(this.topBound){
+	    		this.$el.find('.pullDown').show();
+	        }*/
+			if (this.$el.find('.pullDown').hasClass('loading')) {
+				return;
+			}
 			if(isTopBound){
 				this.$el.find('.pullDown').addClass('flip');
 				this.$el.find('.pullDownLabel').html('Release to refresh...');
@@ -368,9 +376,12 @@ define(deps, function(util) {
 		onBottomBound:function(isBottomBound){
 			if(!this.bottomBound)
 				return;
-                        if(this.bottomRefresh){
-	    			this.$el.find('.pullUp').show();
-	                }
+            if(this.bottomRefresh){
+	    		this.$el.find('.pullUp').show();
+	        }
+			if (this.$el.find('.pullUp').hasClass('loading')) {
+				return;
+			}
 			if(isBottomBound){
 				this.$el.find('.pullUp').addClass('flip');
 				this.$el.find('.pullUpLabel').html('Release to refresh...');

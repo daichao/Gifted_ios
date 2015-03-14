@@ -9,13 +9,14 @@ define(['css!lib/mobiscroll/css/mobiscroll.custom-2.6.2.min.css',
 	result.content =
 		'<div class="product_modify_content"> \
 			<div class="product_modify_images">  \
-				<div><span class="product_image_del"></span><img class="a product_image_btn" index="1" src="img/takepicture.png" alt="all" /></div>\
-				<div><span class="product_image_del"></span><img class="a product_image_btn" index="2" src="img/takepicture.png" alt="left" /></div>\
-				<div><span class="product_image_del"></span><img class="a product_image_btn" index="3" src="img/takepicture.png" alt="right" /></div>\
-				<div><span class="product_image_del"></span><img class="a product_image_btn" index="4" src="img/takepicture.png" alt="top" /></div>\
-				<div><span class="product_image_del"></span><img class="a product_image_btn" index="5" src="img/takepicture.png" alt="bottom" /></div>\
+				<div><span class="product_image_del"></span><img class="a product_image_btn" index="1" src="img/takepicture.png" alt="all" /></div> \
+				<div><span class="product_image_del"></span><img class="a product_image_btn" index="2" src="img/takepicture.png" alt="left" /></div> \
+				<div><span class="product_image_del"></span><img class="a product_image_btn" index="3" src="img/takepicture.png" alt="right" /></div> \
+				<div><span class="product_image_del"></span><img class="a product_image_btn" index="4" src="img/takepicture.png" alt="top" /></div> \
+				<div><span class="product_image_del"></span><img class="a product_image_btn" index="5" src="img/takepicture.png" alt="bottom" /></div> \
 			</div> \
 			<form class="product_modify_form"> \
+          	 	{{#if _timeover}}<div class="product_item_yxq_timeover product_modify_yxq_timeover"></div>{{else}}{{/if}} \
 				<input type="hidden" name="ID" class="product_ID" value="{{ID}}" data-highlight="true" /> \
 				<table> \
 					<tr class="product_modify_text"> \

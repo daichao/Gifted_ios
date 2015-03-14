@@ -218,9 +218,9 @@ if (!Gifted.Cache)
 		 * 合并cache
 		 * 
 		 * @param key
-		 * @param jsonDataStr
+		 * @param jsonObject
 		 */
-		putCache : function(key, jsonDataStr) {
+		putCache : function(key, jsonObject) {
 			var localDatas = localStorage.getItem(key);
 			if (localDatas) {
 				var preJsonList = JSON.parse(localDatas), preLength = preJsonList.length;
@@ -228,15 +228,18 @@ if (!Gifted.Cache)
 					console.log('缓存受限:key='+key+',length='+preLength+',limit='+Gifted.Config.Cache.cacheLimit);
 					return true;
 				}
-				var newJsonList = $.isArray(jsonDataStr)?jsonDataStr:JSON.parse(jsonDataStr), 
+				var newJsonList = $.isArray(jsonObject)?jsonObject:JSON.parse(jsonObject), 
 					newLength = newJsonList.length;
 				var /*finalJsonList = [], */isExist = false; // 根据ID是否匹配来检查是否已经缓存
 				loop_1 : for (var i = 0;i < preLength; i++) { // NOTICE 在key相同情况下，默认都是没有重复的情况
+					if (!preJsonList[i]) {
+						continue;
+					}
 					for (var j = 0;j < newLength; j++) {
-						if (!preJsonList[i] || !newJsonList[j]) {
+						if (!newJsonList[j]) {
 							continue;
 						}
-						if (preJsonList[i].ID && newJsonList[j].ID && preJsonList[i].ID == newJsonList[j].ID) {
+						if (preJsonList[i].ID == newJsonList[j].ID) {
 							isExist = true;
 							preJsonList[i] = newJsonList[j]; // 覆盖新值
 							break loop_1;
@@ -265,9 +268,17 @@ if (!Gifted.Cache)
 						}
 					}
 				}
-				jsonDataStr = JSON.stringify(preJsonList); // 0 最新 len-1最老
+				jsonObject = JSON.stringify(preJsonList); // 0 最新 len-1最老
+			} else {
+				if ($.isArray(jsonObject)) {
+					if (jsonObject.length>=Gifted.Config.Cache.cacheLimit*0.95) {
+						console.log('缓存受限:key='+key+',length='+preLength+',limit='+Gifted.Config.Cache.cacheLimit);
+						return true;
+					}
+				}
+				jsonObject = $.isArray(jsonObject)?JSON.stringify(jsonObject):jsonObject;
 			}
-			localStorage.setItem(key, jsonDataStr); // 存入缓存
+			localStorage.setItem(key, jsonObject); // 存入缓存
 			return false;
 		},
 		/**
@@ -358,6 +369,9 @@ if (!Gifted.Cache)
 				return null;
 			}
 		},
+		/**
+		 * clear指定缓存
+		 */
 		clearCache : function(key) {
 			var localDatas = localStorage.getItem(key);
 			if (localDatas) {

@@ -23,6 +23,10 @@ define(['modules/product/templates/productchoosecatalog_new','modules/product/vi
 		contentRender:function(){
 			ProductChooseCatalogView.__super__.contentRender.apply(this, arguments);
 			this.$el.find('.header_search').hide();
+			_.defer(_.bind(function(){
+				this.$el.css({'height':this.screen.height});
+				this.refresh();
+			},this));
 		},
 	    remove : function() {
 	    	ProductChooseCatalogView.__super__.remove.apply(this, arguments);

@@ -9,7 +9,7 @@ define(['css!modules/product/styles/productlist.css'],function(){
 		<span class="header_right header_search"></span>';
 	// <!--img src="" class="product_list_refresh" /-->
 	result.content = 
-		'<div class="product_scroller product_list_content"> \
+		'<div class="product_scroller product_list_content">\
 			<div class="product_list_columns clearfix">\
 				<div class="product_column product_column_1"></div>\
 				<div class="product_column product_column_2"></div>\

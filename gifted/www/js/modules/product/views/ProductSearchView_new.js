@@ -53,16 +53,11 @@ define(['modules/product/templates/productsearch_new','modules/product/templates
 			this.$el.find('.ui-input-search').hide();
 		},
 		contentRender:function(){
-	    	this.$contentEl.empty();
-	        this.$contentEl.html(this.templateContent([]));
+			ProductSearchView.__super__.contentRender.apply(this, arguments);
 	        // TODO multi condition search
 	        this.$el.find('.product_search_group').hide();
 	        this.$el.find('.product_search_title').html(this.title);
 	        this.getViewWrapBottomEl().addClass('product_search_title2').html(this.title);
-			//this.loadInitData();
-			this.clearCache();
-			//this.loadData(); // 每次打开app都是加载最新的数据
-	        //this.$el.trigger('create');
 			return this;
 	    },
 	    remove : function() {
