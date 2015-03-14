@@ -46,6 +46,9 @@
 		D18DC4521AA050390063B4B1 /* Zip.m in Sources */ = {isa = PBXBuildFile; fileRef = D18DC4511AA050390063B4B1 /* Zip.m */; };
 		D18DC4681AA064E50063B4B1 /* libz.1.2.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D18DC4671AA064E50063B4B1 /* libz.1.2.5.dylib */; };
 		D18DC46E1AA166070063B4B1 /* ZipArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = D18DC46C1AA166070063B4B1 /* ZipArchive.m */; };
+		D19D37B01AB26F5600376709 /* CHANGELOG.md in Sources */ = {isa = PBXBuildFile; fileRef = D19D37AC1AB26F5600376709 /* CHANGELOG.md */; };
+		D19D37B11AB26F5600376709 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = D19D37AE1AB26F5600376709 /* JSONKit.m */; };
+		D19D37B21AB26F5600376709 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = D19D37AF1AB26F5600376709 /* README.md */; };
 		D1A5D7041AAFD587005D8B57 /* libiOS_IMLib_v1_3_4.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D1A5D7031AAFD587005D8B57 /* libiOS_IMLib_v1_3_4.a */; };
 		D1B3E33E1A89F2630067A8C4 /* SocialSharing.m in Sources */ = {isa = PBXBuildFile; fileRef = D1B3E33B1A89F2630067A8C4 /* SocialSharing.m */; };
 		D1B3E3451A89F49F0067A8C4 /* libGexinSdk-1.1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D1B3E3441A89F49F0067A8C4 /* libGexinSdk-1.1.0.a */; };
@@ -77,6 +80,7 @@
 		D1CE6B841AA855ED009EAD59 /* libstdc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CE6B831AA855ED009EAD59 /* libstdc++.dylib */; };
 		D1CE6B861AA85608009EAD59 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CE6B851AA85608009EAD59 /* MapKit.framework */; };
 		D1CE6B881AA85616009EAD59 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1CE6B871AA85616009EAD59 /* OpenGLES.framework */; };
+		D1EC85571AB40EE1001A7EDF /* MessageQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = D1EC85561AB40EE1001A7EDF /* MessageQueue.m */; };
 		F840E1F1165FE0F500CFE078 /* config.xml in Resources */ = {isa = PBXBuildFile; fileRef = F840E1F0165FE0F500CFE078 /* config.xml */; };
 /* End PBXBuildFile section */
 
@@ -148,6 +152,10 @@
 		D18DC4671AA064E50063B4B1 /* libz.1.2.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.5.dylib; path = usr/lib/libz.1.2.5.dylib; sourceTree = SDKROOT; };
 		D18DC46B1AA166070063B4B1 /* ZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZipArchive.h; sourceTree = "<group>"; };
 		D18DC46C1AA166070063B4B1 /* ZipArchive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZipArchive.m; sourceTree = "<group>"; };
+		D19D37AC1AB26F5600376709 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
+		D19D37AD1AB26F5600376709 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = "<group>"; };
+		D19D37AE1AB26F5600376709 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = "<group>"; };
+		D19D37AF1AB26F5600376709 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		D1A5D6E81AAFD587005D8B57 /* AmrDataConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AmrDataConverter.h; sourceTree = "<group>"; };
 		D1A5D6E91AAFD587005D8B57 /* dec_if.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dec_if.h; sourceTree = "<group>"; };
 		D1A5D6EA1AAFD587005D8B57 /* if_rom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = if_rom.h; sourceTree = "<group>"; };
@@ -224,6 +232,8 @@
 		D1CE6B831AA855ED009EAD59 /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "usr/lib/libstdc++.dylib"; sourceTree = SDKROOT; };
 		D1CE6B851AA85608009EAD59 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		D1CE6B871AA85616009EAD59 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		D1EC85551AB40EC7001A7EDF /* MessageQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MessageQueue.h; sourceTree = "<group>"; };
+		D1EC85561AB40EE1001A7EDF /* MessageQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageQueue.m; sourceTree = "<group>"; };
 		F840E1F0165FE0F500CFE078 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = config.xml; path = Gifted/config.xml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -276,6 +286,8 @@
 				302D95F014D2391D003F00A1 /* MainViewController.xib */,
 				1D3623240D0F684500981E51 /* AppDelegate.h */,
 				1D3623250D0F684500981E51 /* AppDelegate.m */,
+				D1EC85551AB40EC7001A7EDF /* MessageQueue.h */,
+				D1EC85561AB40EE1001A7EDF /* MessageQueue.m */,
 			);
 			name = Classes;
 			path = Gifted/Classes;
@@ -308,6 +320,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				D19D37AB1AB26F5600376709 /* JSONKit */,
 				D1A5D6E61AAFD587005D8B57 /* iOS_IMLib */,
 				D1B3E3401A89F49F0067A8C4 /* getui-sdk */,
 				F840E1F0165FE0F500CFE078 /* config.xml */,
@@ -456,6 +469,17 @@
 				30A0434614DC770100060A13 /* Localizable.strings */,
 			);
 			path = se.lproj;
+			sourceTree = "<group>";
+		};
+		D19D37AB1AB26F5600376709 /* JSONKit */ = {
+			isa = PBXGroup;
+			children = (
+				D19D37AC1AB26F5600376709 /* CHANGELOG.md */,
+				D19D37AD1AB26F5600376709 /* JSONKit.h */,
+				D19D37AE1AB26F5600376709 /* JSONKit.m */,
+				D19D37AF1AB26F5600376709 /* README.md */,
+			);
+			path = JSONKit;
 			sourceTree = "<group>";
 		};
 		D1A5D6E61AAFD587005D8B57 /* iOS_IMLib */ = {
@@ -712,6 +736,8 @@
 			files = (
 				D1C4D19F1AAEDE7E00487C52 /* ELCAsset.m in Sources */,
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
+				D19D37B01AB26F5600376709 /* CHANGELOG.md in Sources */,
+				D19D37B21AB26F5600376709 /* README.md in Sources */,
 				D1C4D1B91AAEDECA00487C52 /* mztools.c in Sources */,
 				D1C4D1BB1AAEDECA00487C52 /* zip.c in Sources */,
 				D1B3E33E1A89F2630067A8C4 /* SocialSharing.m in Sources */,
@@ -723,6 +749,8 @@
 				1D3623260D0F684500981E51 /* AppDelegate.m in Sources */,
 				D1C4D1B81AAEDECA00487C52 /* ioapi.c in Sources */,
 				D1C4D1BA1AAEDECA00487C52 /* unzip.c in Sources */,
+				D1EC85571AB40EE1001A7EDF /* MessageQueue.m in Sources */,
+				D19D37B11AB26F5600376709 /* JSONKit.m in Sources */,
 				D1CE6B4B1AA7E888009EAD59 /* PhoneNumber.m in Sources */,
 				D1C4D19E1AAEDE7E00487C52 /* ELCAlbumPickerController.m in Sources */,
 				D18DC4521AA050390063B4B1 /* Zip.m in Sources */,

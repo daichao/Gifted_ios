@@ -12,6 +12,8 @@
 	<dict>
 		<key>3EF6FC3968855DA6E6BA730DF1F13F193C89902A</key>
 		<string>https://github.com/team5pro/iOS.git</string>
+		<key>EF51387A5AF28E4351AFB0302884600583A438B5</key>
+		<string>https://github.com/johnezang/JSONKit.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>gifted/Gifted.xcodeproj</string>
@@ -19,6 +21,8 @@
 	<dict>
 		<key>3EF6FC3968855DA6E6BA730DF1F13F193C89902A</key>
 		<string>../../..</string>
+		<key>EF51387A5AF28E4351AFB0302884600583A438B5</key>
+		<string>../../../gifted/JSONKit</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/team5pro/iOS.git</string>
@@ -35,6 +39,14 @@
 			<string>3EF6FC3968855DA6E6BA730DF1F13F193C89902A</string>
 			<key>IDESourceControlWCCName</key>
 			<string>iOS</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>EF51387A5AF28E4351AFB0302884600583A438B5</string>
+			<key>IDESourceControlWCCName</key>
+			<string>JSONKit</string>
 		</dict>
 	</array>
 </dict>

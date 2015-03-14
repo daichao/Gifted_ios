@@ -28,7 +28,7 @@
 #import <UIKit/UIKit.h>
 #import "GexinSdk.h"
 #import <Cordova/CDVViewController.h>
-
+#import "RCIMClient.h"
 typedef enum {
     SdkStatusStoped,
     SdkStatusStarting,
@@ -36,6 +36,7 @@ typedef enum {
 } SdkStatus;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate, GexinSdkDelegate>{
+    
 @private
     UINavigationController *_naviController;
     NSString *_deviceToken;
@@ -59,7 +60,7 @@ typedef enum {
 @property (assign, nonatomic) int lastPayloadIndex;
 @property (retain, nonatomic) NSString *payloadId;
 @property (retain, nonatomic) NSString *realPath;
-
+@property (retain,nonatomic)RCIMClient *client;
 - (void)startSdkWith:(NSString *)appID appKey:(NSString *)appKey appSecret:(NSString *)appSecret;
 - (void)stopSdk;
 

@@ -48,6 +48,7 @@
 @synthesize lastPayloadIndex = _lastPaylodIndex;
 @synthesize payloadId = _payloadId;
 @synthesize realPath = _realPath;
+@synthesize client;
 
 - (void)dealloc
 {
@@ -190,7 +191,8 @@
     [_deviceToken release];
     _deviceToken = [[token stringByReplacingOccurrencesOfString:@" " withString:@""] retain];
     NSLog(@"deviceToken:%@", _deviceToken);
-    [[RCIMClient sharedRCIMClient] setDeviceToken:_deviceToken];
+    self.client=[RCIMClient sharedRCIMClient];
+     [self.client setDeviceToken:_deviceToken];
     // [3]:向个推服务器注册deviceToken
     if (_gexinPusher) {
         [_gexinPusher registerDeviceToken:_deviceToken];
@@ -426,9 +428,6 @@
 //        NSString *url =[NSString stringWithFormat:@"%@%@",path,_realPath];
 //        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL fileURLWithPath:url]];
 //        [self.viewController.webView loadRequest:request];
-        
-        
-        
 //        [url release];
 //        [request release];
         [payloadMsg release];
