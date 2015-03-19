@@ -56,16 +56,18 @@ define(['translate'], function() {
 		'NotInputYXQ_End':'Pro, you forget to fill a valid end time',
 		'YXQEndMustLaterThanYXQStart':'Pro, filled the valid period of time',
 		'YXQIsSevenDays':'Pro, the valid period of time must between 7 days',
+		'Browse':'Browse',
 		'Catalog':'Category',
 		'EffectTime':'Effect:', // EffectTime
-		'MinQuantity':'MOQ:{0}PCS', // Quantitative
+		'MinQuantity':'MOQ: {0} PCS', // Quantitative
 		'MinQuantity2':'MinQuantity', // Quantitative
 		'Price':'Price: {0} {1}',
 		'Price2':'Price',
 		'Currency':'Currency', // Currency
 		'Share':'Share',
 		'Title':'Title',
-		'Description':'Description(Optional)', // Description
+		'Description':'Description', // Description
+		'DescriptionModify':'Description(Optional)', // Description
 		'PublishedBy':'Published By {0}',
 		'Published':':',
 		'Servers':'Servers',
@@ -84,6 +86,10 @@ define(['translate'], function() {
 		'PasswordsDontMatch':'Pro, the password you entered is not consistent, please check',
 		'UsernameIsEmpty':'Pro, user name cannot be empty',
 		'Success':'Success',
+		'timeout':'timeout',
+		'error':'error',
+		'notmodified':'notmodified',
+		'parsererror':'parsererror',
 		/* user */
 		'DEPLOY':'Release',
 		'FOLLOWER':'Fans',
@@ -117,6 +123,7 @@ define(['translate'], function() {
 		'countdown':'{0}Days {1}HRs {2}Mins {3}Secs',
 		'deliverydate':"Delivery Date",
 		'mobile':'Mobile',
+		'country':'Country',
 		'sexy':'Sexy',
 		'NotInputBusinesscard':'Please upload your business card',
 		'NotInputBusinessLicence':'Please upload your business licence',
@@ -131,16 +138,20 @@ define(['translate'], function() {
 		'PasswordShort':'The length of password is 6 at least',
 		'productsCount':'Products',
 		'invite':'Invite Friends',
+		'consummateData':'Consummate your data please',
+		'consummateAuditing':'Your data is auditing, and you can retry util recieve the notification',
 		
 		'Conversation':'Conversation',
-		'ConversationList':'ConversationList',
+		'ConversationList':'Conversations',
 		'forgetpwd':'Forget Password',
 		'changepwd':'Change Password',
 		'ConfirmPassword':'Confirm Password',
 		'OldPassword':'Old Password',
 		'Password':'Password',
 		'Address':'Address',
-		'AddressIsEmpty':'Address is Empty'
+		'AddressIsEmpty':'Address is Empty',
+		'addFavoriteItemSuccess':'Add Favorite Item Success!',
+		'removeFavoriteItemSuccess':'Remove Favorite Item Success!'
 	};
 	TRANSLATE.registerLang('en',data);
 	return data;

@@ -1,5 +1,4 @@
-define(['modules/product/templates/productsearch_new','modules/product/templates/productlistitem',
-		'modules/product/views/ProductListView_new','handlebars',
+define(['modules/product/templates/productsearch_new','modules/product/templates/productlistitem', 'modules/product/views/ProductListView_new','handlebars',
 		'modules/product/models/models','countdown'], function(mod0, mod1, ProductListView) {
 	var ProductSearchView = ProductListView.extend({
 		templateTop:Handlebars.compile(mod0.top),
@@ -51,6 +50,9 @@ define(['modules/product/templates/productsearch_new','modules/product/templates
 		},
 		hideHeadSearch:function(){
 			this.$el.find('.ui-input-search').hide();
+		},
+		loadInitData:function(){
+			// do nothing
 		},
 		contentRender:function(){
 			ProductSearchView.__super__.contentRender.apply(this, arguments);

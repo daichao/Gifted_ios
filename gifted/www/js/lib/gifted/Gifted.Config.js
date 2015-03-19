@@ -3,15 +3,18 @@
  * 
  * 单例
  ******************************************************************************/
-// namespace
-if (typeof Gifted == 'undefined')
-	Gifted = {};
-//================================== Config ==================================//
-if (typeof deviceIsAndroid == 'undefined')
-	deviceIsAndroid=false;
-if (typeof deviceIsIOS == 'undefined')
-	deviceIsIOS=false;
-if (!Gifted.Config)
+define([], function() {
+	if (typeof deviceIsAndroid == 'undefined')
+		deviceIsAndroid=false;
+	if (typeof deviceIsIOS == 'undefined')
+		deviceIsIOS=false;
+	// namespace
+	if (typeof Gifted == 'undefined')
+		Gifted = {};
+	//================================== Config ==================================//
+	if (Gifted.Config)
+		return Gifted.Config;
+	//================================== Config ==================================//
 	Gifted.Config = { // 单例
 		isDemo : false, // 是否启用demo数据
 		isRealPhone : typeof LocalFileSystem != 'undefined',
@@ -26,8 +29,10 @@ if (!Gifted.Config)
 			,{key:'192.168.0.106:8080',url:'http://192.168.0.106:8080/gifted'} // 内部测试用
 			,{key:'127.0.0.1:8080',url:'http://127.0.0.1:8080/gifted'} // 内部测试用
 			,{key:'127.0.0.1:8087',url:'http://127.0.0.1:8087/gifted'} // 内部测试用
+			,{key:'1.1.8.48:8080',url:'http://1.1.8.48:8080/gifted'} // 内部测试用
 			,{key:'1.1.8.45:8080',url:'http://1.1.8.45:8080/gifted'} // 内部测试用
 			,{key:'1.1.8.64:8080',url:'http://1.1.8.64:8080/gifted'} // 内部测试用
+			,{key:'1.1.8.39:8080',url:'http://1.1.8.39:8080/gifted'}
 		],
 		uploadServerURL : 'http://gifted.5proapp.com', // 测试时读写服务用同一个
 		// "读写分离"的服务器策略(现在默认用"读"服务器来POST)，以后指定到固定的几台"写"服务器上。"写"服务可能是端口不同，并且由客户端自动选择分流。
@@ -38,8 +43,10 @@ if (!Gifted.Config)
 			,{key:'192.168.0.106:8080',url:'http://192.168.0.106:8080/gifted'} // 内部测试用
 			,{key:'127.0.0.1:8080',url:'http://127.0.0.1:8080/gifted'} // 内部测试用
 			,{key:'127.0.0.1:8087',url:'http://127.0.0.1:8087/gifted'} // 内部测试用
+			,{key:'1.1.8.48:8080',url:'http://1.1.8.48:8080/gifted'} // 内部测试用
 			,{key:'1.1.8.45:8080',url:'http://1.1.8.45:8080/gifted'} // 内部测试用
 			,{key:'1.1.8.64:8080',url:'http://1.1.8.64:8080/gifted'} // 内部测试用
+			,{key:'1.1.8.39:8080',url:'http://1.1.8.39:8080/gifted'}
 		],
 		serverURL : 'http://gifted.5proapp.com',
 		//emptyImg : 'data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==',
@@ -65,6 +72,9 @@ if (!Gifted.Config)
 			latitude:0,
 			longitude:0,
 			altitude:0
+		},
+		System : {
+			callbackURL:'/ajax/system/callback'
 		},
 		Product : {
 			loadDataURL:'/ajax/product', // GET collections TODO /content/xxx /catalog/xxx default
@@ -110,5 +120,7 @@ if (!Gifted.Config)
 			sendMessageURL : '/ajax/message/conversation',
 		},
 	};
-//Gifted.Config.uploadServerURL=Gifted.Config.uploadServerList[Math.random()>0.5?1:0].url;
-//Gifted.Config.uploadServerURL="http://192.168.0.106:8080/gifted";
+	//Gifted.Config.uploadServerURL=Gifted.Config.uploadServerList[Math.random()>0.5?1:0].url;
+	//Gifted.Config.uploadServerURL="http://192.168.0.106:8080/gifted";
+	return Gifted.Config;
+});

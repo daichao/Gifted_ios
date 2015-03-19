@@ -12,8 +12,10 @@ define(['modules/user/templates/userlogin', 'handlebars'], function(mod0){
 		loginError:function(args){
 			if(args.errorCode == 401){
 				Gifted.Global.alert(Gifted.Lang['UserNameOrPassWordIsWrong']);
-			} else {
-				Gifted.Global.alert(args[1]);
+			} else if(args.errorInfo){
+				Gifted.Global.alert(Gifted.Lang['login']+Gifted.Lang[args.errorInfo]);
+			}else{
+				Gifted.Global.alert(args.errorResponse);
 			}
 		},
 		events:{

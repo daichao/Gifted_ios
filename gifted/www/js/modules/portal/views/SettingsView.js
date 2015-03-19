@@ -2,9 +2,6 @@ define(['modules/portal/templates/settings', 'handlebars'],function(mod0){
 	var SettingsView = Gifted.View.extend({
 		templateTop:Handlebars.compile(mod0.top),
 		templateContent:Handlebars.compile(mod0.content),
-		initialize:function(){
-			this.app.user.on('logoutComplete',this.logoutComplete,this);
-		},
 	    events:{
 	    	"tap .headbar_sign":"back",
 			"change .settings-language-radio":"switchLanguage",
@@ -12,6 +9,10 @@ define(['modules/portal/templates/settings', 'handlebars'],function(mod0){
 			"change .settings-currency":"switchCurrency",
 			"tap .settings-logout":"logout",
 			"tap .settings-clearcache":"clearCache"
+		},
+		initialize:function(){
+			this.app.user.on('logoutComplete',this.logoutComplete,this);
+	    	SettingsView.__super__.initialize.apply(this, arguments);
 		},
 		switchServer:function(event){
 			this.model.trigger('switchServer', $(event.target).val(), [this]);

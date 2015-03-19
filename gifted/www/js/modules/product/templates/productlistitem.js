@@ -18,7 +18,7 @@ define([],function(){
 					<div class="product_item_yxq_progess">\
 						<div style="width:{{_timeleft_percent}}%" class="product_item_yxq_currentprogess"></div>\
 					</div>\
-					<span class="product_item_yxq" data-time="{{toseconds _timeleft_monent}}"></span> \
+					<span class="product_item_yxq" data-time="{{toseconds _timeleft_monent}}">秒</span> \
 				</div> \
             </div> \
 		</div>';

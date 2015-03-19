@@ -19,7 +19,10 @@ define(['modules/user/models/models'
         	app.route('user/resetpassword','resetpassword');
         	app.route('user/conversation/:friendId(/:productId)','conversation');
         	app.route('user/conversationList','conversationList');
-        	app.on('security:notlogin',this.login,this);
+        	app.route('user/followerList/:userId','followerList');
+        	app.route('user/followList/:userId','followList');
+        	app.on('security:login',this.login,this);
+        	app.on('security:seller',this.noSellerRight,this);
         	app.on('route:login',this.login,this);
         	app.on('route:logout',this.logout,this);
         	app.on('route:userinfo',this.userInfo,this);
@@ -31,12 +34,15 @@ define(['modules/user/models/models'
         	app.on('route:resetpassword',this.resetPassword,this);
         	app.on('route:conversation',this.conversation,this);
         	app.on('route:conversationList',this.conversationList,this);
-        	if(app.user.inited)
+        	app.on('route:followerList',this.followerList,this);
+        	app.on('route:followList',this.followList,this);
+        	if (app.user.inited) {
         		this.trigger('inited',this);
-        	else
+        	} else {
 				app.user.on('userModuleInitialized',_.bind(function(){
 					this.trigger('inited',this);
 				},this));
+			}
 		};
 		this.resetViewCache = function(){
 			_.each(this.viewCache,this.removeCacheView,this);
@@ -47,6 +53,21 @@ define(['modules/user/models/models'
 		};
 		this.removeCacheView = function(v){
 			this.app.removeView(v.key);
+		};
+		this.noSellerRight = function(){
+			var user = this.app.user;
+			var rights = user.get('RIGHTS');
+			if (!rights) {
+				this.app.navigate('user/login', {trigger:true});
+				return;
+			} else {
+				if (!user.get('BUSINESSCARD')||user.get('BUSINESSCARD')=='null'||user.get('BUSINESSCARD')=='undefined') {
+					Gifted.Global.alert(Gifted.Lang['consummateData']);
+					this.app.navigate('user/useredit', {trigger:true});
+				} else {
+					Gifted.Global.alert(Gifted.Lang['consummateAuditing']);
+				}
+			}
 		};
         this.login = function(app){
         	require(['modules/user/views/UserLoginView'],_.bind(function(UserLoginView){
@@ -74,6 +95,42 @@ define(['modules/user/models/models'
 	    		this.app.changeView(hv); 
         	},this));
         };
+        this.followerList = function(userId){
+        	require(['modules/user/views/UserListView'],_.bind(function(UserListView){
+        		if (!userId){
+        			alert('init followerList userId is null');
+        			return;
+        		}
+	    		var hv = this.app.selectView('userfollowerlist_'+userId,_.bind(function(){
+	    			var collection = new UserFollowerListCollection();
+	    			collection.ID = userId;
+	    			var result = new UserListView({collection:collection,app:this.app});
+	    			this.app.pageContainer.append(result.$el);
+	    			result.render();
+	    			this.addCacheView(result);
+	    			return result;
+	    		},this));
+	    		this.app.changeView(hv); 
+        	},this));
+        };
+        this.followList = function(userId){
+        	require(['modules/user/views/UserListView'],_.bind(function(UserListView){
+        		if (!userId){
+        			alert('init followList userId is null');
+        			return;
+        		}
+	    		var hv = this.app.selectView('userfollowlist_'+userId,_.bind(function(){
+	    			var collection = new UserFollowListCollection();
+	    			collection.ID = userId;
+	    			var result = new UserListView({collection:collection,app:this.app});
+	    			this.app.pageContainer.append(result.$el);
+	    			result.render();
+	    			this.addCacheView(result);
+	    			return result;
+	    		},this));
+	    		this.app.changeView(hv); 
+        	},this));
+        };
         this.userInteractive = function(userId){
         	require(['modules/user/views/UserInteractiveView'],_.bind(function(UserInteractiveView){
         		if (!userId || userId == 'navigate')
@@ -83,9 +140,9 @@ define(['modules/user/models/models'
 	    			var model = new UserInteractiveModel(userId); // 复合 Model
 	    			var result = new UserInteractiveView({model:model,app:this.app});
 	    			this.app.pageContainer.append(result.$el);
-	    			result.key = 'UserInteractiveView';
 	    			result.render();
 					result.loadData();
+					this.addCacheView(result);
 	    			return result;
 	    		},this));
 	    		if (this.app.currentView && 
@@ -107,9 +164,9 @@ define(['modules/user/models/models'
 	    			var model = new Publisher(userId); // Bean Model
 	    			var result = new UserInfoView({model:model,app:this.app});
 	    			this.app.pageContainer.append(result.$el);
-	    			result.key = 'UserInfoView';
 	    			result.render();
 					result.loadData();
+					this.addCacheView(result);
 	    			return result;
 	    		},this));
 	    		if (this.app.currentView && this.app.currentView.key=='UserEditView') 
@@ -127,8 +184,8 @@ define(['modules/user/models/models'
 	    			var model = new UserEditModel(); // 复合 Model
 	    			var result = new UserEditView({model:model,app:this.app});
 	    			this.app.pageContainer.append(result.$el);
-	    			result.key = 'UserEditView';
 	    			result.render();
+	    			this.addCacheView(result);
 	    			return result;
 	    		},this));
 	    		this.app.changeView(hv); 
@@ -184,12 +241,11 @@ define(['modules/user/models/models'
 	    			return result;
 	    		},this));
 	    		if(productId){
-    				var product = Gifted.Cache.getCache('productdetail_'+productId);
-    				if(product){
-    					var json = JSON.parse(product);
+	    			var model = new ProductDetail({});
+	    			model.loadDetailItem(productId,false,_.bind(function(json){
     					var message = {'targetId':friendId,'title':json.NAME,'content':json.DESCRIPTION,'imageUri':json.PHOTOURLS[0].PHOTOURL};
-    					hv.sendMessage(message);
-    				}
+    					this.sendMessage(message);
+    				},hv));
     			}
 	    		this.app.changeView(hv); 
         	},this));

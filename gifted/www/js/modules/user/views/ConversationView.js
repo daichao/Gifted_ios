@@ -12,8 +12,8 @@ define(['modules/user/templates/conversation', 'handlebars'],function(mod0){
 			this.model.messageList.on('add',this.addMessage,this);
 			this.model.on('sendSuccess',this.sendSuccess,this);
 			this.on('toprefresh',this.onTopRefresh,this);
-			this.on('loadHistorySuccess',this.refreshComplete,this);
-			this.on('loadHistoryError',this.refreshComplete,this);
+			this.on('loadHistorySuccess',this.loadComplete,this);
+			this.on('loadHistoryError',this.loadComplete,this);
 			Gifted.View.prototype.initialize.apply(this,arguments);
 	    },
 		events : {
@@ -34,9 +34,9 @@ define(['modules/user/templates/conversation', 'handlebars'],function(mod0){
 			}
 			this.loadHistory(20);//默认一次最多加载20条消息
 		},
-		refreshComplete : function(){
-			_.delay(_.bind(this.trigger,this,'refreshcomplete'),1000);
-			//this.trigger('refreshcomplete');
+		loadComplete : function(){
+			_.delay(_.bind(this.trigger,this,'loadComplete'),1000);
+			//this.trigger('loadComplete');
 		},
 		loadHistory : function(count){
 			var firstMessage = this.model.messageList.at(0);
@@ -47,13 +47,14 @@ define(['modules/user/templates/conversation', 'handlebars'],function(mod0){
 				messageId = firstMessage.get('MESSAGEID');
 			}
 			if(!messageId){
-				this.refreshComplete();
+				this.loadComplete();
 				return;//从来没发过消息
 			}
 			this.model.loadHistory(messageId,count);
 		},
 		sendMessage : function(message){
-			if(message && message.targetId && message.content){
+			if(message && message.targetId && (message.content || message.title)){
+				message.senderId = this.app.user.get('ID');
 				this.model.sendMessage(message);
 			}else{
 				var content = this.$el.find('.conversation_input').val();
@@ -63,7 +64,8 @@ define(['modules/user/templates/conversation', 'handlebars'],function(mod0){
 				}
 				var message = {
 					'targetId':this.model.get('CONVERSATIONID'),
-					'content':content
+					'content':content,
+					'senderId' : this.app.user.get('ID'),
 				};
 				this.model.sendMessage(message);
 				this.$el.find('.conversation_input').val('');
@@ -86,6 +88,13 @@ define(['modules/user/templates/conversation', 'handlebars'],function(mod0){
 			}else
 				this.$contentEl.append(html);
 			this.trigger('refreshcontent');
+			if(!nextMessageId){
+				this.scrollToBottom();
+			}
+		},
+		afterRender:function(){
+			Gifted.View.prototype.afterRender.apply(this,arguments);
+			this.scrollToBottom();
 		},
 		contentRender : function(){
 			var html = this.templateContent(this.model.messageList.toJSON());

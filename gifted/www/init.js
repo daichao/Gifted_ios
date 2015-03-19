@@ -63,14 +63,8 @@ require.config({
         'underscore': {
             exports: '_'
         },
-        'gifted.language': {
-            deps: ['jquery']
-        },
-        'gifted.global': {
-            deps: ['jquery','jqmobile']
-        },
         'gifted.cache': {
-            deps: ['gifted.config','gifted.global']
+            deps: ['gifted.config']
         },
         'translate':{
         }
@@ -133,25 +127,11 @@ require(['gifted.language'],function(language) { // 加载默认语言包
 	Gifted.Lang = TRANSLATE.getCurrentLangObject(); // 异常提示用
 });
 require(['App','jquery','jqmobile','underscore','fastclick',
-	'gifted.global','gifted.config','gifted.plugin','gifted.cache','gifted.util','gifted.view'], function (App) {
+	'gifted.config','gifted.plugin','gifted.cache','gifted.global','gifted.util','gifted.view'], function (App) {
 	Gifted.app = new App(); // 启动App
-	var serverURL = Gifted.Cache.getCache('settings.serverURL'); // 读取客户手动设置的参数
-	if (serverURL) {
-		Gifted.Global.switchServer(serverURL);
-	}
-	var localeName = Gifted.Cache.getCache('settings.localeName'); // 读取客户手动设置的参数
-	if (localeName && Gifted.Config.Locale.localeName!=localeName) {
-		Gifted.Global.switchLanguage(localeName);
-	}
-	var currency = Gifted.Cache.getCache('settings.currency'); // 读取客户手动设置的参数
-	if (currency && Gifted.Config.Currency!=currency) {
-		Gifted.Global.switchCurrency(currency);
-	}
 	//app.settings.trigger('switchLanguage', locale.value||'zh_CN');
 	function onDeviceReady() { // navtive加载(必须放在这个js里，放在后面的js里onDeviceReady加载失败)
 		FastClick.attach(document.body); // 真机才用FastClick
-		//alert(deviceIsIOS);
-		//alert(deviceIsAndroid);
 		if (deviceIsIOS==true) {
 			Gifted.Config.Event.tap='click';
 		}

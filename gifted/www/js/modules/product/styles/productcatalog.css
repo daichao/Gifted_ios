@@ -144,11 +144,12 @@
 }
 
 .product_catalog_item:nth-child(odd){
-	border-right:solid 1px white;
-	border-bottom:solid 1px white;
+	border-left:solid 5px white;
+	border-right:solid 5px white;
+	border-top:solid 5px white;
 }
-
 .product_catalog_item:nth-child(even){
-	border-bottom:solid 1px white;
+	border-right:solid 5px white;
+	border-top:solid 5px white;
 }
 

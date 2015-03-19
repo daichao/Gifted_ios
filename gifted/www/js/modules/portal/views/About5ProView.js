@@ -3,12 +3,12 @@ define(['modules/portal/templates/about5pro', 'handlebars', 'jquery.mobitabs'],f
 		templateTop:Handlebars.compile(mod0.top),
 		templateContent:Handlebars.compile(mod0.content),
 		//scrollClassName:'about_tabs_content',
-	    initialize: function () {
-	    	About5ProView.__super__.initialize.apply(this, arguments);
-	    },
 	    events:{
 	    	"tap .headbar_sign":"back"
 		},
+	    initialize: function () {
+	    	About5ProView.__super__.initialize.apply(this, arguments);
+	    },
 		render:function() {
 			this.tabs = this.$el.find('[data-role="tabs"]').tabs();
 			/*{

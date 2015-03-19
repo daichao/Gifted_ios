@@ -3,11 +3,13 @@
  * 
  * 单例
  ******************************************************************************/
-// namespace
-if (typeof Gifted == 'undefined')
-	Gifted = {};
-//================================== Plugin ==================================//
-if (!Gifted.Plugin)
+ define([],function(){
+	// namespace
+	if (typeof Gifted == 'undefined')
+		Gifted = {};
+	//================================== Plugin ==================================//
+	if (Gifted.Plugin)
+		return Gifted.Plugin;
 	Gifted.Plugin = {
 		gotoActivity : function(page,success,error) {
 			if (!Gifted.Config.isRealPhone) {
@@ -140,3 +142,5 @@ if (!Gifted.Plugin)
 				"MutiPicPick", action, paras || []);
 		}
 	};
+	return Gifted.Plugin;
+});

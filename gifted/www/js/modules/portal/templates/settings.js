@@ -15,14 +15,6 @@ define([],function(){
 						'</fieldset>' +
 					'</li>' +
 					'<li class="ui-grid-d">'+
-						'<label data-translate="Servers" data-translate-param="" class="ui-block-a"></label>' +
-						'<fieldset data-role="controlgroup" data-type="horizontal" class="ui-block-b|c|d">' +
-							'<select class="settings-servers settings_field a">' +
-								'{{#each this.serverList}}<option value="{{url}}" checked="{{checked}}">{{key}}</option>{{/each}}' +
-							'</select>'+
-						'</fieldset>' +
-					'</li>' +
-					'<li class="ui-grid-d">'+
 						'<label data-translate="Currency" data-translate-param="" class="ui-block-a"></label>' +
 						'<fieldset data-role="controlgroup" data-type="horizontal" class="ui-block-b|c|d">' +
 							'<select class="settings-currency settings_field a">' +
@@ -31,6 +23,14 @@ define([],function(){
 						        '<option value="3">¥(CNY)</option>' +
 						        '<!--option value="4">¥(JPY)</option-->' +
 						    '</select>' +
+						'</fieldset>' +
+					'</li>' +
+					'<li class="ui-grid-d">'+
+						'<label data-translate="Servers" data-translate-param="" class="ui-block-a"></label>' +
+						'<fieldset data-role="controlgroup" data-type="horizontal" class="ui-block-b|c|d">' +
+							'<select class="settings-servers settings_field a">' +
+								'{{#each this.serverList}}<option value="{{url}}" checked="{{checked}}">{{key}}</option>{{/each}}' +
+							'</select>'+
 						'</fieldset>' +
 					'</li>' +
 				'</ul>' +

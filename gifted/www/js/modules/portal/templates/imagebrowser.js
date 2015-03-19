@@ -9,7 +9,7 @@ define([],function(){
 			'<div class="clearfix">'+
 				'<div class="imageview_images" >' +
 					'{{#each this.PHOTOURLS}}' +
-						'<img class="imageview_image imageview_{{PHOTOID}}" src="img/notexists.png" alt="{{PHOTOID}}" />' +
+						'<img alt="{{PHOTONAME}}" src="img/notexists.png" class="imageview_image imageview_{{PHOTOID}}" />' +
 					'{{/each}}' +
 				'</div>' +
 			'</div>' +

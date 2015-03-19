@@ -16,8 +16,8 @@ define(['css!modules/product/styles/productlist.css'],function(){
 				<div class="product_column product_column_3"></div>\
 				<div class="product_column product_column_4"></div>\
 				<div class="product_column product_column_5"></div>\
-			</div> \
-			<div style="height:30px;">&nbsp;</div>\
+			</div>\
+			<div class="product_last_row"></div>\
 		</div>';
 	return result;
 });

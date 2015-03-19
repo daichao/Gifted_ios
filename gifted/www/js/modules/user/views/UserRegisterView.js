@@ -47,9 +47,12 @@ define(['modules/user/templates/userregister', 'handlebars'],function(mod0){
 			Backbone.history.navigate('home',{trigger:true});//注册成功后自动登录，返回到首页
 		},
 		registerError : function(error){
-			var errorInfo = error.errorInfo;
-			if(errorInfo){
-				var error = JSON.parse(errorInfo).error;
+			if(error.errorInfo){
+				Gifted.Global.alert(Gifted.Lang['register']+Gifted.Lang[error.errorInfo]);
+			}
+			var errorResponse = error.errorResponse;
+			if(errorResponse){
+				var error = JSON.parse(errorResponse).error;
 				if(error)
 					alert(error);
 			}

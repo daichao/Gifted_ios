@@ -8,8 +8,12 @@
 
 #import <Foundation/Foundation.h>
 #import "MessageQueue.h"
+#import "RCMessage.h"
+#import "MessageUtil.h"
+
 
 @implementation MessageQueue
+@synthesize message;
 
 //@synthesize  message;
 //@synthesize messageQueue;//nsmutablearray是可变的数组
@@ -18,19 +22,36 @@ static NSMutableArray *messageQueue;
 
 //添加消息
 +(void)addMessage:(RCMessage*)message{
-    [messageQueue addObject:message];
-    
+    if (messageQueue==nil||messageQueue==NULL){
+        messageQueue=[[NSMutableArray alloc]init];
+        [messageQueue addObject:message];
     }
-
-//返回最新的消息
-+(RCMessage*)consumeMessage{
-//    [messageQueue ]
-//    [messageQueue removeLastObject];
+    else{
+        [messageQueue addObject:message];
+    }
 }
-//返回所有消息
-+(NSArray*)peekMessage{
+
+//获取并移除消息
++(RCMessage*)consumeMessage{
+    RCMessage *message=[[RCMessage alloc]init];
+    if(messageQueue!=nil&&[messageQueue count]>0){
+       message= [messageQueue objectAtIndex:0];
+        [messageQueue removeObjectAtIndex:0];
+    }
+    else{
+        message=nil;
+    }
+    return message;
+    
+}
+////使用前端并不移除消息
++(RCMessage*)peekMessage{
 //    [messageQueue ]
+    RCMessage *message=[[RCMessage alloc]init];
+    if([messageQueue count]>0){
+        message=[messageQueue objectAtIndex:0];
+    }
+    return message;
 }
 
 @end
-

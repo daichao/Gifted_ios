@@ -13,9 +13,18 @@ define([],function(){
 					//'<img class="useredit-portrait" index="1" name="PORTRAIT" src="{{#if PORTRAIT}}{{PORTRAIT}}?imageView/1/w/80/h/80/q/50{{else}}img/noportrait.png{{/if}}" />'+
 				'</div>' +
 				'<ul class="useredit_header_c2">'+
-					'<li><label data-translate="username"></label><input data-role="none" class="useredit_username" value={{NAME}} required></li>'+
-					'<li><label data-translate="countryCode"></label><input data-role="none" class="useredit_countrycode" value={{COUNTRYCODE}}></li>'+
-					'<li><label data-translate="mobile"></label><input data-role="none" class="useredit_mobile" value={{MOBILE}} required></li>'+
+					'<li><label data-translate="username"></label><input data-role="none" class="useredit_username" value="{{NAME}}" required></li>'+
+					'<li><label data-translate="countryCode"></label><input data-role="none" class="useredit_countrycode" value="{{COUNTRYCODE}}"></li>'+
+					'<li><label data-translate="mobile"></label><input data-role="none" class="useredit_mobile" value="{{MOBILE}}" required></li>'+
+					'<li>' +
+						//'<fieldset data-role="fieldcontain">'+
+						//'<!--label data-translate="country"></label-->' +
+						'<label data-translate="Address"></label>'+
+						'<select data-role="none" data-native-menu="false" class="useredit_country" value="{{COUNTRY}}">'+
+						'</select>'+
+						//'</fieldset>'+
+					'</li>'+
+					'<li><!--label data-translate="Address"></label--><input data-role="none" class="useredit_address" value="{{ADDRESS}}" required></li>'+
 				'</ul>'+
 				'<div class="clearfix"></div>'+
 			'</div>'+
@@ -30,8 +39,9 @@ define([],function(){
 				//'<img class="useredit_businesslicence_pic" name="BUSINESSLICENCE" index="3" src="{{#if BUSINESSLICENCE}}{{BUSINESSLICENCE}}?imageView/1/w/80/h/80/q/50{{else}}img/takepicture.png{{/if}}" />'+
 			'</div>'+
 			'<div class="useredit_selfintroduction">'+
-				'<span data-translate="selfintroduction"></span>:'+
-				'<textarea class="useredit_selfintroduction_content" name="SELFINTRODUCTION" >{{SELFINTRODUCTION}}</textarea>'+
+				//'<span data-translate="selfintroduction"></span>:'+
+				'<textarea class="useredit_selfintroduction_content" name="SELFINTRODUCTION" placeholder="'
+					+Gifted.Lang['selfintroduction']+'">{{SELFINTRODUCTION}}</textarea>'+
 			'</div>'+
 			'<div class="photo_select_wrap" style="display:none;">'+
 				'<div><ul class="photo_select_list" data-role="listview">'+

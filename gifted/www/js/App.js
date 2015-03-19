@@ -5,6 +5,19 @@ define(['underscore', 'backbone', 'backbone.cache', 'jqmobile','handlebars',
 	//'css!http://nativedroid.godesign.ch/demo/css/jquerymobile.nativedroid.color.green.css',
 	//'css!../css/reset.css',
 	'css!../css/styles.css'], function (_, Backbone) {
+	var serverURL = Gifted.Cache.getCache('settings.serverURL'); // 读取客户手动设置的参数
+	if (serverURL && Gifted.Config.serverURL!=serverURL) {
+		Gifted.Global.switchServer(serverURL);
+	}
+	var currency = Gifted.Cache.getCache('settings.currency'); // 读取客户手动设置的参数
+	if (currency && Gifted.Config.Currency!=currency) {
+		Gifted.Global.switchCurrency(currency);
+	}
+	var localeName = Gifted.Cache.getCache('settings.localeName'); // 读取客户手动设置的参数
+	if (localeName && Gifted.Config.Locale.localeName!=localeName) {
+		Gifted.Global.switchLanguage(localeName);
+	}
+	//Gifted.Global.systemCallback(); // 用于系统通告
 	Handlebars.registerHelper('dataformnow', function(dt) {
 		 var now = new Date();
 		 if(dt.year!=now.year){
@@ -13,7 +26,7 @@ define(['underscore', 'backbone', 'backbone.cache', 'jqmobile','handlebars',
 		 if(dt.month!=now.month || dt.day!=now.day){
 			 return dt.format('MM-DD');
 		 }
-		 return dt.format('HH:mm')
+		 return dt.format('HH:mm');
 	});
     var App = Backbone.Router.extend({
     	pageContainer:$('body'),
@@ -42,6 +55,7 @@ define(['underscore', 'backbone', 'backbone.cache', 'jqmobile','handlebars',
     	createView:function(key, fn){
     		this.removeView(key);
     		var newView = fn.apply(this);
+    		newView.key = key;
     		this.views[key]= newView;
     		return newView;
     	},
@@ -55,13 +69,17 @@ define(['underscore', 'backbone', 'backbone.cache', 'jqmobile','handlebars',
     	},
     	clearAllView:function(excludes) {
     		for (var key in this.views) {
-    			if (excludes) {
+    			var exclude = false;
+    			if (excludes) { // 排除项
     				for (var i=0;i<excludes.length;i++) {
-    					if (excludes[i]==this.views[key])
-    						return;
+    					if (excludes[i]==this.views[key]) {
+    						exclude=true;
+    						break;
+    					}
     				}
     			}
-    			this.views[key].remove();
+    			if (exclude==false)
+    				this.views[key].remove();
     		};
     		this.views.clear();
 			for (var i=0;i<excludes.length;i++) {
@@ -240,8 +258,8 @@ define(['underscore', 'backbone', 'backbone.cache', 'jqmobile','handlebars',
 				if(options && options.checkRule){//有需要检查的权限
 	        		var rules = options.checkRule;
 	        		var rights = this.user.get('RIGHTS');
-	        		var pass = false;
 	        		for(var i=0;rules[i];i++){
+	        			var pass = false;
 	        			for(var j=0;rights[j];j++){
 	        				if(rights[j] === rules[i]){//检查通过
 	        					pass = true;
@@ -250,18 +268,16 @@ define(['underscore', 'backbone', 'backbone.cache', 'jqmobile','handlebars',
 	        			}
 	        			if(!pass){//检查不通过
 	        				if(options.trigger != false)
-	        					this.trigger('route:'+rules[i].toLowerCase()); //触发获取相应权限的操作
-	        				break;
+	        					this.trigger('security:'+rules[i].toLowerCase()); //触发获取相应权限的操作
+	        				return false;
 	        			}
 	        		}
-	        		if(pass)//所有权限都通过了
-	        			return true;
-	        		return false;
+	        		return true;//所有权限都通过了
 	        	}
 	        	return false;//没说明检查什么权限，或者参数错误
 			} else {
 				if (!options || options.trigger != false)
-					this.trigger('security:notlogin'); //触发登录操作
+					this.trigger('security:login'); //触发登录操作
 				return false;
 			}
         	

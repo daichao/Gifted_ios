@@ -646,7 +646,7 @@ IScroll.prototype = {
 		}
 
 		if ( !this.hasVerticalScroll || this.y > 0 ) {
-			y = 0;
+			y = this.minScrollY || 0;
 		} else if ( this.y < this.maxScrollY ) {
 			y = this.maxScrollY;
 		}

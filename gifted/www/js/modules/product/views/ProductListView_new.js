@@ -23,8 +23,8 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 	    	this.collection.on('set', this.completeLoading, this);
 	    	this.collection.on('clear', this.clearHTML, this);
 	    	this.collection.on('refresh', this.onRefreshContent, this);
-	    	this.collection.on('loaddata', _.bind(function(loadNew){ // 请求新数据
-				this.loadData(loadNew);
+	    	this.collection.on('loaddata', _.bind(function(loadNew, start, count){ // 请求新数据
+				this.loadData(loadNew, start, count);
 	    	},this));
 	    	this.collection.on('add', _.bind(function(model, collection, options){ // 绘制list
 	    		var json = model.toJSON();
@@ -33,6 +33,7 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 	    	this.collection.on('reset', _.bind(function(){ // 绘制当前modellist
 	    		this.clearHTML();
 				this.paintList(this.collection.toJSON());
+				this.trigger('refreshcontent');
 	    	},this));
 	    	this.collection.on('hasmoredata', _.bind(function(hasMore, loadNew){ // 绘制more|loading提示
             	this.paintHasMore(hasMore, loadNew);
@@ -49,17 +50,16 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 			if (this.$el.find('.pullDown').hasClass('loading')) {
 				return;
 			}
-			this.clearFlag();
-			this.loadData(true); // loadData->model.loadData->hasmoredata->refresh
+			this.loadData(true,-1,0); // loadData->model.loadData->hasmoredata->refresh
 		},
 		onBottomRefresh:function(){
 			if (this.$el.find('.pullUp').hasClass('loading')) {
 				return;
 			}
-			this.loadData(false);
+			this.loadData(false); // 使用当前页标记
 		},
 		completeLoading:function(){
-			_.delay(_.bind(this.trigger,this,'refreshcomplete'),1000);
+			_.delay(_.bind(this.trigger,this,'loadComplete'),1000);
 		},
 		addFav:function(favModel){
 			var favoriting = favModel.get('FAVORITING');
@@ -84,10 +84,12 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 				this.app.user.favorites.removeFavorite(productID,publisher);
 				//alert(Gifted.Lang['removeFavoriteSuccess']);//TODO 此处应该在操作成功是操作
 				$(event.target).removeClass("fav_on");
+				Gifted.Global.alert(Gifted.Lang['removeFavoriteItemSuccess']);
 			}else{
 				this.app.user.favorites.addFavorite(productID,publisher);
 				//alert(Gifted.Lang['addFavoriteSuccess']);//TODO 此处应该在操作成功是操作
 				$(event.target).addClass("fav_on");
+				Gifted.Global.alert(Gifted.Lang['addFavoriteItemSuccess']);
 			}
 	    },
 		newProduct:function(event){
@@ -98,34 +100,34 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 			this.$el.find('.product_item').remove();
 	    },
 	    // public
-		clearStorage:function() {
+		clearStorage:function() { // 删除storage缓存
 			this.collection.clearStorage();
 		},
 	    // public
-		clearDatas:function() {
+		clearDatas:function() { // 删除model数据
 			this.collection.clearDatas();
 		},
-	    // public
-		clearFlag:function() {
-			this.collection.clearFlag();
+		// public
+		clearAllFiles:function() { // 删除所有图片缓存文件
+			this.collection.clearAllFiles();
 		},
 	    // public
-	    loadData:function(loadNew) {
-	    	this.collection.loadData(loadNew); // model.loadData->hasmoredata->refresh
+	    loadData:function(loadNew, start, count) {
+	    	this.collection.loadData(loadNew, start, count); // model.loadData->hasmoredata->refresh
 	    },
 	    // public
 	    loadInitData:function(loadNew) {
 	    	this.collection.loadInitData(loadNew);
 	    },
 		refreshPage:function(event){
-			Gifted.Cache.deleteAllLocalFile(); // 删除缓存图片
-			this.clearDatas();
-			this.clearStorage();
-			this.loadData(); // loadData->model.loadData->hasmoredata->refresh
+			this.clearAllFiles(); // 删除图片缓存
+			this.clearStorage(); // 删除storage缓存
+			this.clearDatas(); // 删除model数据和页标记
+			this.loadData(null,-1,0); // loadData->model.loadData->hasmoredata->refresh
 		},
 		refreshImg:function(event){ // 点击图片刷新
 			if (!$(event.target).is('.product_image')) 
-				return false;
+				return;
 			var src = $(event.target).attr('src');
 			var href = $(event.target).parent().attr('href');
 			if (src!='#'&&src!=''&&src!=Gifted.Config.emptyImg) {
@@ -133,32 +135,31 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 					//return false;
 				console.log('productlist image tap');
 				window.location.href=href;
-				return false;
+				return;
 			}
 			var productID = href.substring(16);
 			var model = this.collection.get(productID);
-			if (model) {
-				var json = model.toJSON();
-				if (!json.PHOTOURLS || json.PHOTOURLS.length==0)
-					return false;
-				var domImg = event.target;
-				
-				var cw=this.$el.css('width');
-				var h=cw;
-				cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
-				cw=cw-20;
-				h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
-				h=Math.round(h*4/5);
-				if (cw<0)
-					return false;
-				//var r=json.PHOTOURLS[i].PHOTORADIO;
-				//h=r?Math.round(cw/r):cw;
-				Gifted.Cache.localFile(json.PHOTOURLS[0].PHOTOURL+'?imageView2/1/w/'+cw+'/h/'+h+'/q/80', //'/h/'+h+
-					json.PHOTOURLS[0].PHOTOID+'_1_'+cw+'_'+h+'_80', //'_'+h+
-					domImg); // remoteURL, imgID, domImg
-				return true; // 图片刷新成功的标记
-			}
-			return false;
+			if (!model) 
+				return;
+			var json = model.toJSON();
+			if (!json.PHOTOURLS || json.PHOTOURLS.length==0)
+				return;
+			var domImg = event.target;
+			
+			var cw=window.screen.width; // 没切换过来时宽度为0：this.$el.css('width');
+			var h=cw;
+			//cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
+			cw=cw-20;
+			//h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
+			h=Math.round(h*4/5);
+			if (cw<0)
+				return ;
+			//var r=json.PHOTOURLS[i].PHOTORADIO;
+			//h=r?Math.round(cw/r):cw;
+			Gifted.Cache.localFile(json.PHOTOURLS[0].PHOTOURL+'?imageView2/1/w/'+cw+'/h/'+h+'/q/80', //'/h/'+h+
+				json.PHOTOURLS[0].PHOTOID+'_1_'+cw+'_'+h+'_80', //'_'+h+
+				domImg); // remoteURL, imgID, domImg
+			return true; // 图片刷新成功的标记
 		},
 		// private
 	    paintList:function (jsonList, index) {
@@ -265,8 +266,20 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 				this.$el.find('.pullUp').removeClass('loading');
 				this.$el.find('.pullUpLabel').html('No More.');
 				this.$el.find('.pullUpIcon').removeClass('pullUpIcon');
+				//this.$el.find('.product_last_row').css({height:100});
+				//_.delay(function(v) {
 	    		this.bottomBound = false;
-	      		this.scroll.refresh();
+				this.scroll.refresh();
+				/*if (deviceIsAndroid) {
+					this.$el.find('.product_column_1').append(this.template1({}));
+					var container = this.$el.find('.product_column_1');
+					var last = $(container.children()[container.children().length-1]);//.hide();
+					last.find('.product_image').hide();
+					last.find('.product_item_detail').hide();
+					last.css({height:160,'text-align':'center','font-weight':'bold'}).html('No More');
+					this.$el.find('.pullUp').hide();
+				}*/
+				//},500,this);
 			}
 	    },
 		topbarRender:function(){
@@ -280,10 +293,10 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 	    	this.$contentEl.empty();
 	        this.$contentEl.html(this.templateContent([]));
 	        
-			this.clearDatas();
 			//this.clearStorage(); // 不删除本地缓存
+			this.clearDatas(); // 删除model数据
 			this.loadInitData(); // 加载初始化缓存数据
-			//this.loadData(); // 每次打开app都是加载最新的数据
+			//this.loadData(null,-1,0); // 每次打开app都是加载最新的数据
 			return this;
 	    },
 	    preventTap:function() {

@@ -26,6 +26,11 @@ define(['modules/portal/templates/navigator','handlebars',
 	        //$('body').append(this.el);
 	        this.$el.find('ul').listview();
 	        $(this.el).panel();
+	        
+	    	var name = this.app.user.get('NAME');
+	    	if (name) {
+	    		this.$el.find('#navigator-userInfo').html(name);
+	    	}
 	        return this;
 	    },
 	    remove: function(){

@@ -68,7 +68,7 @@ define(['css!lib/mobiscroll/css/mobiscroll.custom-2.6.2.min.css',
 					<tr class="product_modify_area"> \
 					    <!--th colspan="1"><label for="DESCRIPTION" class="product_label product_label_description" data-translate="Description"></label></th--> \
 						<td colspan="3"><textarea name="DESCRIPTION" class="product_description product_area" data-highlight="true" \
-					    	data-theme="a" data-role="textarea" placeholder="'+Gifted.Lang['Description']+'" required maxlength="2048" >{{DESCRIPTION}}</textarea></td> \
+					    	data-theme="a" data-role="textarea" placeholder="'+Gifted.Lang['DescriptionModify']+'" required maxlength="2048" >{{DESCRIPTION}}</textarea></td> \
 					</tr> \
 				</table> \
 			</form> \

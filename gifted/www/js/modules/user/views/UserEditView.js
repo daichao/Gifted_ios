@@ -1,17 +1,18 @@
 define(['modules/user/templates/useredit', 'handlebars', 'gifted.countrycode'],function(mod0){
-	var UserInfoView = Gifted.View.extend({
+	var UserEditView = Gifted.View.extend({
 		templateTop:Handlebars.compile(mod0.top),
 		templateContent:Handlebars.compile(mod0.content),
 		topRefresh:false,
 		bottomRefresh:false,
 		saving:false,
 		events:{
-			'tap .headbar_sign':'back',
+			'tap .headbar_sign':'backHome',
 			'tap .header_commit':'save',
 			'tap .useredit-portrait':'pickPhoto',
 			'tap .useredit_businesscard_pic':'pickPhoto',
 			'tap .useredit_businesslicence_pic':'pickPhoto',
-			'tap .photo_select_list':'selectPhoto'
+			'tap .photo_select_list':'selectPhoto',
+			'change .useredit_country':'changeCountry'
 		},
 		initialize: function () {
 			this.model.set(this.app.user.toJSON());
@@ -20,6 +21,7 @@ define(['modules/user/templates/useredit', 'handlebars', 'gifted.countrycode'],f
 			this.app.user.on('saveError',this.saveError,this);
 			this.app.user.on('saveSuccess',this.saveSuccess,this);
 	    	this.fileUploader = new Gifted.Util.FileUploader({zip:true});
+	    	UserEditView.__super__.initialize.apply(this, arguments);
 	    },
 		refreshCountryCode:function(){
 			var country = this.model.get('SimCountryIso')||'null';
@@ -30,7 +32,14 @@ define(['modules/user/templates/useredit', 'handlebars', 'gifted.countrycode'],f
 			var phone = this.model.get('Line1Number')||'';
 			this.$contentEl.find('.useredit_mobile').val(phone);
 		},
+		changeCountry:function(event){
+			//var option = this.$el.find(".useredit_country option[value='"+$(event.target).val()+"']");
+			var option = this.$el.find(".useredit_country option:selected");
+			var phone_prefix = option.attr('phone_prefix');
+			this.$el.find('.useredit_countrycode').val(phone_prefix);
+		},
 		saveError:function(args){
+			this.fileUploader.remove();
 			if(401 == args.errorCode){
 				Backbone.history.navigate('user/useredit',{trigger:true});
 			}else if(403 == xhr.status){
@@ -39,17 +48,29 @@ define(['modules/user/templates/useredit', 'handlebars', 'gifted.countrycode'],f
 		},
 		saveSuccess:function(args){
 			Gifted.Global.alert(Gifted.Lang['saveSuccess']);
-			Backbone.history.history.back();
+			this.fileUploader.remove();
+			this.backHome();
 		},
 		save:function(){
+			var name=this.$el.find('.useredit_username').val();
+			if(!name){
+				Gifted.Global.alert(Gifted.Lang['UsernameIsEmpty']);
+				return;
+			}
 			var countryCode = this.$el.find('.useredit_countrycode').val();
 			if(!countryCode){
 				Gifted.Global.alert(Gifted.Lang['NotInputCountryCode']);
 				return;
 			}
+			var country=this.$el.find('.useredit_country').val();
 			var mobile = this.$el.find('.useredit_mobile').val();
 			if(!mobile){//TODO 手机号码验证
 				Gifted.Global.alert(Gifted.Lang['NotInputMobile']);
+				return;
+			}
+			var address=this.$el.find('.useredit_address').val();
+			if(!address){
+				Gifted.Global.alert(Gifted.Lang['AddressIsEmpty']);
 				return;
 			}
 			var pic = this.$el.find('.useredit_businesscard_pic').attr('src');
@@ -63,7 +84,7 @@ define(['modules/user/templates/useredit', 'handlebars', 'gifted.countrycode'],f
 				return;
 			}
 			var selfIntroduction = this.$el.find('.useredit_selfintroduction_content').val();
-			this.model.set({'SELFINTRODUCTION':selfIntroduction,'MOBILE':mobile.trim(),'COUNTRYCODE':countryCode.trim()});
+			this.model.set({'SELFINTRODUCTION':selfIntroduction,'MOBILE':mobile.trim(),'COUNTRYCODE':countryCode.trim(),'COUNTRY':country.trim(),'ADDRESS':address});
 			
 			/*var len = this.fileUploader.photoCount();
 			if (len==0) { // 检查是否有选择照片 修改其他信息也要让保存
@@ -143,6 +164,7 @@ define(['modules/user/templates/useredit', 'handlebars', 'gifted.countrycode'],f
 			if(!this.model.get('MOBILE'))
 				this.model.getPhoneNumber();
 			this.paintImage();
+			this.loadContriesListView();
 		},
 		deletePhoto:function() {
 			this.fileUploader.deletePhoto();
@@ -212,9 +234,36 @@ define(['modules/user/templates/useredit', 'handlebars', 'gifted.countrycode'],f
 			this.fileUploader.remove();
 			this.fileUploader = null;
 			delete this.model;
-			UserInfoView.__super__.remove.apply(this,arguments);
-		}
+			UserEditView.__super__.remove.apply(this,arguments);
+		},
+	    loadContriesListView:function(){
+	    	var that=this;
+	    	require(['lib/countries'],function(countries){
+	    		var counties=getCountries();
+	    		var i;
+	    		for(i=0;i<counties.length;i++){
+	    			var country=counties[i];
+	    			var name,option;    			
+	    			if(Gifted.Config.Locale.localeName=='en'){
+	    				name=country.en_name.trim();
+	    			}else if(Gifted.Config.Locale.localeName=='zh_CN'){
+	    				name=country.cn_name.trim();
+	    			}
+	    			if(country.IDN.trim()&&that.model.attributes['COUNTRY']==country.IDN.trim()){
+	    				option='<option value ="'+country.IDN.trim()+'" phone_prefix="'+country.phone_prefix.trim()+'" selected="selected">'+name.trim()+'</option>'
+	    			}else if(!that.model.attributes['COUNTRY']&&
+	    					that.model.attributes['COUNTRYCODE']==country.phone_prefix.trim()){
+	    				option='<option value ="'+country.IDN.trim()+'" phone_prefix="'+country.phone_prefix.trim()+'" selected="selected">'+name.trim()+'</option>'
+	    			}else{
+	    				option='<option value ="'+country.IDN.trim()+'" phone_prefix="'+country.phone_prefix.trim()+'">'+name.trim()+'</option>'
+	    			}
+	    			that.$el.find('.useredit_country').append(
+	    				option
+    	    		);
+	    		}
+	    	});
+	    }
 	});
-	return UserInfoView;
+	return UserEditView;
 	
 });

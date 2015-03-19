@@ -8,7 +8,7 @@ define(['modules/product/models/models'
 			if (v)
 				v.refreshPage();
 		},this);
-		this.dependents=['user', 'portal'];
+		this.dependents=['user', 'portal']; // 依赖于另两个模块
 		this.detailViewCache = [];
 		this.init = function(app){
         	this.app = app;
@@ -57,7 +57,6 @@ define(['modules/product/models/models'
 	    		var v = this.app.selectView('home',_.bind(function(){
 	    			var result = new ProductListView({collection:products,app:this.app});
 	    			this.app.pageContainer.append(result.$el);
-        			result.key = 'home';
 	    			result.render(); // 在创建时只render一次->loadInitData
 	    			return result;
 	    		},this));
@@ -71,7 +70,6 @@ define(['modules/product/models/models'
 					var model = new ProductDetail({collection:products,ID:id});
 					var result = new ProductDetailView({model:model,app:this.app}); // 根据缓存获取model
         			this.app.pageContainer.append(result.$el);
-        			result.key = 'productdetailview_'+id;
 	    			result.render(); // 只render一次后面的复用时都清空(先画出来)
 	    			this.addDetailView(result);
         			return result;
@@ -92,7 +90,7 @@ define(['modules/product/models/models'
 	    this.productModify=function(publisher, id){ // 放到自己发布的页面去修改
 	        require(['modules/product/views/ProductModifyView_new','jquery.snipbox']
 	        	,_.bind(function(ProductModifyView){
-	        	if(!this.app.checkRight({checkRule:['LOGIN']}))
+	        	if(!this.app.checkRight({checkRule:['LOGIN','SELLER']}))
 		    		return;
 		    	if(this.app.user.get('ID')!=publisher) {
 		    		Gifted.Global.alert(Gifted.Lang['NoRight']);
@@ -103,7 +101,6 @@ define(['modules/product/models/models'
 					var model = new Product({collection:products,ID:id});
 					var result = new ProductModifyView({model:model,app:this.app}); // 根据缓存获取model
         			this.app.pageContainer.append(result.$el);
-        			result.key = 'productmodifyview_'+id;
 	    			result.render(); // 只render一次后面的复用时都清空
 	    			result.loadData(id, true, false); // 触发了loadModifyItem->sync->render
         			return result;
@@ -119,14 +116,13 @@ define(['modules/product/models/models'
         this.productNew=function(){
 	        require(['modules/product/views/ProductModifyView_new','jquery.snipbox']
 	        	,_.bind(function(ProductNewView){
-	        	if(!this.app.checkRight({checkRule:['LOGIN']})) // ,'FACTORY'
+	        	if(!this.app.checkRight({checkRule:['LOGIN','SELLER']})) // ,'FACTORY'
 		    		return;
 				//var h = this.app.selectView('productnewview');
         		var v = this.app.selectView('productnewview',_.bind(function(){
 					var model = new Product({collection:products});
         			var result = new ProductNewView({model:model,app:this.app});
         			this.app.pageContainer.append(result.$el);
-        			result.key = 'productnewview';
 	    			result.render(); // 只render一次后面的复用时都清空
         			return result;
         		},this));
@@ -142,10 +138,9 @@ define(['modules/product/models/models'
         this.productChooseCatalog=function() {
         	require(['modules/product/views/ProductChooseCatalogView_new'],_.bind(function(ProductChooseCatalogView){
 				//var h = this.app.selectView('productchoosecatalogview');
-        		var v = this.app.selectView('productchoosecatalogview',_.bind(function(){
+        		var v = this.app.selectView('choosecatalogview',_.bind(function(){
         			var result = new ProductChooseCatalogView({app:this.app});
         			this.app.pageContainer.append(result.$el);
-        			result.key = 'productchoosecatalogview';
 		    		result.render(); // 在创建时只render一次
         			return result;
         		},this));
@@ -155,10 +150,9 @@ define(['modules/product/models/models'
         this.productOpenCatalog=function() {
         	require(['modules/product/views/ProductCatalogView_new'],_.bind(function(ProductCatalogView){
 				//var h = this.app.selectView('productcatalogview');
-        		var v = this.app.selectView('productcatalogview',_.bind(function(){
+        		var v = this.app.selectView('catalogview',_.bind(function(){ // 重用
         			var result = new ProductCatalogView({app:this.app});
         			this.app.pageContainer.append(result.$el);
-        			result.key = 'productcatalogview';
 		    		result.render(); // 在创建时只render一次
         			return result;
         		},this));
@@ -172,11 +166,11 @@ define(['modules/product/models/models'
 		this.productSearchCatalog = function(catalog, title){
 			require(['modules/product/views/ProductSearchView_new'],_.bind(function(ProductSearchView){
 				//var h = this.app.selectView('querycatalog');
-	    		var v = this.app.selectView('querycatalog',_.bind(function(){
+	    		var v = this.app.selectView('querycatalog_'+catalog,_.bind(function(){ // 重用
+				//var v = this.app.createView('querycatalog',_.bind(function(){
 	    			var collection = new ProductCachedCollection({key:'_querycatalog_'+catalog});
 	    			var result = new ProductSearchView({collection:collection,app:this.app,title:title});
 	    			this.app.pageContainer.append(result.$el);
-        			result.key = 'querycatalog';
 	    			result.render(); // 在创建时只render一次
 	    			return result;
 	    		},this));
@@ -197,17 +191,17 @@ define(['modules/product/models/models'
 		this.productQueryJSON = function(jsonString, title){
 			require(['modules/product/views/ProductSearchView_new'],_.bind(function(ProductSearchView){
 				//var h = this.app.selectView('queryjson');
-				var v = this.app.selectView('queryjson',_.bind(function(){
+				//var v = this.app.selectView('queryjson',_.bind(function(){
+				var v = this.app.createView('queryjson',_.bind(function(){ // 查询条件太多不要重用
 	    			var collection = new ProductCachedCollection({key:'_queryjson_'+title});
 	    			var result = new ProductSearchView({collection:collection,app:this.app,title:title});
 	    			this.app.pageContainer.append(result.$el);
-        			result.key = 'queryjson';
 	    			result.render(); // 在创建时只render一次
 	    			return result;
 	    		},this));
-	    		if (this.app.currentView && this.app.currentView.key=='ProductDetailView') 
+	    		if (this.app.currentView && this.app.currentView.key=='ProductDetailView') {
 	    			this.app.changeView(v); // ,{transition:'slidedown'}
-	    		else {
+	    		} else {
 	    			if (jsonString!='*') {
 		    			var subQuery = JSON.parse(jsonString);
 		    			v.clearSearch();
@@ -222,11 +216,11 @@ define(['modules/product/models/models'
 		this.productPublishedBy = function(jsonString, title){
 			require(['modules/product/views/ProductSearchView_new'],_.bind(function(ProductSearchView){
 				//var h = this.app.selectView('queryjson');
-				var v = this.app.selectView('queryjson',_.bind(function(){
+				var v = this.app.selectView('publishedby_'+title,_.bind(function(){ // 按发布人title重用
+				//var v = this.app.createView('publishedby',_.bind(function(){
 	    			var collection = new ProductCachedCollection({key:'_queryjson_'+title});
 	    			var result = new ProductSearchView({collection:collection,app:this.app,title:title});
 	    			this.app.pageContainer.append(result.$el);
-        			result.key = 'queryjson';
 	    			result.render(); // 在创建时只render一次
 	    			return result;
 	    		},this));

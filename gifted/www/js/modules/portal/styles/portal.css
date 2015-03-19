@@ -1,6 +1,11 @@
 .notlogined {
 	display:none;
 }
+
+/*.navigator-item {
+	line-height:50px;
+}*/
+
 .setting_list li>label {
 	display:inline-block;
 	line-height:50px;
@@ -17,13 +22,13 @@
 	width:90px;
 }
 .setting_list .settings-currency {
-	min-width:120px;
+	/*min-width:120px;*/
 }
 .setting_list .settings-servers {
-	min-width:120px;
+	/*min-width:120px;*/
 }
 .setting_list .settings-clearcache {
-	min-width:120px;
+	/*min-width:120px;*/
 }
 .setting-button {
 	width: 100% !important;

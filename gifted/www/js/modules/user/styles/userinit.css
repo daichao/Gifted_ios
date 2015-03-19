@@ -249,7 +249,17 @@
 	width:100%;
 	height:30px;
 }
+.useredit_country {
+	right:0px;
+	width:100%;
+	height:30px;
+}
 .useredit_countrycode {
+	right:0px;
+	width:100%;
+	height:30px;
+}
+.useredit_address {
 	right:0px;
 	width:100%;
 	height:30px;

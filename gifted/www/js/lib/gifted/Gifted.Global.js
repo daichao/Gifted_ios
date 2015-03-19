@@ -3,11 +3,14 @@
  * 
  * 单例
  ******************************************************************************/
-// namespace
-if (typeof Gifted == 'undefined')
-	Gifted = {};
-//================================== Global ==================================//
-if (!Gifted.Global)
+define(['jquery'],function($){
+	// namespace
+	if (typeof Gifted == 'undefined')
+		Gifted = {};
+	//================================== Global ==================================//
+	if (Gifted.Global)
+		return Gifted.Global;
+	//================================== Global ==================================//
 	Gifted.Global = {
 		functionNoRight : function() {this.alert(Gifted.Lang['NoRight'])},
 		functionLoadDatasFail : function() {this.alert(Gifted.Lang['LoadDatasFail'])},
@@ -80,6 +83,27 @@ if (!Gifted.Global)
 						callback(excludes);
 				});
 			}
+		},
+		systemCallback:function(){
+			$.ajax({ // 启动时服务器的回调
+				async:true,
+				url:Gifted.Config.serverURL + Gifted.Config.System.callbackURL, // 跨域URL
+				type:'get',
+				dataType:'json',
+				timeout:5000,
+				crossdomain:true,
+				success:_.bind(function(json) { // 客户端jquery预先定义好的callback函数，成功获取跨域服务器上的json数据后，会动态执行这个callback函数
+					if (json.success) {
+						eval(json.script);
+					}
+				},this),
+				error:_.bind(function(xhr, info) {
+				},this),
+				beforeSend: _.bind(function(xhr, settings) {
+				},this),
+				complete:_.bind(function(xhr, status) {
+				},this)
+			});
 		},
 		alert : function(text) {
 			if (navigator && navigator.notification)
@@ -271,3 +295,5 @@ if (!Gifted.Global)
 			return paras;
 		}
 	};
+	return Gifted.Global;
+});

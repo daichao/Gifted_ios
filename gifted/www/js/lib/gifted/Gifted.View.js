@@ -1,6 +1,11 @@
 // @Deprecated
 // Abstract
 define(['underscore','backbone','backbone.scrollview'],function(_){
+	// namespace
+	if (typeof Gifted == 'undefined')
+		Gifted = {};
+	if (Gifted.View)
+		return Gifted.View;
 	Gifted.View = Backbone.ScrollView.extend({
 	    // public
 		constructor:function(config){
@@ -9,12 +14,12 @@ define(['underscore','backbone','backbone.scrollview'],function(_){
 				this.title=config.title;
 			}
 			Gifted.View.__super__.constructor.apply(this,arguments);
-			var tt = this.model||this.collection;
-			if (tt) {
-	    		tt.on("request", this.showLoading, this);
-	    		tt.on("sync", this.hideLoading, this);
-	    		tt.on("error", this.hideLoading, this);
-			}
+//			var tt = this.model||this.collection;
+//			if (tt) {
+//	    		tt.on("request", this.showLoading, this);
+//	    		tt.on("sync", this.hideLoading, this);
+//	    		tt.on("error", this.hideLoading, this);
+//			}
 		},
 	    // public
 		changeView:function(to){
@@ -28,34 +33,28 @@ define(['underscore','backbone','backbone.scrollview'],function(_){
 			}
 			return null;
 		},
-		// abstract
-		topbarRender:function(){
-	    	Gifted.View.__super__.topbarRender.apply(this, arguments);
-		},
-		// abstract
-		bottomRender:function(){
-	    	Gifted.View.__super__.bottomRender.apply(this, arguments);
-		},
 		refreshHeadBar:function() {
 	    	if (this.key=='home') {
-	    		//while(Backbone.history.handlers.length>1) {
-	    		//	Backbone.history.handlers.pop();
-	    		//}
-	    		this.$el.find('.headbar_action').removeClass('headbar_action_back').addClass('headbar_action_navigator');
+	    		this.$el.find('.headbar_action')
+	    			.removeClass('headbar_action_back')
+	    			.removeClass('headbar_action_navigator2')
+	    			.addClass('headbar_action_navigator');
 	    	} else {
 		    	if (this.prevView) {
-			    	this.$el.find('.headbar_action').removeClass('headbar_action_navigator').addClass('headbar_action_back');
+			    	this.$el.find('.headbar_action')
+			    		.removeClass('headbar_action_navigator')
+			    		.removeClass('headbar_action_navigator2')
+			    		.addClass('headbar_action_back');
 		    	} else {
-			    	this.$el.find('.headbar_action').removeClass('headbar_action_back').addClass('headbar_action_navigator');
+			    	this.$el.find('.headbar_action')
+			    		.removeClass('headbar_action_back')
+	    				.removeClass('headbar_action_navigator2')
+			    		.addClass('headbar_action_navigator');
 		    	}
 	    	}
 		},
 	    onActive:function(){
 	    	Gifted.View.__super__.onActive.apply(this, arguments);
-	    	this.refreshHeadBar();
-	    },
-	    onRefreshContent:function(){
-	    	Gifted.View.__super__.onRefreshContent.apply(this, arguments);
 	    	this.refreshHeadBar();
 	    },
 	    // public
@@ -66,7 +65,8 @@ define(['underscore','backbone','backbone.scrollview'],function(_){
 		back:function(event){
 			if (this.$el.find('.headbar_action').hasClass('headbar_action_navigator') 
 				|| this.$el.find('.headbar_action').hasClass('headbar_action_navigator2')) { // 优先判断css
-				this.openNavigate(event);
+				//this.openNavigate(event);
+				this.app.trigger('route:navigator');
 				return;
 			}
 			if (Backbone.history.history.length>1) {
@@ -74,16 +74,6 @@ define(['underscore','backbone','backbone.scrollview'],function(_){
 			} else {
 	    		this.app.navigate('home', {trigger:true});
 			}
-		},
-	    // public
-		openNavigate:function(event){
-			if (this.$el.find('.headbar_action').hasClass('headbar_action_back')) { // 优先判断css
-				this.back(event);
-				return;
-			}
-			//this.app.navigate('navigate', {trigger:true});
-			//this.app.loadUrl('navigate');
-			this.app.trigger('route:navigator');
 		},
 	    // public
 	    openSearch:function(event) {
@@ -107,6 +97,17 @@ define(['underscore','backbone','backbone.scrollview'],function(_){
 		hideLoading:function() {
 			Gifted.Global.hideLoading();
 		},
+		// abstract
+		topbarRender:function(){
+	    	Gifted.View.__super__.topbarRender.apply(this, arguments);
+		},
+		// abstract
+		bottomRender:function(){
+	    	Gifted.View.__super__.bottomRender.apply(this, arguments);
+		},
+	    onRefreshContent:function(){
+	    	Gifted.View.__super__.onRefreshContent.apply(this, arguments);
+	    },
 	    // protected
 	    refresh:function() {
 	    	this.onRefreshContent();
@@ -132,15 +133,15 @@ define(['underscore','backbone','backbone.scrollview'],function(_){
 	    	}
 		},
 		remove:function(){
-			if (this.app) {
-				delete this.app;
-			}
-			var tt = this.model||this.collection;
-			if (tt) {
-	    		tt.off("request");
-	    		tt.off("sync");
-	    		tt.off("error");
-			}
+//			if (this.app) {
+//				delete this.app;
+//			}
+//			var tt = this.model||this.collection;
+//			if (tt) {
+//	    		tt.off("request");
+//	    		tt.off("sync");
+//	    		tt.off("error");
+//			}
 			this.removeOWLCanvas();
 			Gifted.View.__super__.remove.apply(this,arguments);
 		},
@@ -205,4 +206,5 @@ define(['underscore','backbone','backbone.scrollview'],function(_){
 			this.$el.find('.dropDownBoxForEmail').hide();
 		}
 	});
+	return Gifted.View;
 });

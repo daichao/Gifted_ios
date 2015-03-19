@@ -22,6 +22,8 @@ define(['modules/user/templates/userinteractive', 'handlebars','owl-carousel'],f
 	    	'tap .userinteractive_changepwd':'openPassword',
 			'tap .userinteractive_img':'openUserInfo',
 			'tap .userinteractive_settings':'openSettings',
+			'tap .userinteractive_follow':'openFollowList',
+			'tap .userinteractive_follower':'openFollowerList',
 	    	//'tap .userinteractive_img':'openIM',
 			
 	    	//'click .userinteractive_other_img':'openOthers',
@@ -34,7 +36,6 @@ define(['modules/user/templates/userinteractive', 'handlebars','owl-carousel'],f
 			this.model.on("change:userInfo", this.refreshInfoHead, this);
 			this.model.on("change:products", this.refreshProducts, this);
 	    	this.on('toprefresh',this.onTopRefresh,this);
-	    	this.on('bottomrefresh',this.onBottomRefresh,this);
 	    },
 	    loadData:function(reload) {
 			this.model.loadData(reload);
@@ -50,7 +51,7 @@ define(['modules/user/templates/userinteractive', 'handlebars','owl-carousel'],f
 		onTopRefresh:function(event){
 			this.loadData(true); 
 			//this.contentRender(); // by trigger
-			_.delay(_.bind(this.trigger,this,'refreshcomplete'),1000);
+			_.delay(_.bind(this.trigger,this,'loadComplete'),1000);
 		},
 		openPassword:function(event){
 			this.app.navigate("user/modifypassword", {trigger:true});
@@ -87,6 +88,12 @@ define(['modules/user/templates/userinteractive', 'handlebars','owl-carousel'],f
 		openSettings:function(event){
 			this.app.navigate('settings', {trigger:true});
 		},
+		openFollowList:function(event){
+			this.app.navigate('user/followList/'+this.model.id, {trigger:true});
+		},
+		openFollowerList:function(event){
+			this.app.navigate('user/followerList/'+this.model.id, {trigger:true});
+		},
 		addFollow : function(){
 			this.model.addFollow();
 		},
@@ -97,11 +104,11 @@ define(['modules/user/templates/userinteractive', 'handlebars','owl-carousel'],f
 			var html = this.templateInteractive(this.model.toJSON());
 			this.$contentEl.find('.userinteractive_interactive').empty().html(html);
 			if(this.model.get("following") == true){
-				this.$el.find(".userinteractive_follow").addClass('following').removeClass('follow');
-				this.$el.find('.userinteractive_follow').html(Gifted.Lang['Following'])
+				this.$el.find(".userinteractive_follow_action").addClass('following').removeClass('follow');
+				this.$el.find('.userinteractive_follow_action').html(Gifted.Lang['Following'])
 			}else if(this.model.get("following") == false){
-				this.$el.find(".userinteractive_follow").addClass('follow').removeClass('following');
-				this.$el.find('.userinteractive_follow').html(Gifted.Lang['FOLLOW'])
+				this.$el.find(".userinteractive_follow_action").addClass('follow').removeClass('following');
+				this.$el.find('.userinteractive_follow_action').html(Gifted.Lang['FOLLOW'])
 			}else{
 				this.$el.find('.userinteractive_interactive').empty();
 			}
@@ -142,14 +149,14 @@ define(['modules/user/templates/userinteractive', 'handlebars','owl-carousel'],f
 			this.$el.find('.userinteractive_other_img').off('touchstart touchend');
 			this.$el.find('.owl-carousel').off('touchstart');
         	this.removeOWLCanvas();
+        	
 			var html = this.templateInfoproducts(this.model.toJSON());
 			this.$contentEl.find('.userinteractive_product').empty().html(html);
-			// 明细图片
+			
+	    	this.$el.find('.userinteractive_product').addClass(Gifted.Config.isCanvasCarouel?'canvascarousel':'owl-carousel');
         	if (Gifted.Config.isCanvasCarouel) { // 启用CanvasCarouel或OWLCarousel的开关
 	        	this.$el.find('.canvascarousel').carouseldestroy();
-				var cw=this.$el.css('width'), h=cw;
-				cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
-		        this.$el.find('.canvascarousel').css({width:cw,height:h});
+		        //this.$el.find('.canvascarousel').css({width:cw,height:h});
 		        this.$el.find('.canvascarousel').carousel({mouseOnly:Gifted.Config.isCanvasCarouelDebug});
 	        } else {
 	        	{
@@ -194,7 +201,7 @@ define(['modules/user/templates/userinteractive', 'handlebars','owl-carousel'],f
 //		        this.$el.find('.userinteractive_other_img').on('tap',_.bind(this.openOthers,this));
 	        }
 		},
-		paintImage : function() {
+		paintImage:function() {
 			var userInfo = this.model.get('userInfo');
 			if (!userInfo) {
 				return;

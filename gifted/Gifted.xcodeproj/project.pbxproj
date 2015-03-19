@@ -810,7 +810,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Weizhi Huang (NP2BLS24TF)";
+				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Weizhi Huang (NP2BLS24TF)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -848,7 +848,7 @@
 					"-Obj-C",
 				);
 				PRODUCT_NAME = Gifted;
-				PROVISIONING_PROFILE = "816d1656-ff35-4ba5-9700-13e2e16c0c10";
+				PROVISIONING_PROFILE = "d5ea94ee-1dda-4ec3-a3fc-e6ff5d4816ae";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -858,7 +858,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Weizhi Huang (NP2BLS24TF)";
+				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Weizhi Huang (NP2BLS24TF)";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -894,7 +894,7 @@
 					"-Obj-C",
 				);
 				PRODUCT_NAME = Gifted;
-				PROVISIONING_PROFILE = "816d1656-ff35-4ba5-9700-13e2e16c0c10";
+				PROVISIONING_PROFILE = "d5ea94ee-1dda-4ec3-a3fc-e6ff5d4816ae";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;

@@ -192,7 +192,7 @@ input.ui-slider-input {
 .gifted-link {
 	background-color:#FD6D05!important;
 	color:#FFFFFF!important;
-	font-height:30px;
+	/*line-height:30px;*/
 }
 .gifted-link:hover{
 	background-color:#FD6D05!important;

@@ -13,8 +13,9 @@ define(['modules/product/templates/productmodify_new','handlebars',
 	    	'change .product_date':'changeDate',
 	    	'change .product_price':'changePrice',
 	    	'change .product_qdl':'changeQDL',
-	    	'tap .product_image_btn':'pickPhoto',
-	    	'tap .photo_select_list':'selectPhoto'
+	    	//'tap .photo_select_list':'selectPhoto',
+	    	'tap .scrollview_content':'selectPhoto',
+	    	'tap .product_image_btn':'pickPhoto'
 	    },
 	    initialize: function () {
 	    	ProductModifyView.__super__.initialize.apply(this,arguments);
@@ -72,24 +73,6 @@ define(['modules/product/templates/productmodify_new','handlebars',
 	    	$(event.target).val(Math.abs(val));
 	    },
 	    changeDate:function(event){
-	    	//if ($(event.target).is('.product_yxq_start')) {
-	    		//var smm = moment($(event.target).val(),'YYYY-MM-DD');
-				//var emm = moment($(event.target).val(),'YYYY-MM-DD').add('days', 7);
-				/*this.$el.find('.product_yxq_end').mobiscroll('destroy').mobiscroll().date({
-					preset: 'date', //日期
-					theme: deviceIsIOS?'ios':'android-ics light', //皮肤样式
-					display: deviceIsIOS?'bottom':'modal', //显示方式  bottom modal
-					mode: 'scroller', //日期选择模式
-					dateFormat: 'yy-mm-dd', // 日期格式
-					dateOrder: 'yymmdd', //面板中日期排列格式
-					startYear:smm.year(), // 起始年份
-					startMonth:smm.month(), // 起始月份
-					startDate:smm.date(), // 起始日期
-					endYear:emm.year(), // 结束年份
-					endMonth:emm.month(), // 结束月份
-					endDate:emm.date() // 结束日期
-				});*/
-			//} else if ($(event.target).is('.product_yxq_end')) {
 			//_.delay(_.bind(function(){
 				var smm = moment(this.$el.find('.product_yxq_start').val(),'YYYY-MM-DD').add('days', 6);
 				var emm = moment(this.$el.find('.product_yxq_end').val(),'YYYY-MM-DD');
@@ -121,24 +104,26 @@ define(['modules/product/templates/productmodify_new','handlebars',
 	      
 	    	var imgDoms = this.$el.find('.product_image_btn');
 			for (var i=0;i<5;i++) {
-				var dom = imgDoms[i];
-				dom.src = 'img/takepicture.png';
+				var domImg = imgDoms[i];
+				domImg.src = 'img/takepicture.png';
 			}
 			// 和detail参数保持一致
-			var cw=this.$el.css('width');
+			var cw=window.screen.width; // 没切换过来时宽度为0：this.$el.css('width');
 			var h=cw;
-			cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
+			//cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
 			cw=cw-20;
-			h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
+			//h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
 			h=Math.round(h*4/5);
 			if (cw<0)
 				return false;
 			if (json.PHOTOURLS && json.PHOTOURLS.length>0) { // Math.random()
 				var len = json.PHOTOURLS.length;
 				for (var i=0;i<len;i++) {
-					var photoIndex = (!json.PHOTOURLS[i].PHOTOINDEX||json.PHOTOURLS[i].PHOTOINDEX<=0)
-						?(i+1):json.PHOTOURLS[i].PHOTOINDEX; // 计算图片的序列位置
-					var domImg = imgDoms[photoIndex-1];
+					var domImg = imgDoms[i];
+					$(domImg).attr({PHOTOID:json.PHOTOURLS[i].PHOTOID});
+					//var index = (!json.PHOTOURLS[i].PHOTOINDEX||json.PHOTOURLS[i].PHOTOINDEX<=0)
+					//	?(i+1):json.PHOTOURLS[i].PHOTOINDEX; // 计算图片的序列位置(NOTICE 服务器已经算好了直接用即可)
+					//var domImg = imgDoms[index-1];
 					// 下面代码的目的:直接用明细页面的缓存图片
 					//var r=json.PHOTOURLS[i].PHOTORADIO;
 					//h=r?Math.round(cw/r):cw; // 和detail参数保持一致
@@ -308,43 +293,32 @@ define(['modules/product/templates/productmodify_new','handlebars',
 			}
 		},
 		// ------------------------------------------------------------------------------------------ //
-		/*photoUpload:function() {
-			var len = this.fileUploader.photoCount();
-			var params = this.model.serializeSaveObject();
-			var productID = this.$el.find(".product_ID").val();
-			var paramOfURL = 'GIFTED_SESSIONID='+Gifted.Global.getSessionId()
-				+'&inputFileCount='+len+'&inputTransID='+this.transID+'&inputProductID='+productID; // getParameter
-			var uploadUrlDebug = Gifted.Config.uploadServerURL+Gifted.Config.Product.uploadFileURLDebug +'?'+paramOfURL;
-			var uploadUrl = Gifted.Config.uploadServerURL+Gifted.Config.Product.uploadFileURL +'?'+paramOfURL;
-			this.fileUploader.upload({
-				uploadUrlDebug:uploadUrlDebug,
-				uploadUrl:uploadUrl,
-				params:params,
-				success:_.bind(function(json, status) {
-					if (json.success==true) {
-						this.model.set('PHOTO_'+this.fileUploader.imageKey, json.url);
-					}
-				},this),
-				failure:_.bind(function(status, message) {
-					//console.log('上传错误:'+message);
+		photoDelete:function() {
+			this.fileUploader.photoDelete({
+				callback:_.bind(function(imageKey){
+					if (!imageKey)
+						return;
+	    			var imgDoms = this.$el.find('.product_image_btn');
+	    			if (imgDoms.length>=imageKey*1) {
+		    			var imgDom = imgDoms[imageKey*1-1];
+		    			var deleteUrl = this.fileUploader.deleteUrl;
+		    			var photoID = $(imgDom).attr('PHOTOID');
+		    			if (photoID)
+		    				deleteUrl[imageKey]=photoID;
+	    			}
 				},this)
 			});
-		},*/
-		photoDelete:function() {
-			this.fileUploader.photoDelete();
 			//this.model.unset('PHOTO_'+this.fileUploader.imageKey);
 		},
 		photo4Debug:function() {
 			this.fileUploader.photo4Debug({
 				callback:_.bind(function(){
-					//this.photoUpload();
 				},this)
 			});
 		},
 	    photo4Camera:function(blob) {
 			this.fileUploader.photo4Camera({
 				callback:_.bind(function(){
-					//this.photoUpload();
 				},this)
 			});
 		},
@@ -353,15 +327,12 @@ define(['modules/product/templates/productmodify_new','handlebars',
 			this.fileUploader.photo4MultiFile({
 				maxPic:maxPic,
 				callback:_.bind(function(uris){
-					//this.photoUpload();
-					//alert('modfiypic2......,this.fileUploader.imageKey:'+this.fileUploader.imageKey);
 					var index = Number(this.fileUploader.imageKey)-1, len=uris.length;
 					for (var i=0;i<len;i++) {
-						var imageIndex = (index+i)%maxPic;
-						var imageKey = imageIndex+'';
-						//alert('modfiypic3......,i:'+i+',imageKey:'+imageKey);
-						this.fileUploader.pickUrl[imageKey] = uris[i];
-						delete this.fileUploader.deleteUrl[imageKey];
+						var imageIndex = (index+i)%maxPic; // 0~4
+						var imageKey = imageIndex*1+1; // 1~5
+						this.fileUploader.pickUrl[imageKey] = uris[i]; // 设置上传参数
+						delete this.fileUploader.deleteUrl[imageKey]; // 告诉服务器覆盖该图片而不是删除
 						var imageDom = this.$el.find('.product_image_btn')[imageIndex];
 						imageDom.style.display = 'block';
 						imageDom.src = uris[i];
@@ -372,22 +343,19 @@ define(['modules/product/templates/productmodify_new','handlebars',
 	    pickPhoto:function(event) {
 	    	if (event.target.tagName=='IMG') {
 		    	if (this.saving==true) {
-		    		//console.log("uploading......");
 		    		Gifted.Global.alert('saving...');
 		    		return false;
 		    	}
 				this.fileUploader.imageDom = event.target;
-				this.fileUploader.imageKey = $(event.target).attr('index');
-				//alert('modfiypic1......,this.fileUploader.imageKey:'+this.fileUploader.imageKey);
-				//this.isEditing = true;
-				//Backbone.history.navigate('product/photo',{trigger:true});
-				//this.$el.find('.product_modify_form').hide();
+				this.fileUploader.imageKey = $(event.target).attr('index'); // 可以是任何代表该图片的属性值
 				_.delay(_.bind(function(){
 					this.$el.find('.photo_select_wrap').show();
 				},this),100);
 			}
 		},
 	    selectPhoto:function(event) {
+	    	if (this.$el.find('.photo_select_wrap:visible').length==0)
+	    		return;
         	var val = $(event.target).attr('value');
 			if (val==1) {
 				this.photo4Camera();
@@ -404,7 +372,7 @@ define(['modules/product/templates/productmodify_new','handlebars',
 				_.delay(_.bind(function(){
 					this.$el.find('.photo_select_wrap').hide();
 				},this),100);
-			} else if (val==4) {
+			} else {
 				_.delay(_.bind(function(){
 					this.$el.find('.photo_select_wrap').hide();
 				},this),100);

@@ -5,7 +5,7 @@ define(['css!lib/owl.carousel/owl.carousel.css', 'css!lib/owl.carousel/owl.theme
 			'<span class="headbar_sign">' +
 				'<div class="headbar_action">G</div>' +
 			'</span>' +
-			'<span class="header_mid">{{NAME}}</span>'+
+			//'<span class="header_mid">{{NAME}}</span>'+
 			'<span class="header_right header_edit" style="display:none;"></span>' +
 			//'<span class="header_right header_refresh"></span>' +
 			'<span class="header_right header_share"></span>';
@@ -18,7 +18,7 @@ define(['css!lib/owl.carousel/owl.carousel.css', 'css!lib/owl.carousel/owl.theme
 					'<div class="product_detail_itemfav fav_{{ID}}"></div>' +
 					'<div class="product_item_images product_detail_images" >' + 
 						'{{#each this.PHOTOURLS}}' +
-							'<img class="product_detail_image product_image product_image_{{PHOTOID}}" src="img/notexists.png" alt="{{PHOTOID}}" />' +
+							'<img alt="{{PHOTONAME}}" src="img/notexists.png" class="product_detail_image product_image product_image_{{PHOTOID}}" />' +
 						'{{/each}}' +
 						//'<img class="product_detail_image product_image product_image_0" src="img/notexists.png" alt="0" />' +
 					'</div>' +
@@ -57,6 +57,7 @@ define(['css!lib/owl.carousel/owl.carousel.css', 'css!lib/owl.carousel/owl.theme
 			'<div class="product_detail_person">'+
 				'<div class="publisher_img"><img src="{{#if publisher.PORTRAIT}}{{publisher.PORTRAIT}}?imageView2/1/w/40/h/40/q/50{{else}}img/noportrait_30_30.png{{/if}}"/></div>' +
 				'<div class="publisher_name">{{publisher.NAME}}</div>'+
+				'<div class="publisher_positionaddress">{{publisher.POSITION_ADDRESS}}</div>'+
 			'</div>';
 	result.publisher2 = 
 			'<div class="publisher_position" style="display:none;">{{#if publisher.POSITION}}{{publisher.POSITION.latitude}},{{publisher.POSITION.longitude}}{{else}}Not specified{{/if}}</div>' +

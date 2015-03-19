@@ -28,9 +28,9 @@ define(['modules/portal/templates/imagebrowser', 'handlebars',
 				//Gifted.Util.fullScreen(event.target);
 				return false;
 			}
-			var cw=this.$el.css('width');
-			//var h=this.$el.css('height'); // h=cw;
-			cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
+			var cw=window.screen.width; // 没切换过来时宽度为0：this.$el.css('width');
+			//var h=cw;
+			//cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
 			//cw=cw-20;
 			//h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
 			//h-=50;
@@ -55,11 +55,11 @@ define(['modules/portal/templates/imagebrowser', 'handlebars',
 			return false;
 	    },
 	    doPaint:function(json, placeholder) {
-			var cw=this.$el.css('width');
-			var h=this.$el.css('height'); // h=cw;
-			cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
+			var cw=window.screen.width; // 没切换过来时宽度为0：this.$el.css('width');
+			//var h=cw;
+			//cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
 			//cw=cw-20;
-			h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
+			//h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
 			//h-=50;
 	    	//if (placeholder) {
 			//	this.$el.find('.product_image_0').css({'width':cw,'height':h});
@@ -73,8 +73,8 @@ define(['modules/portal/templates/imagebrowser', 'handlebars',
         			continue;
 				var domImg = domImgs[0];
 				
-				//var r=json.PHOTOURLS[i].PHOTORADIO;
-				//h=r?Math.round(cw/r):cw;
+				var r=json.PHOTOURLS[i].PHOTORADIO;
+				h=r?Math.round(cw/r):cw;
 				$(domImg).css({'width':cw});
 				$(domImg).attr({'index':i});
 				//if (Gifted.Config.isCanvasCarouel) { // 启用CanvasCarouel或OWLCarousel的开关
@@ -94,9 +94,7 @@ define(['modules/portal/templates/imagebrowser', 'handlebars',
 	    	this.$el.find('.imageview_images').addClass(Gifted.Config.isCanvasCarouel?'canvascarousel':'owl-carousel');
         	if (Gifted.Config.isCanvasCarouel) { // 启用CanvasCarouel或OWLCarousel的开关
 	        	this.$el.find('.canvascarousel').carouseldestroy();
-				var cw=this.$el.css('width'), h=cw;
-				cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
-		        this.$el.find('.canvascarousel').css({width:cw,height:h});
+		        //this.$el.find('.canvascarousel').css({width:cw,height:h});
 		        this.$el.find('.canvascarousel').carousel({mouseOnly:Gifted.Config.isCanvasCarouelDebug});
 	        } else {
 	        	{

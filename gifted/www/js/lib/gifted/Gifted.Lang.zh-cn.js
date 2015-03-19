@@ -56,17 +56,19 @@ define(['translate'], function() {
 		'NotInputYXQ_End':'亲，你忘填有效期结束时间了',
 		'YXQEndMustLaterThanYXQStart':'亲，有效期的时间填反了',
 		'YXQIsSevenDays':'亲，有效期只能在7天内，我们帮你修正了',
+		'Browse':'浏览',
 		'Catalog':'分类',
 		'EffectTime':'有效时间:',
-		'MinQuantity':'起定量:{0}件',
+		'MinQuantity':'起定量: {0} 件',
 		'MinQuantity2':'起定量',
 		'Price':'单价: {0} {1}',
 		'Price2':'单价',
 		'Currency':'货币',
 		'Share':'分享',
 		'Title':'标题',
-		'Description':'描述(选填)',
-		'PublishedBy':'{0}发布的',
+		'Description':'描述',
+		'DescriptionModify':'描述(选填)',
+		'PublishedBy':'{0} 发布的',
 		'Published':'',
 		'Servers':'服务器',
 		'Others':'其他',
@@ -84,6 +86,10 @@ define(['translate'], function() {
 		'PasswordsDontMatch':'亲，您输入的密码不一致，请检查',
 		'UsernameIsEmpty':'亲，用户名不能为空',
 		'Success':'操作成功',
+		'timeout':'超时',
+		'error':'错误',
+		'notmodified':'不能修改',
+		'parsererror':'解析错误',
 		/* user */
 		'DEPLOY':'发布',
 		'FOLLOWER':'粉丝',
@@ -117,6 +123,7 @@ define(['translate'], function() {
 		'countdown':'{0}天 {1}时 {2}分 {3}秒',
 		'deliverydate':"交货日期",
 		'mobile':'手机',
+		'country':'国家',
 		'sexy':'性别',
 		'NotInputBusinesscard':'请上传您名片的照片',
 		'NotInputBusinessLicence':'请上传您营业执照的照片',
@@ -131,6 +138,8 @@ define(['translate'], function() {
 		'PasswordShort':'密码长度最小6位',
 		'productsCount':'发布商品',
 		'invite':'邀请朋友',
+		'consummateData':'请完善您的资料',
+		'consummateAuditing':'您的资料正在审核中，请接到通知后重试此操作',
 		
 		'Conversation':'消息',
 		'ConversationList':'消息列表',
@@ -139,8 +148,10 @@ define(['translate'], function() {
 		'ConfirmPassword':'确认密码',
 		'OldPassword':'原密码',
 		'Password':'密码',
-		'Address':'地址',
-		'AddressIsEmpty':'地址不能为空'
+		'Address':'联系地址',
+		'AddressIsEmpty':'地址不能为空',
+		'addFavoriteItemSuccess':'已成功加入收藏夹!',
+		'removeFavoriteItemSuccess':'已成功从收藏夹移除!'
 	};
 	TRANSLATE.registerLang('zh_CN',data);
 	return data;

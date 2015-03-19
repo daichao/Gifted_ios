@@ -14,7 +14,7 @@ define([],function(){
 			    	var sql = 'DROP TABLE IF EXISTS user';
 			    	console.log(sql);
 			    	tx.executeSql(sql); // TODO 当表结构发生变化时
-			    	sql = 'CREATE TABLE IF NOT EXISTS user (ID,GIFTED_SESSIONID,CODE,NAME,REALNAME,SEX,USED,EMAIL,YEALS_OLD,COUNTRYCODE,MOBILE,PORTRAIT,RIGHTS,BUSINESSCARD,BUSINESSLICENCE,SELFINTRODUCTION,FOLLOWER,FOLLOW,FAVORITE,PRODUCT)';
+			    	sql = 'CREATE TABLE IF NOT EXISTS user (ID,GIFTED_SESSIONID,CODE,NAME,REALNAME,SEX,USED,EMAIL,YEALS_OLD,COUNTRYCODE,COUNTRY,ADDRESS,MOBILE,PORTRAIT,RIGHTS,BUSINESSCARD,BUSINESSLICENCE,SELFINTRODUCTION,FOLLOWER,FOLLOW,FAVORITE,PRODUCT)';
 			    	console.log(sql);
 			        tx.executeSql(sql);
 			    }
@@ -32,7 +32,7 @@ define([],function(){
 			    db.transaction(
 				    function createUserTable(tx) {//创建用户表
 				    	//tx.executeSql('DROP TABLE IF EXISTS user');//TODO 当表结构发生变化时
-				        tx.executeSql('CREATE TABLE IF NOT EXISTS user (ID,GIFTED_SESSIONID,CODE,NAME,REALNAME,SEX,USED,EMAIL,YEALS_OLD,COUNTRYCODE,MOBILE,PORTRAIT,RIGHTS,BUSINESSCARD,BUSINESSLICENCE,SELFINTRODUCTION,FOLLOWER,FOLLOW,FAVORITE,PRODUCT)');
+				        tx.executeSql('CREATE TABLE IF NOT EXISTS user (ID,GIFTED_SESSIONID,CODE,NAME,REALNAME,SEX,USED,EMAIL,YEALS_OLD,COUNTRYCODE,COUNTRY,ADDRESS,MOBILE,PORTRAIT,RIGHTS,BUSINESSCARD,BUSINESSLICENCE,SELFINTRODUCTION,FOLLOWER,FOLLOW,FAVORITE,PRODUCT)');
 				    }
 			    );
 			    db.transaction(
@@ -100,7 +100,7 @@ define([],function(){
 				},
 				error : _.bind(function(xhr, info) { // jsonp 方式此方法不被触发
 					this.trigger('error');
-					this.trigger('registerError',{'errorCode':xhr.status,'errorInfo':xhr.responseText})
+					this.trigger('registerError',{'errorCode':xhr.status,'errorInfo':info,'errorResponse':xhr.responseText})
 					/*if(401 == xhr.status){
 						if (xhr.responseJSON)
 							Gifted.Global.alert(xhr.responseJSON.error);
@@ -196,25 +196,26 @@ define([],function(){
 				},this),
 				error : _.bind(function(xhr, info) { // jsonp 方式此方法不被触发
 					this.trigger('error');
-					this.trigger('loginError',{'errorCode':xhr.status,'errorInfo':xhr.responseText})
+					this.trigger('loginError',{'errorCode':xhr.status,'errorInfo':info,'errorResponse':xhr.responseText});
 				},this)
 			});
 		},
 		// 用户的属性填充
 		setAttributes:function(userInfo,insertDB){
 			var json = {
-				GIFTED_SESSIONID : userInfo['GIFTED_SESSIONID'],
+				GIFTED_SESSIONID : userInfo.GIFTED_SESSIONID,
 				ID : userInfo.ID,
 				CODE : (userInfo.CODE=='undefined'||userInfo.CODE=='null')?undefined:userInfo.CODE,
 				EMAIL : (userInfo.EMAIL=='undefined'||userInfo.EMAIL=='null')?undefined:userInfo.EMAIL,
 				COUNTRYCODE : (userInfo.COUNTRYCODE=='undefined'||userInfo.COUNTRYCODE=='null')?undefined:userInfo.COUNTRYCODE,
+				COUNTRY : (userInfo.COUNTRY=='undefined'||userInfo.COUNTRY=='null')?undefined:userInfo.COUNTRY,
 				MOBILE : (userInfo.MOBILE=='undefined'||userInfo.MOBILE=='null')?undefined:userInfo.MOBILE,
 				NAME : (userInfo.NAME=='undefined'||userInfo.NAME=='null')?undefined:userInfo.NAME,
 				REALNAME : (userInfo.REALNAME=='undefined'||userInfo.REALNAME=='null')?undefined:userInfo.REALNAME,
 				SEX : (userInfo.SEX=='undefined'||userInfo.SEX=='null')?undefined:userInfo.SEX,
 				YEARS_OLD : (userInfo.YEARS_OLD=='undefined'|| userInfo.YEARS_OLD=='null')?undefined:userInfo.YEARS_OLD,
 				SELFINTRODUCTION : (userInfo.SELFINTRODUCTION=='undefined'||userInfo.SELFINTRODUCTION=='null')?undefined:userInfo.SELFINTRODUCTION,
-				RIGHTS : userInfo.RIGHTS?userInfo.RIGHTS.split(';') : ['GUEST'],
+				RIGHTS : userInfo.RIGHTS?userInfo.RIGHTS.split(',') : ['GUEST'],
 				USED : userInfo.USED,
 				PORTRAIT : (userInfo.PORTRAIT=='undefined'||userInfo.PORTRAIT=='null')?undefined:userInfo.PORTRAIT,
 				BUSINESSCARD : (userInfo.BUSINESSCARD=='undefined'||userInfo.BUSINESSCARD=='null')?undefined:userInfo.BUSINESSCARD,
@@ -222,18 +223,19 @@ define([],function(){
 				FOLLOWER : userInfo.FOLLOWER,
 				FOLLOW : userInfo.FOLLOW,
 				FAVORITE : userInfo.FAVORITE,
-				PRODUCT : userInfo.PRODUCT
+				PRODUCT : userInfo.PRODUCT,
+				ADDRESS : (userInfo.ADDRESS=='undefined'||userInfo.ADDRESS=='null')?undefined:userInfo.ADDRESS
 			};
+			//this.set({"userInfo":{REALNAME:this.get('REALNAME'),NAME:this.get('NAME'),PORTRAIT:this.get('PORTRAIT')}});//触发change trigger
 			this.set(json);
-			Gifted.Global.setSessionId(userInfo['GIFTED_SESSIONID']);
-			//this.set({"userInfo":{REALNAME:this.get('REALNAME'),NAME:this.get('NAME'),PORTRAIT:this.get('PORTRAIT')}});//触发 set attributes
+			Gifted.Global.setSessionId(userInfo.GIFTED_SESSIONID);
 			if(insertDB==true){//将用户信息保存到数据库
 				var db = Gifted.Global.getDatabase('alluser');
 				db.transaction(
 					_.bind(function(tx){
-						tx.executeSql('insert into user (ID,GIFTED_SESSIONID,CODE,NAME,REALNAME,SEX,USED,EMAIL,YEALS_OLD,COUNTRYCODE,MOBILE,PORTRAIT,RIGHTS,BUSINESSCARD,BUSINESSLICENCE,SELFINTRODUCTION,FOLLOWER,FOLLOW,FAVORITE,PRODUCT)' +
-								'values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ',
-								[this.get('ID'),this.get('GIFTED_SESSIONID'),this.get('CODE'),this.get('NAME'),this.get('REALNAME'),this.get('SEX'),this.get('USED'),this.get('EMAIL'),this.get('YEARS_OLD'),this.get('COUNTRYCODE'),this.get('MOBILE'),this.get('PORTRAIT'),this.get('RIGHTS').toString(),this.get('BUSINESSCARD'),this.get('BUSINESSLICENCE'),this.get('SELFINTRODUCTION'),this.get('FOLLOWER'),this.get('FOLLOW'),this.get('FAVORITE'),this.get('PRODUCT')])
+						tx.executeSql('insert into user (ID,GIFTED_SESSIONID,CODE,NAME,REALNAME,SEX,USED,EMAIL,YEALS_OLD,COUNTRYCODE,COUNTRY,ADDRESS,MOBILE,PORTRAIT,RIGHTS,BUSINESSCARD,BUSINESSLICENCE,SELFINTRODUCTION,FOLLOWER,FOLLOW,FAVORITE,PRODUCT)' +
+								'values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ',
+								[this.get('ID'),this.get('GIFTED_SESSIONID'),this.get('CODE'),this.get('NAME'),this.get('REALNAME'),this.get('SEX'),this.get('USED'),this.get('EMAIL'),this.get('YEARS_OLD'),this.get('COUNTRYCODE'),this.get('COUNTRY'),this.get('ADDRESS'),this.get('MOBILE'),this.get('PORTRAIT'),this.get('RIGHTS').toString(),this.get('BUSINESSCARD'),this.get('BUSINESSLICENCE'),this.get('SELFINTRODUCTION'),this.get('FOLLOWER'),this.get('FOLLOW'),this.get('FAVORITE'),this.get('PRODUCT')])
 					},this),
 					function(err){
 						Gifted.Global.alert(err.message);
@@ -519,8 +521,7 @@ define([],function(){
 					//this.user.set({"userInfo" : json.userInfo,
 					this.set({"userInfo" : json.userInfo,
 						"products" : json.products,
-						"following" : json.following,
-						"favorites" : json.favorites});
+						"following" : json.following});
 				},this),
 				complete : function(XMLHttpRequest, textStatus) {
 				},
@@ -572,6 +573,72 @@ define([],function(){
 				error : function(xhr, info) { // jsonp 方式此方法不被触发
 				}
 			});
+		}
+	});
+	UserFollowListCollection = Backbone.Collection.extend({
+		initialize : function(){
+			this.page = 1;
+			this.count = 20;
+			this.name = Gifted.Lang['FOLLOW'];
+			this.hasMoreData = true;
+		},
+		refresh : function(){
+			this.page = 1;
+			this.loadData(true)
+		},
+		loadData : function(refresh){
+			if(!this.ID){
+				alert('UserFollowListCollection ID can not be null');
+			}
+			var maxSize = this.count;
+			var pageIndex = this.page;
+			var url = Gifted.Config.serverURL+Gifted.Config.User.getFollowsURL+'/'+this.ID+'?COUNT='+maxSize+'&PAGE='+pageIndex; // 跨域URL
+			var options = {url : url,success:function(collection,response){
+								if(response.length>0){
+									collection.page += 1;
+								}
+								if(response.length<this.count){
+									collection.hasMoreData = false;
+								}else{
+									collection.hasMoreData = true;
+								}
+							}};
+			if(refresh)
+				options.reset=true;
+			this.fetch(options);
+		}
+	});
+	UserFollowerListCollection = Backbone.Collection.extend({
+		initialize : function(){
+			this.page = 1;//默认加载第一页
+			this.count = 20;//默认加载20个
+			this.name = Gifted.Lang['FOLLOWER'];
+			this.hasMoreData = true;
+		},
+		refresh : function(){
+			this.page = 1;
+			this.loadData(true)
+		},
+		loadData : function(refresh){
+			if(!this.ID){
+				alert('UserFollowerListCollection ID can not be null');
+			}
+			var maxSize = this.count;
+			var pageIndex = this.page;
+			var url = Gifted.Config.serverURL+Gifted.Config.User.getFollowersURL+'/'+this.ID+'?COUNT='+maxSize+'&PAGE='+pageIndex; // 跨域URL
+			var options = {url : url,success:function(collection,response){
+								if(response.length>0){
+									collection.page += 1;
+								}
+								if(response.length<this.count){
+									collection.hasMoreData = false;
+								}else{
+									collection.hasMoreData = true;
+								}
+							}};
+			if(refresh)
+				options.reset=true;
+			this.fetch(options);
 		}
 	});
 	UserEditModel = Backbone.Model.extend({
@@ -653,13 +720,13 @@ define([],function(){
 		},
 		sendMessage : function(message){
 			if(message.title && message.imageUri){
-				Gifted.Plugin.messageUtil('sendRichContentMessage',[message.targetId,message.title,message.content,message.imageUri],
+				Gifted.Plugin.messageUtil('sendRichContentMessage',[message.targetId,message.title,message.content,message.imageUri,message.senderId],
 					_.bind(function(message){this.sendSuccess(message)},this),
 					_.bind(function(){
 						alert('sendRichContentMessage error');
 					},this));
 			}else{
-				Gifted.Plugin.messageUtil('sendTextMessage',[message.targetId,message.content],
+				Gifted.Plugin.messageUtil('sendTextMessage',[message.targetId,message.content,message.senderId],
 					_.bind(function(message){this.sendSuccess(message)},this),
 					_.bind(function(){
 						alert('sendTextMessage error');
@@ -733,6 +800,9 @@ define([],function(){
 		},
 		getMessage : function(){
 			Gifted.Plugin.messageUtil('consumeMessage',[],_.bind(function(message){
+				if(!message){
+					return;
+				}
 				this.receiveMessage(message);
 			},this));
 		},

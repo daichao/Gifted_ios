@@ -24,7 +24,7 @@ label.product_label{
 	padding:0px;
 }
 .product_modify_form th {
-	width:9%;
+	width:8%;
 }
 .product_modify_form input {
 	font-size:14px;
@@ -198,7 +198,7 @@ label.product_label{
 		height: 90px;
 		margin-left: 7px;
 	}
-	.ui-extends-snipbox-inputwrap {
+	.product_modify_form .ui-extends-snipbox-inputwrap {
 		width:86%;
 	}
 }

@@ -21,6 +21,8 @@ define(['moment'],function(monent){
 			if (!json)
 				return null;
 			//if (!json['YXQ_START_MOMENT']||forceTime==true) { // 每次都要算
+				//return json;
+			//}
 			var now = moment();
 			var start = json['YXQ_START_MOMENT'];
 			var end = json['YXQ_END_MOMENT'];
@@ -32,13 +34,14 @@ define(['moment'],function(monent){
 			if (now.isBefore(start)||now.isAfter(end)) {
 				json['_timeover'] = true;
 			}
-			//}
 			return json;
 		},
 		_parseTimes:function(json){ // 附加时间对象
 			if (!json)
 				return null;
 		    //if(!json['YXQ_START_MOMENT']||forceTime==true) // 每次都要算
+				//return json;
+			//}
 		    _.each(this.dateFields, function(field) {
 		    	if (json[field]) {
 		    		var mm = moment(json[field],'YYYY-MM-DD hh:mm:ss'); // moment类型字段 直接转moment对象
@@ -52,7 +55,7 @@ define(['moment'],function(monent){
 			if (!json)
 				return null;
 			if (json['_parsedDatas']!=true) { // 已经转化过本地数据或强制转化
-			    if(this.dateFields) // 日期本地化转换 forceLocal
+			    if(this.dateFields) { // 日期本地化转换 forceLocal
 				    _.each(this.dateFields, function(field) {
 				    	if (json[field]) {
 			    			var mm = moment(json[field],'YYYY-MM-DD hh:mm:ss'); // 先转moment对象
@@ -61,16 +64,52 @@ define(['moment'],function(monent){
 			    			json[field] = localTime;
 				    	}
 				    });
-				if (json && json.publisher && json.publisher.POSITION) { // 地理位置转换
-					var position = json.publisher.POSITION;
-					if (position.latitude)
-						position.latitude = Math.round(position.latitude*100)/100;
-					if (position.longitude)
-						position.longitude = Math.round(position.longitude*100)/100;
 				}
 			    if (json.CATALOG && Number(json.CATALOG)>0) { // 产品大类显示值转换
 			   		json['__CATALOG__Option__'] = catalogs[json.CATALOG-1].display;
 			    }
+				if (json.publisher && json.publisher.POSITION) { // 地理位置转换
+					var position_address = Gifted.Cache.getCache('user.position_address:'+json.publisher.ID);
+					if (!position_address) {
+						// && !json.publisher.POSITION_ADDRESS
+						var position = json.publisher.POSITION;
+						//if (position.latitude)
+						//	position.latitude = Math.round(position.latitude*100)/100;
+						//if (position.longitude)
+						//	position.longitude = Math.round(position.longitude*100)/100;
+						// http://maps.google.com/maps/api/geocode/json?latlng=39.910093,116.403945&language=zh-CN&sensor=false
+						//position={longitude:116.403945,latitude:39.910093}
+						var language = Gifted.Config.Locale.localeName=='zh_CN'?'zh-CN':'en';
+						$.ajax({
+							url:'http://maps.google.com/maps/api/geocode/json?latlng='
+								+position.latitude+','+position.longitude+'&language='+language+'&sensor=false',
+							type:'get',
+							dataType:'json',
+							timeout:5000,
+							//data:params,
+							//useBody:true,
+							async:true,
+							crossdomain:true,
+							success:_.bind(function(mapJson) { // 客户端jquery预先定义好的callback函数，成功获取跨域服务器上的json数据后，会动态执行这个callback函数
+								if (mapJson.results && mapJson.results.length>0) {
+									var formatted_address = mapJson.results[0].formatted_address;
+									if (formatted_address) {
+										Gifted.Cache.setCache('user.position_address:'+json.publisher.ID, formatted_address);
+										this.set('POSITION_ADDRESS', formatted_address);
+									}
+								}
+							},this),
+							beforeSend:_.bind(function(jqXHR, settings) { // jsonp 方式此方法不被触发。dataType如果指定为jsonp的话，就已经不是ajax事件了
+							},this),
+							complete:_.bind(function(XMLHttpRequest, textStatus) {
+							},this),
+							error:_.bind(function(xhr, info) { // jsonp 方式此方法不被触发
+							},this)
+						});
+					} else {
+						json.publisher.POSITION_ADDRESS = position_address;
+					}
+				}
 			    json['_parsedDatas']=true;
 		    }
 		   	this._parseTimes(json); // 附加时间对象
@@ -155,7 +194,7 @@ define(['moment'],function(monent){
             	Gifted.Global.checkStatus(status);
             },this));
 		},
-		loadDetailItem:function(id, reload){
+		loadDetailItem:function(id, reload, callback){
 			console.log('loadDetailItem：id='+id);
 			if (!id) {
 				return null;
@@ -165,7 +204,10 @@ define(['moment'],function(monent){
 				this.loadItem(id, _.bind(function(){
 					var json = this.toSaveJSON();
 					Gifted.Cache.setCache('productdetail_'+id, JSON.stringify(json));
-					Gifted.Cache.putCache("product_list_datas"+this.collection.key, [json]);
+					if (this.collection)
+						Gifted.Cache.putCache("product_list_datas"+this.collection.key, [json]);
+					if (callback)
+						callback(this.attributes);
 				},this));
 			} else if (localDatas) {
 				var json = JSON.parse(localDatas);
@@ -173,13 +215,15 @@ define(['moment'],function(monent){
 				this._parseDatas(json, catalogs);
 				$.extend(this.attributes, json);
 				this.trigger('sync');
+					if (callback)
+						callback(this.attributes);
 			}
 		},
-		loadModifyItem:function(id, sync, reload) {
+		loadModifyItem:function(id, sync, reload, callback) {
 			console.log('loadModifyItem：id='+id);
 			var item = this.loadListItem(id, sync);
 			if (!item) {
-				this.loadDetailItem(id, reload);
+				this.loadDetailItem(id, reload, callback);
 			}
 		},
 		isNew:function(){
@@ -217,9 +261,9 @@ define(['moment'],function(monent){
 			delete json['_timeleft']; // 临时对象
 			delete json['_timeleft_monent']; // 临时对象
 			delete json['_timeleft_percent']; // 临时变量
-			delete json['__CATALOG__Option__']; // 临时变量
-			delete json['__CURRENCY__Option__']; // 临时变量
-			delete json['__LANGUAGE__Option__']; // 临时变量
+			//delete json['__CATALOG__Option__']; // 临时变量
+			//delete json['__CURRENCY__Option__']; // 临时变量
+			//delete json['__LANGUAGE__Option__']; // 临时变量
 		},
 		toSaveJSON:function(){ // 保存转义
 			var json = Product.__super__.toJSON.apply(this, arguments);
@@ -310,17 +354,17 @@ define(['moment'],function(monent){
 				FOLLOWER:0
 			}
 		},
-		initialize:function(config){
-			// 方法置空 否则在init中new ProductDetail就去做parseDatas了
-			return ProductDetail.__super__.initialize.call(this, config);
-		},
 		getURL:function(id) {
 			this.urlRoot = Gifted.Config.serverURL+Gifted.Config.Product.loadDetailURL;
 			var url = this.urlRoot+'/'+id+'/'+Gifted.Config.Locale.localeName;
 			return url;
 		},
-		loadDetailItem:function(id, refresh){
-			return ProductDetail.__super__.loadDetailItem.call(this, id, refresh);
+		initialize:function(config){
+			// 方法置空 否则在init中new ProductDetail就去做parseDatas了
+			return ProductDetail.__super__.initialize.call(this, config);
+		},
+		loadDetailItem:function(id, reload, callback){
+			return ProductDetail.__super__.loadDetailItem.call(this, id, reload, callback);
 		}
 	});
 	// NOTICE 有limit的内存缓存collection，能有效防止内存溢出(只看到和缓存最新的limit条数据)
@@ -346,18 +390,16 @@ define(['moment'],function(monent){
 		initialize: function(arguments){
 			this.key = arguments?(arguments.key||''):'';
 		},
+		clearAllFiles:function() {
+			Gifted.Cache.deleteAllLocalFile(); // 删除缓存图片
+		},
 		clearStorage:function() {
 			Gifted.Cache.clearCache("product_list_datas"+this.key);
 			Gifted.Cache.clearCache("product_list_count"+this.key);
 			Gifted.Cache.clearCache("product_list_start"+this.key);
 			Gifted.Cache.clearCache("product_list_last"+this.key);
 		},
-		clearFlag:function() {
-			this.count=0;
-			this.start=-1;
-			//this.last=null; // 不能删除这个last
-		},
-		clearDatas:function() {
+		clearDatas:function() { // 删除model数据和页标记 并重新ajax
 			this.reset([]);
 			this.count=0;
 			this.start=-1;
@@ -386,8 +428,8 @@ define(['moment'],function(monent){
 		loadListItem:function(id, sync){
 			return Product.prototype.loadListItem.call(this, id, sync);
 		},
-		loadDetailItem:function(id){
-			return ProductDetail.prototype.loadDetailItem.call(this, id);
+		loadDetailItem:function(id, reload, callback){
+			return ProductDetail.prototype.loadDetailItem.call(this, id, reload, callback);
 		},
 		loadInitData:function() {
 			var localDatas = Gifted.Cache.getCache("product_list_datas"+this.key); // TODO 可以从collection中获取
@@ -413,7 +455,7 @@ define(['moment'],function(monent){
 		comparator:function(model) {
 		    return model.get(this.sortField);
 		},
-		search:function(sRestfulAction) {
+		search:function(sRestfulAction) { // start肯定是-1 count肯定是0
 			if (!Gifted.Global.checkConnection()) {
 				this.trigger('refresh');
 				return false;
@@ -422,7 +464,7 @@ define(['moment'],function(monent){
 			var _start=-1, _count=0, loadNew=true;
 			var _url=this.getURL(_start, _count);
 			var at=null; // typeof(loadNew)=='undefined'?null:(loadNew?0:null); 第一次搜索结果总是按默认排序
-			console.log('正在查询数据：url='+_url+',restfulAction='+this.restfulAction);
+			console.log('正在查询数据：url='+_url+', restfulAction='+this.restfulAction);
 			//var GIFTED_POSITION = JSON.stringify(Gifted.Config.Position);
 			this.fetch({ // ajax or cache
 				url:_url, start:_start, count:_count,
@@ -433,7 +475,7 @@ define(['moment'],function(monent){
 					if (response.count==0) {
 						console.log('服务器没有更多要查的数据');
 						this.trigger('hasmoredata', false, loadNew); // 绘制上下是否有最新数据的状态栏->refresh
-						//this.trigger('refresh'); // completeLoading->refreshcomplete->刷新iscroll
+						//this.trigger('refresh'); // completeLoading->loadComplete->刷新iscroll
 					} else if (response.count>0) { // 从缓存加载或者服务器有新的数据
 						console.log('服务器有要查的新数据：'+response.count+'条');
 						this.start = Number(response.start);
@@ -450,7 +492,7 @@ define(['moment'],function(monent){
 							}
 						}
 						if (!loadNew) { // 上拉
-							var limited = response.datas.length<20;
+							var limited = response.datas.length<this.perCount;
 							//limited = false; // 还是到中间层去确认下有无数据
 							this.trigger('hasmoredata', limited==true?false:true, loadNew); // 绘制上下是否有最新数据的状态栏->refresh->刷新iscroll
 						} 
@@ -460,7 +502,7 @@ define(['moment'],function(monent){
             	} else {
             		Gifted.Global.checkStatus(status);
             	}
-				//this.trigger('refresh'); // completeLoading->refreshcomplete->刷新iscroll
+				//this.trigger('refresh'); // completeLoading->loadComplete->刷新iscroll
             },this))
             .fail(_.bind(function(event, response, status){
             	Gifted.Global.checkStatus(status);
@@ -468,19 +510,13 @@ define(['moment'],function(monent){
 				//this.trigger('refresh'); // 刷新iscroll
             },this));
 		},
-		loadData:function(loadNew) {
+		loadData:function(loadNew, start, count) {
 			if (!Gifted.Global.checkConnection()) {
 				this.trigger('refresh');
 				return false;
 			}
-			if (Number(this.start)<-1) {
-				this.start=-1; // 表示重新取数
-			}
-			if (Number(this.count)<0) {
-				this.count=0;
-			}
-			var _start=Number(this.start);
-			var _count=Number(this.count);
+			var _start=start||(Number(this.start)<-1?-1:Number(this.start));  // -1表示重新取数
+			var _count=count||(Number(this.count)< 0? 0:Number(this.count));
 			if (loadNew) {
 				_start=-1;
 				_count=0;
@@ -488,7 +524,7 @@ define(['moment'],function(monent){
 			var _url=this.getURL(_start+_count, _count);
 			var at=typeof(loadNew)=='undefined'?null:(loadNew?0:null); // typeof(loadNew)=='undefined' 打开界面
 			loadNew=typeof(loadNew)=='undefined'?true:loadNew;
-			console.log('正在读取数据：url='+_url);
+			console.log('正在读取数据：url='+_url+', at='+at);
 			//var GIFTED_POSITION = JSON.stringify(Gifted.Config.Position);
 			this.fetch({ // ajax or cache
 				url:_url, start:_start+_count, count:_count,
@@ -499,11 +535,11 @@ define(['moment'],function(monent){
 					if (response.count==0) {
 						console.log('服务器没有更多的数据');
 						this.trigger('hasmoredata', false, loadNew); // 绘制上下是否有最新数据的状态栏->refresh
-						//this.trigger('refresh'); // completeLoading->refreshcomplete->刷新iscroll
+						//this.trigger('refresh'); // completeLoading->loadComplete->刷新iscroll
 					} else if (response.count>0) { // 从缓存加载或者服务器有新的数据
 						if (loadNew && this.last && response.last && this.last==response.last) {
 							console.log('服务器没有新数据');
-							//this.trigger('refresh'); // completeLoading->refreshcomplete->刷新iscroll
+							//this.trigger('refresh'); // completeLoading->loadComplete->刷新iscroll
 							return;
 						}
 						console.log('服务器有新数据：'+response.count+'条');
@@ -513,7 +549,7 @@ define(['moment'],function(monent){
 							if (response.last) {
 								this.last = response.last;
 							}
-							if (this.start==0) { // 只存放最新数据的缓存(因为有时候是直接刷编辑页models里没数据只有cache里有)
+							if (_start==-1) { // 只存放最新数据的缓存(因为有时候是直接刷编辑页models里没数据只有cache里有)
 								Gifted.Cache.setCache("product_list_last"+this.key, this.last);
 								Gifted.Cache.setCache("product_list_start"+this.key, this.start);
 								Gifted.Cache.setCache("product_list_count"+this.key, this.count);
@@ -524,11 +560,11 @@ define(['moment'],function(monent){
 							}
 						}
 						if (!loadNew) { // 上拉
-							var limited = false;//response.datas.length<20;
+							var limited = response.datas.length<this.perCount;
 							//limited = false; // 还是到中间层去确认下有无数据
 							this.trigger('hasmoredata', limited==true?false:true, loadNew); // 绘制上下是否有最新数据的状态栏->refresh
 						} 
-						if(Gifted.app.checkRight({checkRule:['LOGIN'],trigger:false})){ // 只有登录过的才可能有favorite数据(根据产品ids获取喜好信息)
+						if (Gifted.app.checkRight({checkRule:['LOGIN'],trigger:false})){ // 只有登录过的才可能有favorite数据(根据产品ids获取喜好信息)
 							var ids = '';
 							var datas = response.datas;
 							for(var i=0;i<datas.length ;i++){
@@ -544,12 +580,12 @@ define(['moment'],function(monent){
             	} else {
             		Gifted.Global.checkStatus(status);
             	}
-				//this.trigger('refresh'); // completeLoading->refreshcomplete->刷新iscroll
+				//this.trigger('refresh'); // completeLoading->loadComplete->刷新iscroll
             },this))
             .fail(_.bind(function(event, response, status){
             	Gifted.Global.checkStatus(status);
 				this.trigger('hasmoredata', false, loadNew);
-				//this.trigger('refresh'); // completeLoading->refreshcomplete->刷新iscroll
+				//this.trigger('refresh'); // completeLoading->loadComplete->刷新iscroll
             },this));
 		}
 	});

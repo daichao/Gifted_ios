@@ -16,7 +16,7 @@ define(['css!lib/owl.carousel/owl.carousel.css', 'css!lib/owl.carousel/owl.theme
 	result.head =
 		'<table><tr>'+
 		'<td class="userinteractive_portrait ui-block-portrait">'+
-			'<img class="gifted-image userinteractive_img" src="img/noportrait.png" />' +
+			'<img src="img/noportrait.png" class="gifted-image userinteractive_img" />' +
 			//'<img class="userinteractive_img" src="{{#if this.userInfo.PORTRAIT}}{{this.userInfo.PORTRAIT}}?imageView/1/w/80/h/80/q/50{{else}}img/noportrait.png{{/if}}" />' +
 			//'<span class="userinteractive_username">{{this.userInfo.NAME}}</span>'+
 			//'<span class="userinteractive_position"></span>' +
@@ -52,7 +52,7 @@ define(['css!lib/owl.carousel/owl.carousel.css', 'css!lib/owl.carousel/owl.theme
 			'<img alt="More" src="img/navigate-right256.png" class="userinteractive_other_img userinteractive_openmoreproducts" />' +
 		'</a>';
 	result.interactive = 
-		'<a class="userinteractive_follow ui-btn ui-btn-inline" data-icon=""></a>' +
+		'<a class="userinteractive_follow_action ui-btn ui-btn-inline" data-icon=""></a>' +
 		'<a class="userinteractive_contact ui-btn ui-btn-inline" data-icon="" data-translate="Contact"></a>' ;
 	return result;
 });

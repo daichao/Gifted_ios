@@ -331,7 +331,7 @@ IScroll.prototype = {
 			pos = this.getComputedPosition();
 			this._translate(Math.round(pos.x), Math.round(pos.y));
 			this._execEvent('scrollEnd');
-			//e.preventDefault();
+			e.preventDefault();
 			e.stopPropagation();
 		} else if ( !this.options.useTransition && this.isAnimating ) {
 			this.isAnimating = false;
@@ -570,6 +570,9 @@ IScroll.prototype = {
 		this.directionX = 0;
 		this.directionY = 0;
 		this.wrapperOffset = utils.offset(this.wrapper);
+		if(this.maxScrollY>this.minScrollY){
+			this.maxScrollY=this.minScrollY;
+		}
 		this._execEvent('refresh');
 		this.resetPosition();
 // INSERT POINT: _refresh

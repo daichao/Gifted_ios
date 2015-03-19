@@ -39,6 +39,7 @@ define(['modules/product/templates/productdetail_new','handlebars',
 	    	ProductDetailView.__super__.initialize.apply(this,arguments);
 	    	this.model.on('sync error', this.completeLoading, this);
 	    	this.model.on("sync", this.render, this);
+	    	this.model.on('change:POSITION_ADDRESS',this.doPaintPositionAddress,this);
 	    	//this.model.on("change", this.refreshPage, this);
 	    	//this.model.on("synccache", this.renderCache, this);
 	    	//this.model.on("refresh", this.refresh, this);
@@ -54,7 +55,7 @@ define(['modules/product/templates/productdetail_new','handlebars',
 			//this.loadData(false);
 		},
 		completeLoading:function(){
-			_.delay(_.bind(this.trigger,this,'refreshcomplete'),1000);
+			_.delay(_.bind(this.trigger,this,'loadComplete'),1000);
 		},
 	    addFav:function(favModel){
 			var productId = favModel.get('PRODUCTID');
@@ -151,12 +152,12 @@ define(['modules/product/templates/productdetail_new','handlebars',
 				return false;
 			}
 			// 和list参数保持一致
-			var cw=this.$el.css('width');
+			var cw=window.screen.width; // 没切换过来时宽度为0：this.$el.css('width');
 			var h=cw;
-			cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
+			//cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
 			cw=cw-20;
-			h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
-			h=Math.round(h*4/5)
+			//h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
+			h=Math.round(h*4/5);
 			if (cw<0)
 				return false;
 			var json = this.model.toJSON();
@@ -174,13 +175,16 @@ define(['modules/product/templates/productdetail_new','handlebars',
 			}
 			return false;
 	    },
+	    doPaintPositionAddress:function() {
+	    	this.$el.find('.publisher_positionaddress').html(this.model.get('POSITION_ADDRESS'));
+	    },
 	    doPaint:function(json, placeholder) {
 			// 和list参数保持一致
-			var cw=this.$el.css('width');
+			var cw=window.screen.width; // 没切换过来时宽度为0：this.$el.css('width');
 			var h=cw;
-			cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
+			//cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
 			cw=cw-20;
-			h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
+			//h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
 			h=Math.round(h*4/5);
 			if (cw<0)
 				return false;
@@ -229,9 +233,7 @@ define(['modules/product/templates/productdetail_new','handlebars',
 	    	this.$el.find('.product_detail_images').addClass(Gifted.Config.isCanvasCarouel?'canvascarousel':'owl-carousel');
         	if (Gifted.Config.isCanvasCarouel) { // 启用CanvasCarouel或OWLCarousel的开关
 	        	this.$el.find('.canvascarousel').carouseldestroy();
-				var cw=this.$el.css('width'), h=cw;
-				cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
-		        this.$el.find('.canvascarousel').css({width:cw,height:h});
+		        //this.$el.find('.canvascarousel').css({width:cw,height:h});
 		        this.$el.find('.canvascarousel').carousel({mouseOnly:Gifted.Config.isCanvasCarouelDebug});
 	        } else {
 	        	{ // 主图片
@@ -277,7 +279,7 @@ define(['modules/product/templates/productdetail_new','handlebars',
 	        	this.$el.find('.header_edit').hide();
 	        }
 			var favModel = this.app.user.favorites.getFavorite(productID);
-			if(favModel == undefined){//没有加载过改product的favorite记录
+			if(!favModel){//没有加载过改product的favorite记录
 				if(this.app.checkRight({trigger:false,checkRule:['LOGIN']}))//只有登录过的才可能有favorite数据
 					this.app.user.favorites.loadFavorites(productID);
 			}else if(favModel.get('FAVORITING') == true){
@@ -291,22 +293,23 @@ define(['modules/product/templates/productdetail_new','handlebars',
 	    		delete this.countdown;
 	    	}
 	    	var json = this.model.toJSON();
-	    	var name = json.NAME;
-	    	if (name && name.length>14) {
-	    		name = name.substring(0, 14)+'...';
-	    	}
-	    	this.$el.find('.header_mid').html(name);
+	    	//var name = json.NAME;
+	    	//if (name && name.length>14) {
+	    	//	name = name.substring(0, 14)+'...';
+	    	//}
+	    	//this.$el.find('.header_mid').html(name);
 	        this.$contentEl.empty().html(this.templateContent(json));
-	        this.getContentBottomEl().html('&nbsp;');
+	        
 			this.$el.find('.product_detail_publisher').empty().html(this.templatePublisher(json));
 			this.$el.find('.product_detail_publisher2').empty().html(this.templatePublisher2(json));
 			this.$el.find('.product_detail_others').empty().html(this.templateOthers(json));
 	        if (json.PHOTOURLS && json.PHOTOURLS.length>0) {
         		this.doPaint(json, false);
         		this.doPaintEffects(); // 渲染dom占位符特效
+				this.doPaintUser();
 	        }
-			this.doPaintUser();
 		 	this.countdown = this.$el.find('[data-time]').countdown();
+	    	this.refreshHeadBar();
 //		 	this.$el.on('swiperight',_.bind(function(event){
 //		 		if(event.swipestart.coords[0]<40){
 //		        	event.stopPropagation();
@@ -354,44 +357,53 @@ define(['modules/product/templates/productdetail_new','handlebars',
 				return false;
 			if (!json.PHOTOURLS)
 				return false;
+			var cw=window.screen.width; // 没切换过来时宽度为0：this.$el.css('width');
+			var h=cw;
+			//cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
+			cw=cw-20;
+			//h=h.indexOf('px')>=0?h.substring(0,h.length-2):h;
+			h=Math.round(h*4/5);
+			if (cw<0)
+				return false;
         	var len = json.PHOTOURLS.length;
 			for (var i=0;i<len;i++) {
 				if (!json.PHOTOURLS[i]) 
 					continue;
-				var cw=this.$el.css('width');
-				cw=cw.indexOf('px')>=0?cw.substring(0,cw.length-2):cw;
 				var fileID = json.PHOTOURLS[i].PHOTOID+'_1_'+cw+'_80';
 				Gifted.Cache.deleteLocalFile(fileID);
 				//var fileID = json.PHOTOURLS[i].PHOTOID+'_1_'+cw+'_80'; // 其他图片
 				//Gifted.Cache.deleteLocalFile(fileID);
         	}
 		},
-		loadData:function(refresh){
+		loadData:function(reload, callback){
 			var id = this.model.get('ID');
 			if (!id) {
 				return;
 			}
-			this.model.loadDetailItem(id, refresh);  // 触发了sync->render(画完整的数据)
+			this.model.loadDetailItem(id, reload, callback);  // 触发了sync->render(画完整的数据)
 		},
 //	    onSwipe:function(event){
 //	       	 event.stopPropagation();
 //	    	 event.preventDefault();
 //	    },
 	    remove:function(){
-	    	this.model.off('sync error');
-	    	this.model.off("sync");
-	    	//this.model.off("synccache");
-	    	//this.model.off("refresh");
-	    	this.stopListening(this.model);
+	    	this.model.off('sync error', this.completeLoading, this);
+	    	this.model.off("sync", this.render, this);
+	    	this.model.off('change:POSITION_ADDRESS',this.doPaintPositionAddress,this);
+	    	//this.model.off("change", this.refreshPage, this);
+	    	//this.model.off("synccache", this.renderCache, this);
+	    	//this.model.off("refresh", this.refresh, this);
 	    	this.app.user.off('change:RIGHTS',this.doPaintUser,this);
 	    	this.app.user.favorites.off('favoritechange:' + this.model.get('ID'),this.addFav,this);
+	    	this.off('toprefresh',this.onTopRefresh,this);
+	    	this.off('bottomrefresh',this.onBottomRefresh,this);   
+	    	
+	    	this.$el.off('swiperight');
+	    	this.stopListening(this.model);
 	    	if(this.countdown){
 	    		this.countdown.destroy();
 	    		delete this.countdown;
 	    	}
-	    	this.off('toprefresh');
-	    	this.off('bottomrefresh');
-	    	this.$el.off('swiperight');
         	
         	this.removeOWLCanvas();
 	    	if(this.countdown){

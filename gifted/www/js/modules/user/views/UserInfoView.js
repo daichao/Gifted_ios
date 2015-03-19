@@ -14,6 +14,7 @@ define(['modules/user/templates/userinfo', 'handlebars'],function(mod0){
 				this.contentRender();
 				this.refresh();
 			},this),this);
+	    	UserInfoView.__super__.initialize.apply(this, arguments);
 	    },
 	    loadData:function() {
 			this.model.getUserInfo(); // trigger render
@@ -29,7 +30,8 @@ define(['modules/user/templates/userinfo', 'handlebars'],function(mod0){
 			if (!userInfo) {
 				return [];
 			}
-			var userID = userInfo['ID'], width = this.$el.css('width');
+			var userID=userInfo['ID'];
+			var width=window.screen.width;
 	    	return [
 	    		{PHOTOURL:userInfo['PORTRAIT']||'img/noportrait.png',PHOTORADIO:1,PHOTOID:'userportrait_'+userID,PHOTOWIDTH:width},
 	    		{PHOTOURL:userInfo['BUSINESSCARD']||'img/notexists_80_80.png',PHOTORADIO:1,PHOTOID:'usercard_'+userID,PHOTOWIDTH:width},

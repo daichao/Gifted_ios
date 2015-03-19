@@ -24,7 +24,7 @@ define(deps, function(util) {
 		initialize:function(){
             this.on('active',this.onActive,this);
 			this.on('refreshcontent',this.onRefreshContent,this);
-			this.on('refreshcomplete',this.onRefreshComplete,this);
+			this.on('loadComplete',this.onLoadComplete,this);
 		},
 		getPrevView:function(){
 			return null;
@@ -72,8 +72,8 @@ define(deps, function(util) {
 				this.$el.addClass('tophead');
 			}
 			this.lastX = this.startX;
-			var t = new Date();
-			this.startTime = t.getTime();
+			var t = originEvent.timeStamp;
+			this.startTime = t;
 			this.translateX = 0;
 			this.maxX = this.$el.width();
 			this.$el.removeAttr('style');
@@ -85,6 +85,8 @@ define(deps, function(util) {
 				var originEvent = e;
 				var pos = originEvent.touches ? originEvent.touches[0] : originEvent;
 				var curX = pos.pageX;
+				if(e.timeStamp-this.startTime<300)
+					return;
 				if(Math.abs(curX-this.lastX)<2)
 					return;
 				var deltaX = curX-this.lastX;
@@ -113,10 +115,15 @@ define(deps, function(util) {
 				this.swiping=false;
 				if(this.translateX==0){
 					var v = this.getPrevView();
-					if(v){
+					if(v && v!=this){
 						v.$el.removeClass('ui-page-active');
 					}
 					this.$el.removeAttr('style');
+					var originEvent = event;
+					var pos = originEvent.changedTouches ? originEvent.changedTouches[0] : originEvent;
+					if(pos.pageX-this.startX>40){
+						this.changeView(v);
+					}
 					return;
 				}
 				if(this.translateX==this.maxX){
@@ -124,7 +131,6 @@ define(deps, function(util) {
 					return;
 				}
 				if(this.translateX<=(this.maxX/2)){
-					
 //					this.$el.css('transition','transform 0.5s ease-in');
 //					this.$el.css('-webkit-transition','transform 0.5s ease-in');
 //					this.$el.css('transform','translate(0px,0px)');
@@ -186,21 +192,24 @@ define(deps, function(util) {
 		render:function(){
 			this.beforeRender();
 			this.scrollDestroy();
+			
 			this.$el.html(this.template());
 			this.$topbarEl = this.getTopbarEl();
 			this.$contentEl=this.getContentEl();
 			this.$bottombarEl = this.getBottomEl();
+			
 			this.topbarRender();
 			this.contentRender();
 			this.bottomRender();
-			this.caculateHeight();
+			
 			this.scrollRender();
+			this.initSwipeEffect(); // 兼容某些设备
 			this.afterRender();
 		},
 		beforeRender:function(){
+			//
 		},
 		afterRender:function(){
-			this.initSwipeEffect();
 			/*if(this.effectInited)
 				return;
 			this.$el.on('touchstart',_.bind(this.onTouchStart,this));
@@ -224,18 +233,17 @@ define(deps, function(util) {
 		scrollRender:function() {
 //			console.log($('.scrollview').css('display'));
 //			console.log($('.'+this.scrollClassName).css('display'));
-	    	if (this.scroll) {
-	      		this.scroll.refresh();
-	    	} else {
+	    	if (!this.scroll) {
+				this.caculateHeight();
 	    		if(this.topRefresh){
-	    			this.topBound = 40;
+	    			this.topBound=40;
 	    			this.minScrollY=-40;
 	    		}else{
 	    			this.$el.find('.pullDown').hide();
 	    		}
 	    		if(this.bottomRefresh){
 	    			this.bottomBound=40;
-	    			this.maxScrollYOffset = 40;
+	    			this.maxScrollYOffset=40;
 	    		}
                 //else{
 	    		this.$el.find('.pullUp').hide();
@@ -252,13 +260,14 @@ define(deps, function(util) {
 					bindToWrapper:false,
 					freeScroll:false,
 					fadeScrollbars:false,
-					bounceLock:false,
+					bounceLock:true,
+					bounce:true,
 					deceleration:deviceIsIOS?0.0006:0.0002,
 					//shrinkScrollbars:'clip', // 真机 华为荣耀7不用clip速度比较快
 					
 					//offsetTop:52,
 					minScrollY:this.minScrollY,
-					maxScrollYOffset:this.maxScrollYOffset,
+					//maxScrollYOffset:this.maxScrollYOffset,
 					startY:this.minScrollY,
 					
 					topBound:this.topBound,
@@ -281,71 +290,55 @@ define(deps, function(util) {
 				if(this.topBound || this.bottomBound){
 					this.scroll.on('release',_.bind(this.onScrollRelease,this));
 				}
-//				this.scroll.on('refresh',_.bind(function(){
-//					_.delay(function(view){
-//						view.isScrolling = false;
-//						view.scrollingStack = [];
-//						console.log('----------refresh:'+view.scrollingStack.length);
-//					},500,this);
-//				},this));
-//				this.scroll.on('scrollStart',_.bind(function(){
-//					this.isScrolling = true;
-//					this.scrollingStack.push(1); // 连续触发多次
-//					/*if(this.scrollingStack.length>1) {
-//						this.scrollingWait = 500;
-//					}else{
-//						this.scrollingWait = 2000;
-//					}*/
-//					console.log('----------scrollStart:'+this.scrollingStack.length);
-//				},this));
-//				this.scroll.on('scrollEnd',_.bind(function(){
-//					if (this.scrollingStack.length>0) {
-//						this.scrollingStack.pop();
-//					}
-//					$(document).trigger( "vmousecancel");
-//					console.log('----------scrollEnd:'+this.scrollingStack.length);
-//					if (this.scrollingStack.length==0) // 堆栈退完才能触发
-//						_.delay(function(view){
-//							if (view.scrollingStack.length==0) {
-//								view.isScrolling = false;
-//							}
-//						},500,this);
-//				},this));
 			}
 		},
-        onActive:function(){
+        onActive:function(){ // 切换View后调用
             if (this.scroll) {
-            	_.delay(function(view){ // view change maybe cost much time 
-	               	if (view.scroll)
-		            	view.scroll.refresh();
-	    		},500,this);
+				//this.caculateHeight();
+            	//_.delay(function(view){ // view change maybe cost much time 
+	               	if (this.scroll)
+		            	this.scroll.refresh();
+	    		//},500,this);
 	        }
 			console.log('已切换完View');
         },
-		onRefreshContent:function(){ // 对外的刷新方法
-			if (this.scroll) {
-            	this.scroll.refresh();
+		onRefreshContent:function(){ // 描绘完html后调用
+			this.$el.translate(); // 描绘完html要翻译
+            if (this.scroll) {
+				//this.caculateHeight();
+            	//_.delay(function(view){ // view change maybe cost much time 
+	               	if (this.scroll)
+		            	this.scroll.refresh();
+	    		//},500,this);
 	        }
-			this.$el.translate(); // 翻译 after content refresh
 			console.log('已描绘完View');
 		},
-		onRefreshComplete:function(){
+		scorllToBottom:function(){
+			if(this.scroll){
+				this.scroll.scrollTo(0,this.scroll.maxScrollY);
+			}
+		},
+		onLoadComplete:function(){ // ajax完调用
 			if(this.$el.find('.pullDown').hasClass('loading')){
 				this.$el.find('.pullDown').removeClass('loading');
 				this.$el.find('.pullDownLabel').html('Pull up to load more...');
 				this.scroll.minScrollY = -40;
+				this.scroll.maxScrollY+=40;
 				this.scroll.resetPosition(300);
 			}
 			if(this.$el.find('.pullUp').hasClass('loading')){
-				this.$el.find('.pullUp').removeClass('loading');
+				this.$el.find('.pullUp').removeClass('loading');//.removeClass('bottomLoading');
 				this.$el.find('.pullUpLabel').html('Pull Down to refresh...');
-				this.scroll.maxScrollY+=this.scroll.maxScrollY-this.maxScrollYOffset;
-				this.scroll.refresh();
+				this.scroll.maxScrollY += this.scroll.maxScrollY -this.maxScrollYOffset;
 			}
-			if (this.scroll) {
-            	this.scroll.refresh();
+			this.$el.translate(); // 加载完新数据要翻译
+            if (this.scroll) {
+				//this.caculateHeight();
+            	//_.delay(function(view){ // view change maybe cost much time 
+	               	if (this.scroll)
+		            	this.scroll.refresh();
+	    		//},500,this);
 	        }
-			this.$el.translate(); // 翻译 after load data
 			console.log('已刷新完View');
 		},
 		onScrollRelease:function(){
@@ -353,29 +346,37 @@ define(deps, function(util) {
 				return;
 			if(this.$el.find('.pullDown').hasClass('flip')){
 				this.trigger('toprefresh');
-				this.$el.find('.pullDown').removeClass('flip').addClass('loading')
+				this.$el.find('.pullDown').removeClass('flip').addClass('loading');
 				this.$el.find('.pullDownLabel').html('Loading.');
 				this.scroll.minScrollY = 0;
+				this.scroll.maxScrollY -=40;
+				this.scroll.refresh();
 			}
 			if(this.$el.find('.pullUp').hasClass('flip')){
 				this.trigger('bottomrefresh');
-				this.$el.find('.pullUp').removeClass('flip').addClass('loading')
+				this.$el.find('.pullUp').removeClass('flip').addClass('loading');//.addClass('bottomLoading');
 				this.$el.find('.pullUpLabel').html('Loading.');
 				this.scroll.maxScrollY = this.scroll.maxScrollY-this.maxScrollYOffset;
+				this.scroll.refresh();
 			}
 		},
 		showPullDownRefreshing:function(action){
-			this.$el.find('.pullDown').removeClass('flip').addClass('loading')
-			this.$el.find('.pullDownLabel').html('Loading.');
-			this.scroll.minScrollY = 0;
-			if(action){
-				this.scroll.scrollTo(0, 0, 300);
+			if(this.$el.find('.pullDown').hasClass('flip')){
+				this.$el.find('.pullDown').removeClass('flip').addClass('loading');
+				this.$el.find('.pullDownLabel').html('Loading.');
+				this.scroll.minScrollY = 0;
+				if(action){
+					this.scroll.scrollTo(0, 0, 300);
+				}
 			}
 		},
 		showPullUpRefreshing:function(action){
-			this.$el.find('.pullUp').removeClass('flip').addClass('loading')
-			this.$el.find('.pullUpLabel').html('Loading.');
-			this.scroll.maxScrollY = this.scroll.maxScrollY-this.maxScrollYOffset;
+			if(this.$el.find('.pullUp').hasClass('flip')){
+				this.$el.find('.pullUp').removeClass('flip').addClass('loading');//.addClass('bottomLoading');
+				this.$el.find('.pullUpLabel').html('Loading.');
+				//this.scroll.maxScrollY = this.scroll.maxScrollY;
+				this.scroll.maxScrollY = this.scroll.maxScrollY-this.maxScrollYOffset;
+			}
 		},
 		onTopBound:function(isTopBound){
 			if(!this.topBound)
@@ -451,6 +452,11 @@ define(deps, function(util) {
 		},
 		getBottomEl:function(){
 			return this.$el.find('.scrollview_bottombar');
+		},
+		scrollToBottom:function(){
+			if(this.scroll){
+				this.scroll.scrollTo(0,this.scroll.maxScrollY);
+			}
 		},
 		remove:function(){
 			this.scrollDestroy();

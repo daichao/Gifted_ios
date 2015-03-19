@@ -3,11 +3,14 @@
  * 
  * 单例
  ******************************************************************************/
-// namespace
-if (typeof Gifted == 'undefined')
-	Gifted = {};
-//================================== Cache ==================================//
-if (!Gifted.Cache)
+ define(['jquery'],function($){
+	// namespace
+	if (typeof Gifted == 'undefined')
+		Gifted = {};
+	//================================== Cache ==================================//
+	if (Gifted.Cache)
+		return Gifted.Cache;
+	//================================== Cache ==================================//
 	Gifted.Cache = {
 		/**
 		 * 下载缓存图片
@@ -22,7 +25,7 @@ if (!Gifted.Cache)
 				var domImg = (typeof domID=='string')?document.getElementById(domID):domID;
 				domImg.style.display = 'block';
 				domImg.src = sourceURL; // network url
-				console.log('下载net图片文件:'+sourceURL);
+				//console.log('下载net图片文件:'+sourceURL);
 				if (callback)
 					callback.call(callback.scope||this, sourceURL);
 				return;
@@ -33,13 +36,11 @@ if (!Gifted.Cache)
 					var domImg = (typeof domID=='string')?document.getElementById(domID):domID;
 					domImg.style.display = 'block';
 					domImg.src = targetURL; // local url
-					//alert('下载cache图片文件到:'+targetURL);
-					console.log('下载cache图片文件到:'+targetURL);
+					//console.log('下载cache图片文件到:'+targetURL);
 					if (callback)
 						callback.call(callback.scope||this, targetURL);
 				},
 				function(error) { // error
-					//alert('下载cache图片出错:'+JSON.stringify(error));
 					console.log("下载cache图片出错:"+JSON.stringify(error));
 				});
 		},
@@ -48,8 +49,9 @@ if (!Gifted.Cache)
 		 * 
 		 * @param sourceURL 目标图片地址
 		 * @param imgID 图片ID
-		 * @parem domID || dom
-		 * @parem callback
+		 * @param domID || dom
+		 * @param callback
+		 * @param override
 		 */
 		localFile : function(sourceURL, imgID, domID, callback, override) {
 			//alert('localFile:'+(typeof LocalFileSystem));
@@ -58,11 +60,11 @@ if (!Gifted.Cache)
 				return;
 			}
 			var scope = this;
-			console.log("将要加载文件系统...");
+			//console.log("将要加载文件系统...");
 			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0,
 				function(fs) { // request filesystem successful
 					var fileSystem = fs;
-					console.log("将要加载根目录:"+Gifted.Config.Cache.dir);
+					//console.log("将要加载根目录:"+Gifted.Config.Cache.dir);
 					fileSystem.root.getDirectory( 
 						Gifted.Config.Cache.dir, // 根目录
 						{ // options
@@ -72,7 +74,7 @@ if (!Gifted.Cache)
 						function(fileEntry) { // create dir successful
 							var hashCode = Gifted.Util.hashCode(imgID);
 							var _hashDir = Gifted.Config.Cache.dir+'/'+hashCode;
-							console.log("将要加载Hash目录:"+_hashDir);
+							//onsole.log("将要加载Hash目录:"+_hashDir);
 							fileSystem.root.getDirectory(
 								_hashDir, // hash目录
 								{ // options
@@ -81,7 +83,7 @@ if (!Gifted.Cache)
 								},
 								function(parentEntry) { // exists 文件存在就直接显示
 									var _localFile = _hashDir+'/'+imgID;
-									console.log("将要加载缓存文件:"+_localFile);
+									//console.log("将要加载缓存文件:"+_localFile);
 									fileSystem.root.getFile(
 										_localFile, // 要查找的本地文件
 										{ // options
@@ -109,7 +111,7 @@ if (!Gifted.Cache)
 												var domImg = (typeof domID=='string')?document.getElementById(domID):domID;
 												domImg.style.display = 'block';
 												domImg.src = targetURL; // local url
-												console.log('找到缓存文件:'+targetURL);
+												//console.log('找到缓存文件:'+targetURL);
 												if (callback)
 													callback.call(callback.scope||scope, targetURL);
 											}
@@ -156,7 +158,7 @@ if (!Gifted.Cache)
 					var hashCode = Gifted.Util.hashCode(imgID);
 					var _hashDir = Gifted.Config.Cache.dir+'/'+hashCode;
 					var _localFile = _hashDir+'/'+imgID;
-					console.log("将要删除文件:"+_localFile);
+					//console.log("将要删除文件:"+_localFile);
 					fileSystem.root.getFile(
 						_localFile, 
 						{ // options
@@ -385,3 +387,5 @@ if (!Gifted.Cache)
 			// doDeleteFile();
 		}*/
 	};
+	return Gifted.Cache;
+});
