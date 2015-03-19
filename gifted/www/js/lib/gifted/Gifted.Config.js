@@ -32,7 +32,7 @@ define([], function() {
 			,{key:'1.1.8.48:8080',url:'http://1.1.8.48:8080/gifted'} // 内部测试用
 			,{key:'1.1.8.45:8080',url:'http://1.1.8.45:8080/gifted'} // 内部测试用
 			,{key:'1.1.8.64:8080',url:'http://1.1.8.64:8080/gifted'} // 内部测试用
-			,{key:'1.1.8.39:8080',url:'http://1.1.8.39:8080/gifted'}
+			,{key:'1.1.8.79:8080',url:'http://1.1.8.79:8080/gifted'}
 		],
 		uploadServerURL : 'http://gifted.5proapp.com', // 测试时读写服务用同一个
 		// "读写分离"的服务器策略(现在默认用"读"服务器来POST)，以后指定到固定的几台"写"服务器上。"写"服务可能是端口不同，并且由客户端自动选择分流。
@@ -46,7 +46,7 @@ define([], function() {
 			,{key:'1.1.8.48:8080',url:'http://1.1.8.48:8080/gifted'} // 内部测试用
 			,{key:'1.1.8.45:8080',url:'http://1.1.8.45:8080/gifted'} // 内部测试用
 			,{key:'1.1.8.64:8080',url:'http://1.1.8.64:8080/gifted'} // 内部测试用
-			,{key:'1.1.8.39:8080',url:'http://1.1.8.39:8080/gifted'}
+			,{key:'1.1.8.79:8080',url:'http://1.1.8.79:8080/gifted'}
 		],
 		serverURL : 'http://gifted.5proapp.com',
 		//emptyImg : 'data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==',
@@ -103,6 +103,7 @@ define([], function() {
 			
 			addFavorite:'/ajax/user/favorite/add', //POST
 			removeFavorite:'/ajax/user/favorite/remove', //POST
+			synchronizeFavorite:'/ajax/user/favorite/synchronize', //POST
 			getFavorites:'/ajax/user/favorites', //GET 能否看他人收藏？
 			
 			addFollowURL:'/ajax/user/follow/add', //POST
@@ -118,6 +119,9 @@ define([], function() {
 		},
 		Message : {
 			sendMessageURL : '/ajax/message/conversation',
+		},
+		Favorite:{
+			localDBTime:"60000"
 		},
 	};
 	//Gifted.Config.uploadServerURL=Gifted.Config.uploadServerList[Math.random()>0.5?1:0].url;

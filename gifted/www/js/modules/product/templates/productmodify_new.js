@@ -65,6 +65,11 @@ define(['css!lib/mobiscroll/css/mobiscroll.custom-2.6.2.min.css',
 						<td colspan="4"><input type="text" name="YXQ_END" class="product_yxq_end product_field product_date" data-highlight="true" \
 							data-theme="a" data-role="date" data-mini="true" placeholder="EndDate Of EffectTime" value="{{YXQ_END}}" required /></td> \
 					</tr> \
+					<tr class="product_modify_date"> \
+						<!--th colspan="1"><label for="DELIVERY_DATE" class="product_label product_label_delivery">&nbsp;&nbsp;~</label></th--> \
+						<td colspan="4"><input type="text" name="DELIVERY_DATE" class="product_delivery_date product_field product_date" data-highlight="true" \
+							data-theme="a" data-role="date" data-mini="true" placeholder="Est. Delivery Date" value="{{DELIVERY_DATE}}" required /></td> \
+					</tr> \
 					<tr class="product_modify_area"> \
 					    <!--th colspan="1"><label for="DESCRIPTION" class="product_label product_label_description" data-translate="Description"></label></th--> \
 						<td colspan="3"><textarea name="DESCRIPTION" class="product_description product_area" data-highlight="true" \

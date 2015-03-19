@@ -237,8 +237,7 @@ define(['modules/user/templates/useredit', 'handlebars', 'gifted.countrycode'],f
 			UserEditView.__super__.remove.apply(this,arguments);
 		},
 	    loadContriesListView:function(){
-	    	var that=this;
-	    	require(['lib/countries'],function(countries){
+	    	require(['lib/countries'],_.bind(function(countries){
 	    		var counties=getCountries();
 	    		var i;
 	    		for(i=0;i<counties.length;i++){
@@ -249,19 +248,19 @@ define(['modules/user/templates/useredit', 'handlebars', 'gifted.countrycode'],f
 	    			}else if(Gifted.Config.Locale.localeName=='zh_CN'){
 	    				name=country.cn_name.trim();
 	    			}
-	    			if(country.IDN.trim()&&that.model.attributes['COUNTRY']==country.IDN.trim()){
+	    			if(country.IDN.trim()&&this.model.attributes['COUNTRY']==country.IDN.trim()){
 	    				option='<option value ="'+country.IDN.trim()+'" phone_prefix="'+country.phone_prefix.trim()+'" selected="selected">'+name.trim()+'</option>'
-	    			}else if(!that.model.attributes['COUNTRY']&&
-	    					that.model.attributes['COUNTRYCODE']==country.phone_prefix.trim()){
+	    			}else if(!this.model.attributes['COUNTRY']&&
+	    					this.model.attributes['COUNTRYCODE']==country.phone_prefix.trim()){
 	    				option='<option value ="'+country.IDN.trim()+'" phone_prefix="'+country.phone_prefix.trim()+'" selected="selected">'+name.trim()+'</option>'
 	    			}else{
 	    				option='<option value ="'+country.IDN.trim()+'" phone_prefix="'+country.phone_prefix.trim()+'">'+name.trim()+'</option>'
 	    			}
-	    			that.$el.find('.useredit_country').append(
+	    			this.$el.find('.useredit_country').append(
 	    				option
     	    		);
 	    		}
-	    	});
+	    	},this));
 	    }
 	});
 	return UserEditView;

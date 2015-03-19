@@ -54,6 +54,7 @@ define(['translate'], function() {
 		'NotInputQDL':'亲，你忘填起定量了',
 		'NotInputYXQ_Start':'亲，你忘填有效期开始时间了',
 		'NotInputYXQ_End':'亲，你忘填有效期结束时间了',
+		'NotInputDELIVERY_DATE':'亲, 你忘记填写预计交货期了',
 		'YXQEndMustLaterThanYXQStart':'亲，有效期的时间填反了',
 		'YXQIsSevenDays':'亲，有效期只能在7天内，我们帮你修正了',
 		'Browse':'浏览',

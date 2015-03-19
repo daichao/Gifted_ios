@@ -2,7 +2,7 @@ define(['moment'],function(monent){
 	var catalogs = TRANSLATE.getCurrentLangItem(null,'CatalogData');
 	Product = Backbone.Model.extend({
 		idAttribute: "ID",
-		dateFields:['YXQ_START','YXQ_END','CREATEDATE','UPDATEDATE'],
+		dateFields:['YXQ_START','YXQ_END','DELIVERY_DATE','CREATEDATE','UPDATEDATE'],
 		urlRoot:Gifted.Config.serverURL+Gifted.Config.Product.loadItemURL,
 		defaults:{
 			NAME:'',
@@ -304,6 +304,9 @@ define(['moment'],function(monent){
 			if (this.isEmtpyValue(this.attributes['YXQ_END'])) {
 				return Gifted.Lang['NotInputYXQ_End'];
 			}
+			if(this.isEmtpyValue(this.attributes['DELIVERY_DATE'])){
+				return Gifted.Lang['NotInputDELIVERY_DATE'];
+			}
 			if (this.attributes['YXQ_END']<this.attributes['YXQ_START']) {
 				return Gifted.Lang['YXQEndMustLaterThanYXQStart'];
 			}
@@ -319,7 +322,7 @@ define(['moment'],function(monent){
 	});
 	ProductDetail = Product.extend({ // 特殊model
 		idAttribute: "ID",
-		dateFields:['YXQ_START','YXQ_END','CREATEDATE','UPDATEDATE'],
+		dateFields:['YXQ_START','YXQ_END','DELIVERY_DATE','CREATEDATE','UPDATEDATE'],
 		urlRoot:Gifted.Config.serverURL+Gifted.Config.Product.loadDetailURL,
 		defaults:{
 			NAME:'',
@@ -378,7 +381,7 @@ define(['moment'],function(monent){
 	    key:'',
 	    sortField:'UPDATEDATE',
 		idAttribute: "ID",
-		dateFields:['YXQ_START','YXQ_END','CREATEDATE','UPDATEDATE'],
+		dateFields:['YXQ_START','YXQ_END','DELIVERY_DATE','CREATEDATE','UPDATEDATE'],
 	    url:Gifted.Config.serverURL+Gifted.Config.Product.loadDataURL,
 		getURL:function(_start,_count) { // 切换server后重新计算
 			this.url = Gifted.Config.serverURL+Gifted.Config.Product.loadDataURL;

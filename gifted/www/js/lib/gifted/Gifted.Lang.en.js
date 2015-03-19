@@ -54,6 +54,7 @@ define(['translate'], function() {
 		'NotInputQDL':'Pro, you forget to fill up the quantitative',
 		'NotInputYXQ_Start':'Pro, you forgot to fill a valid start time',
 		'NotInputYXQ_End':'Pro, you forget to fill a valid end time',
+		'NotInputDELIVERY_DATE':'Pro, you forget to fill a valid delivery date',
 		'YXQEndMustLaterThanYXQStart':'Pro, filled the valid period of time',
 		'YXQIsSevenDays':'Pro, the valid period of time must between 7 days',
 		'Browse':'Browse',

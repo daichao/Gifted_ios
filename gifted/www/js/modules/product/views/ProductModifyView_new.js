@@ -146,13 +146,33 @@ define(['modules/product/templates/productmodify_new','handlebars',
 			    mode: 'scroller' //选择模式
 	    	}).mobiscroll('setValue', this.model.get('CURRENCY'), true); //设置option的checked属性
 	    	var date = new Date();
-	        this.$el.find(".product_date").each(function(){
+	        this.$el.find(".product_yxq_start,.product_yxq_end").each(function(){
 				$(this).mobiscroll('destroy').mobiscroll().date({
 					preset: 'date', //日期
 					theme: deviceIsIOS?'ios':'android-ics light', //皮肤样式
 					display: deviceIsIOS?'bottom':'modal', //显示方式  bottom modal
 					mode: 'scroller', //日期选择模式
 					dateFormat: 'yy-mm-dd', // 日期格式
+					dateOrder: 'yymmdd', //面板中日期排列格式
+					//dayText: '日', monthText: '月', yearText: '年', //面板中年月日文字
+					//setText: '确定', //确认按钮名
+					//cancelText: '取消',//取消按钮名
+					//minYear:date.getFullYear(), // 起始年份
+					//minMonth:date.getMonth()+1, // 起始月份
+					//minDate:date.getDate(), // 起始日期
+					startYear:date.getFullYear(), // 起始年份
+					startMonth:date.getMonth()+1, // 起始月份
+					startDate:date.getDate(), // 起始日期
+					endYear:date.getFullYear()+20 // 结束年份
+		    	});
+			});
+	        this.$el.find(".product_delivery_date").each(function(){
+				$(this).mobiscroll('destroy').mobiscroll().date({
+					preset: 'date', //日期
+					theme: deviceIsIOS?'ios':'android-ics light', //皮肤样式
+					display: deviceIsIOS?'bottom':'modal', //显示方式  bottom modal
+					mode: 'scroller', //日期选择模式
+					dateFormat: 'yy/mm/dd', // 日期格式
 					dateOrder: 'yymmdd', //面板中日期排列格式
 					//dayText: '日', monthText: '月', yearText: '年', //面板中年月日文字
 					//setText: '确定', //确认按钮名

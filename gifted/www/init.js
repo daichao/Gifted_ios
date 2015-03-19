@@ -92,7 +92,7 @@ require(['jquery'],function($, language) { // 重载jquery方法
 		//Gifted.Global.checkStatus(xhr.status);
 		var s = xhr.getResponseHeader('sessionstatus');
  		if (s=='timeout') { // 服务器重启或异常导致session丢失后要触发App登出
- 			Gifted.app.user.logout();
+ 			//Gifted.app.user.logout();//先不要统一处理
  		}
 	});
 	$(document).ajaxSuccess(function(event, xhr, property) {

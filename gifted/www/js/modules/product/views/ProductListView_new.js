@@ -162,7 +162,7 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 			return true; // 图片刷新成功的标记
 		},
 		// private
-	    paintList:function (jsonList, index) {
+	    paintList:function (jsonList, index) {	    	
 	    	//这里需要根据当前产品列的高度计算当前产品应该放到哪个列上
 			var d=this.$el.find('.product_list_columns');
 			//if (loadNew) d.prepend(html); else d.append(html);
@@ -202,8 +202,10 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 				h=heightRule;
 			}*/
 			var len=jsonList.length;
+			var needLoadFavIds=[];
 			for (var i=0;i<len;i++) { // 渲染dom
 				var json=jsonList[i];
+				needLoadFavIds.push(json.ID);
 				if (!json)
 					continue;
 				if (!json.PHOTOURLS || json.PHOTOURLS.length<=0) 
@@ -234,8 +236,15 @@ define(['modules/product/templates/productlist_new','modules/product/templates/p
 				var domImg = domImgs[0];
 				var cw=json._maxListWidth, h=json._maxListHeight;
 				$(domImg).css({width:cw,height:h}); // 占位符*/
-				this.$el.find('.product_image_'+json.ID).css({width:cw,height:h});
+				this.$el.find('.product_image_'+json.ID).css({width:cw,height:h});				
 		 　	}
+			if(needLoadFavIds.length>0){//延迟加载用户喜好
+	    		Gifted.app.user.favorites.loadFavorites(needLoadFavIds.join("/"),_.bind(function(){
+	    			jsonList.forEach(function(json){
+	    				this.addFav(Gifted.app.user.favorites.getFavorite(json.ID));
+	    	    	},this);	
+	    		},this));
+	    	}	 
 		 	for (var i=0;i<len;i++) { // 延迟加载缓存图片
 				var json = jsonList[i];
 				if (!json)

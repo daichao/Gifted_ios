@@ -21,6 +21,7 @@ define(['modules/user/templates/userinfo', 'handlebars'],function(mod0){
 	    },
 		onTopRefresh:function(event){
 			this.loadData();
+			_.delay(_.bind(this.trigger,this,'loadComplete'),1000);
 		},
 		edit : function(){
 			this.app.navigate('user/useredit', {trigger:true});

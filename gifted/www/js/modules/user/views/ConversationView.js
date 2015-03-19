@@ -12,8 +12,6 @@ define(['modules/user/templates/conversation', 'handlebars'],function(mod0){
 			this.model.messageList.on('add',this.addMessage,this);
 			this.model.on('sendSuccess',this.sendSuccess,this);
 			this.on('toprefresh',this.onTopRefresh,this);
-			this.on('loadHistorySuccess',this.loadComplete,this);
-			this.on('loadHistoryError',this.loadComplete,this);
 			Gifted.View.prototype.initialize.apply(this,arguments);
 	    },
 		events : {
@@ -33,10 +31,7 @@ define(['modules/user/templates/conversation', 'handlebars'],function(mod0){
 				return;
 			}
 			this.loadHistory(20);//默认一次最多加载20条消息
-		},
-		loadComplete : function(){
 			_.delay(_.bind(this.trigger,this,'loadComplete'),1000);
-			//this.trigger('loadComplete');
 		},
 		loadHistory : function(count){
 			var firstMessage = this.model.messageList.at(0);
@@ -47,7 +42,6 @@ define(['modules/user/templates/conversation', 'handlebars'],function(mod0){
 				messageId = firstMessage.get('MESSAGEID');
 			}
 			if(!messageId){
-				this.loadComplete();
 				return;//从来没发过消息
 			}
 			this.model.loadHistory(messageId,count);

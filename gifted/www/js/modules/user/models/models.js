@@ -57,7 +57,8 @@ define([],function(){
 			this.setAttributes(params[0],params[1]);
 			this.off('change:IMTOKEN',this.conversationList.startListening,this.conversationList);
 			this.on('change:IMTOKEN',this.conversationList.startListening,this.conversationList);
-			this.getIMToken();
+			this.getIMToken();		
+			Gifted.app.user.favorites.doSomethingAfterLogin();
 		},
 		/*regetIMToken:function() {
 			if (!this.get('IMTOKEN'))
@@ -264,6 +265,8 @@ define([],function(){
 					this.trigger('logoutError',{'errorCode':xhr.status,'errorInfo':xhr.responseText})
 				},this)
 			});
+			//用户登出的时候将favorite和服务器同步一次
+			Gifted.app.user.favorites.startSynchronizeWithService(false);
 		},
 		logoutComplete:function(){
 			var db = Gifted.Global.getDatabase('alluser');
@@ -824,21 +827,101 @@ define([],function(){
 	});
 	FavoritesCollection = Backbone.Collection.extend({
 		model: FavoriteModel,
+		isDataSynchronised : true,//是否已经和服务器同步
 		initialize : function(models,options){
 			this.on('change',this.onItemChange,this);
 			this.on('add',this.onItemChange,this);
 		},
+		doSomethingAfterLogin:function(){
+			this.createFavoriteDB();	
+			this.startSynchronizeWithService(true);//开启favorite与service同步的轮循
+		},
 		onItemChange:function(model){
 			this.trigger('favoritechange:' + model.get(model.idAttribute),model);
 		},
-		loadFavorites : function(productIds){
+		dropFavoriteDB:function() {
+			var db = Gifted.Global.getDatabase('alluser');
+			db.transaction(
+			    function createUserTable(tx) {//删除喜好表
+			    	var sql = 'DROP TABLE IF EXISTS favorite_product';
+			    	console.log(sql);
+			    	tx.executeSql(sql);
+			    }
+		    );
+		},
+		createFavoriteDB:function() {
+			var db = Gifted.Global.getDatabase('alluser');
+			db.transaction(
+			    function createUserTable(tx) {//创建喜好表
+			    	sql = 'CREATE TABLE IF NOT EXISTS favorite_product (USERID,PRODUCTID,FAVORITING,PUBLISHERID)';
+			    	console.log(sql);
+			        tx.executeSql(sql);
+			    }
+		    );
+		},
+		//private
+		innerLoadFavorites:function(productIds,callback){//先从localDB读取数据，如果读不到再到服务器读取	
+			var db = Gifted.Global.getDatabase('alluser');
+			var queryStr='select * from favorite_product';
+			var paras=[];
+			db.transaction(
+			    	_.bind(function selectFavorite(tx){
+			    		tx.executeSql(queryStr,paras,_.bind(function(tx,results){
+			    			var ids=productIds.length>0?productIds.split("/"):[];
+			    			var localIds=[];
+			    			var remainIds=[];
+			    			var i;
+			    			for(i=0;i<results.rows.length;i++){
+			    				var item=results.rows.item(i);
+			    				localIds.push(item.PRODUCTID);
+			    				this.add([ {
+			    					FAVORITING : item.FAVORITING=='true',
+			    					PRODUCTID : item.PRODUCTID
+			    				} ], {
+			    					merge : true
+			    				});
+			    			}	
+			    			ids.forEach(function(id){
+			    				if(localIds.indexOf(id)<0){
+			    					remainIds.push(id);
+			    				}			    				
+			    			});
+			    			if(remainIds.length>0){
+			    				this.loadFavoritesFromRemote(remainIds.join("/"),callback);//从远程服务器加载数据
+			    			}else if(callback){
+			    				callback();
+			    			}		    			
+			    		},this));
+			    	},this)
+			 );
+			
+		},
+		//private
+		persistence2localDB:function(productIds){
+			var userid=Gifted.app.user.attributes['ID'];
+			var db = Gifted.Global.getDatabase('alluser');
+			productIds.forEach(function(id){
+				if(this.getFavorite(id)){
+					var favoriting=this.getFavorite(id).attributes.FAVORITING;
+					var productid=this.getFavorite(id).attributes.PRODUCTID;
+					var publishid=this.getFavorite(id).attributes.PUBLISHID;
+					this.insertOrUpdateFavoriteBy(userid,productid,favoriting,publishid);
+				}				
+			},this);
+		},
+		//private
+		loadFavoritesFromRemote:function(productIds,callback){
 			var url = Gifted.Config.serverURL+Gifted.Config.User.getFavorites+'?GIFTED_SESSIONID='+Gifted.Global.getSessionId()
-				+'&IDS='+productIds; // 跨域URL
+			+'&IDS='+productIds; // 跨域URL
 			this.fetch({
 				url : url,
 				remove: false,
 				success : _.bind(function(json) {
-					
+					this.persistence2localDB(productIds.split("/"));//将新加载的数据持久化的localDB
+					this.isDataSynchronised=false;
+					if(callback){
+						callback();
+					}					
 				},this),
 				error : function(json, xhr) { // jsonp 方式此方法不被触发
 					if(401 == xhr.status){
@@ -849,52 +932,168 @@ define([],function(){
 				}
 			});
 		},
+		recoverFavorites : function(){
+			this.loadFavorites('');
+		},
+		//public
+		loadFavorites : function(productIds,callback){	
+			this.innerLoadFavorites(productIds,callback);//调用新的api
+		},
 		getFavorite : function(productId){
 			return this.get(productId);
 		},
-		addFavorite : function(productID,publisherId){
-			params = {GIFTED_SESSIONID:Gifted.Global.getSessionId(),
-						PRODUCTID:productID,
-						PUBLISHERID:publisherId};
+		startSynchronizeWithService:function(isCircle){
+			if(!this.isDataSynchronised&&//如果未同步
+					Gifted.app.checkRight({trigger:false,checkRule:['LOGIN']})){//并且已经登录
+				var db = Gifted.Global.getDatabase('alluser');
+				db.transaction(
+				    	_.bind(function selectFavorite(tx){
+				    		tx.executeSql('select * from favorite_product',[],_.bind(this.synchronizeResults,this));
+				    	},this)
+				 );
+				this.isDataSynchronised=true;
+			}	
+			if(isCircle){
+				setTimeout(
+						_.bind(function(){this.startSynchronizeWithService(isCircle);}								,
+								this
+						),
+						Gifted.Config.Favorite.localDBTime
+					);
+			}			
+		},
+		//private
+		synchronizeResults:function(tx,results){
+			var realUrl=Gifted.Config.serverURL + Gifted.Config.User.synchronizeFavorite;
+			var allFavoriteData=[];
+			var i;
+			for(i=0;i<results.rows.length;i++){
+				var item=results.rows.item(i);
+				allFavoriteData.push({
+					PRODUCTID : item.PRODUCTID,
+					PUBLISHERID : item.PUBLISHERID,
+					FAVORITING : item.FAVORITING
+				});					
+			}	
+			params = {
+					GIFTED_SESSIONID : Gifted.Global.getSessionId(),
+					allFavoriteData:JSON.stringify(allFavoriteData)
+			};
 			$.ajax({
 				//useBody:true,
 				async : true,
-				url : Gifted.Config.serverURL + Gifted.Config.User.addFavorite, // 跨域URL
+				url : realUrl, // 跨域URL
 				type : 'post',
 				dataType : 'json',
 				data : params,
 				timeout : 5000,
 				success : _.bind(function(json) { // 客户端jquery预先定义好的callback函数，成功获取跨域服务器上的json数据后，会动态执行这个callback函数
-					this.add([json],{merge:true});
+//					this.add([json],{merge:true});
 				},this),
 				error : function(xhr, info) { // jsonp 方式此方法不被触发
 					if(401 == xhr.status){
 						//Backbone.history.navigate('user/useredit',{trigger:true});
+//						Gifted.Global.alert('synchronize error');
+						console.log('synchronize error');
 					}
 				}
 			});
 		},
-		removeFavorite : function(productID,publisherId){
-			params = {GIFTED_SESSIONID:Gifted.Global.getSessionId(),
-						PRODUCTID:productID,
-						PUBLISHERID:publisherId};
-			$.ajax({
-				//useBody:true,
-				async : true,
-				url : Gifted.Config.serverURL + Gifted.Config.User.removeFavorite, // 跨域URL
-				type : 'post',
-				dataType : 'json',
-				data : params,
-				timeout : 5000,
-				success : _.bind(function(json) { // 客户端jquery预先定义好的callback函数，成功获取跨域服务器上的json数据后，会动态执行这个callback函数
-					this.add([json],{merge:true});
-				},this),
-				error : function(xhr, info) { // jsonp 方式此方法不被触发
-					if(401 == xhr.status){
-						//Backbone.history.navigate('user/useredit',{trigger:true});
-					}
-				}
+		insertOrUpdateFavoriteBy:function(userID,productID,FAVORITING,PUBLISHERID){
+			var db = Gifted.Global.getDatabase('alluser');
+			var innerWork=function(tx,results){
+		    	var length = results.rows.length;
+		    	if(length == 0){// 没有相对用户和产品的favorite
+		    		db.transaction(
+		    				_.bind(function(tx){
+		    					tx.executeSql('insert into favorite_product (USERID,PRODUCTID,FAVORITING,PUBLISHERID)' +
+		    							'values(?,?,?,?) ',
+		    							[userID,productID,FAVORITING,PUBLISHERID])
+		    				},this),
+		    				function(err){
+		    					Gifted.Global.alert(err.message);
+		    				}
+		    			);
+		    	}else if(length ==  1){//
+		    		db.transaction(
+		    				_.bind(function(tx){
+		    					tx.executeSql('update favorite_product set FAVORITING=?,PUBLISHERID=?' +
+		    							' where  USERID=? and PRODUCTID=?',
+		    							[FAVORITING,PUBLISHERID,userID,productID])
+		    				},this),
+		    				function(err){
+		    					Gifted.Global.alert(err.message);
+		    				}
+		    			);
+		    	}else{// TODO
+		    		console.log("favorite_db_error!");
+		    	}
+			};			
+		    db.transaction(
+		    	_.bind(function selectFavorite(tx){
+		    		tx.executeSql('select * from favorite_product where USERID=? and PRODUCTID=?',[userID,productID],_.bind(innerWork,this));
+		    	},this)
+		    );
+		},
+		addFavorite : function(productID,publisherId){		
+			this.insertOrUpdateFavoriteBy(Gifted.app.user.attributes['ID'],productID,true,publisherId);
+			this.isDataSynchronised=false;//本地数据库变动，标记集合为未和服务器同步
+			this.add([ {
+				FAVORITING : true,
+				PRODUCTID : productID
+			} ], {
+				merge : true
 			});
+//			params = {GIFTED_SESSIONID:Gifted.Global.getSessionId(),
+//			PRODUCTID:productID,
+//			PUBLISHERID:publisherId};
+//			$.ajax({
+//				//useBody:true,
+//				async : true,
+//				url : Gifted.Config.serverURL + Gifted.Config.User.addFavorite, // 跨域URL
+//				type : 'post',
+//				dataType : 'json',
+//				data : params,
+//				timeout : 5000,
+//				success : _.bind(function(json) { // 客户端jquery预先定义好的callback函数，成功获取跨域服务器上的json数据后，会动态执行这个callback函数
+//					this.add([json],{merge:true});
+//				},this),
+//				error : function(xhr, info) { // jsonp 方式此方法不被触发
+//					if(401 == xhr.status){
+//						//Backbone.history.navigate('user/useredit',{trigger:true});
+//					}
+//				}
+//			});
+		},
+		removeFavorite : function(productID,publisherId){			
+			this.insertOrUpdateFavoriteBy(Gifted.app.user.attributes['ID'],productID,false,publisherId);
+			this.isDataSynchronised=false;//本地数据库变动，标记集合为未和服务器同步
+			this.add([ {
+				FAVORITING : false,
+				PRODUCTID : productID
+			} ], {
+				merge : true
+			});
+//			params = {GIFTED_SESSIONID:Gifted.Global.getSessionId(),
+//						PRODUCTID:productID,
+//						PUBLISHERID:publisherId};
+//			$.ajax({
+//				//useBody:true,
+//				async : true,
+//				url : Gifted.Config.serverURL + Gifted.Config.User.removeFavorite, // 跨域URL
+//				type : 'post',
+//				dataType : 'json',
+//				data : params,
+//				timeout : 5000,
+//				success : _.bind(function(json) { // 客户端jquery预先定义好的callback函数，成功获取跨域服务器上的json数据后，会动态执行这个callback函数
+//					this.add([json],{merge:true});
+//				},this),
+//				error : function(xhr, info) { // jsonp 方式此方法不被触发
+//					if(401 == xhr.status){
+//						//Backbone.history.navigate('user/useredit',{trigger:true});
+//					}
+//				}
+//			});			
 		},
 		clear : function(){
 			while(this.size()>0)
